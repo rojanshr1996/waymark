@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { width: 100vw; margin: 0; padding: 0; } body { overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-error": "#ffffff", "on-tertiary-container": "#fffbff", "on-error-container": "#93000a", "on-secondary-fixed": "#002110", "surface-card": "#FFFFFF", "text-secondary": "#6C757D", "error": "#ba1a1a", "on-surface-variant": "#57423f", "surface-canvas": "#FBF9F5", "surface-variant": "#dfe4df", "inverse-on-surface": "#edf2ed", "primary-fixed-dim": "#ffb4a8", "on-primary-fixed": "#410000", "on-primary-fixed-variant": "#82261b", "background": "#f6fbf5", "surface-container-lowest": "#ffffff", "secondary": "#286a46", "surface": "#f6fbf5", "outline": "#8a716e", "surface-dim": "#d7dbd6", "tertiary-fixed-dim": "#ffba27", "primary": "#9f3b2e", "outline-variant": "#ddc0bb", "route-start": "#3B82F6", "error-container": "#ffdad6", "surface-container-highest": "#dfe4df", "tertiary-container": "#996c00", "surface-container-low": "#f0f5f0", "on-tertiary-fixed": "#271900", "tertiary-fixed": "#ffdea9", "secondary-fixed": "#adf2c3", "on-surface": "#181d1a", "on-secondary-container": "#2f704b", "inverse-surface": "#2c322e", "on-secondary": "#ffffff", "surface-bright": "#f6fbf5", "primary-fixed": "#ffdad4", "on-primary": "#ffffff", "forest-vivid": "#38B000", "tertiary": "#7a5500", "on-secondary-fixed-variant": "#065230", "inverse-primary": "#ffb4a8", "surface-container": "#ebefea", "secondary-fixed-dim": "#92d5a8", "on-tertiary-fixed-variant": "#5e4100", "surface-container-high": "#e5e9e4", "route-end": "#F43F5E", "route-mid": "#8B5CF6", "on-primary-container": "#fffbff", "on-tertiary": "#ffffff", "primary-container": "#bf5343", "on-background": "#181d1a", "secondary-container": "#adf2c3", "surface-tint": "#a23d30", "border-divider": "#E9ECEF" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-lg": "1.5rem", "space-2xl": "3rem", "space-xl": "2rem", "space-xs": "0.5rem", "space-sm": "0.75rem", "margin-desktop": "2.5rem", "margin-tablet": "1.5rem", "space-md": "1rem", "gutter-desktop": "1.5rem", "gutter": "1rem", "space-2xs": "0.25rem", "margin": "1rem" }, fontFamily: { "headline-sm": ["Outfit"], "body-lg": ["Inter"], "caption": ["Inter"], "display-md": ["Outfit"], "body-md": ["Inter"], "display-lg-mobile": ["Outfit"], "headline-lg": ["Outfit"], "display-lg": ["Outfit"], "label-sm": ["Inter"], "body-sm": ["Inter"], "headline-md": ["Outfit"], "label-md": ["Inter"] }, fontSize: { "headline-sm": ["16px", { lineHeight: "22px", letterSpacing: "0em", fontWeight: "600" }], "body-lg": ["16px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "400" }], "caption": ["10px", { lineHeight: "12px", letterSpacing: "0.04em", fontWeight: "500" }], "display-md": ["36px", { lineHeight: "44px", letterSpacing: "-0.015em", fontWeight: "600" }], "body-md": ["14px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }], "display-lg-mobile": ["32px", { lineHeight: "38px", letterSpacing: "-0.015em", fontWeight: "600" }], "headline-lg": ["28px", { lineHeight: "34px", letterSpacing: "-0.01em", fontWeight: "600" }], "display-lg": ["44px", { lineHeight: "52px", letterSpacing: "-0.02em", fontWeight: "600" }], "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.03em", fontWeight: "500" }], "body-sm": ["13px", { lineHeight: "18px", letterSpacing: "0em", fontWeight: "400" }], "headline-md": ["20px", { lineHeight: "26px", letterSpacing: "0em", fontWeight: "700" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }] } } } };</script></head><body class="bg-surface-canvas text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-canvas/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-16 px-margin flex items-center justify-between"><div class="flex items-center gap-space-xs"><div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[20px]">explore</span></div><div class="flex flex-col"><div class="flex items-center gap-space-2xs"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">WayMark</span><span class="font-caption text-caption text-text-secondary">•</span><span class="font-headline-sm text-headline-sm text-primary tracking-tight">Studio</span></div><div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-forest-vivid animate-pulse"></span><span class="font-caption text-caption text-secondary font-medium tracking-wide uppercase">Drift Synced</span></div></div></div><div class="flex items-center gap-space-xs"><button aria-label="Notifications" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-full hover:bg-surface-variant/40"><span class="material-symbols-outlined text-[22px]">notifications</span></button><a class="w-11 h-11 flex items-center justify-center" data-path="profile" href="#"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-[0_2px_8px_rgba(31,36,33,0.08)]" src="https://lh3.googleusercontent.com/aida/AEtjO1UqlIz9IWXqapE7oHDgxPCtzbbpkCrYWbD1B5QygVi278h1CWy7GISHZb-TR1jITJkr6m7-rxd3amkKWFP5i2flxeKwoS39OD2zAV5dJlVL4uK5mHULtM_IrL7WUv2gawsArdAIkCn4d8lqvn5O67q7UGmCT7S5euqQMAq8SUfDqV6TqEx-lromIq4KiPSqM_zrTefS_WbYjm-OLbXo4xYPBw_4cxVTuUa7i-gzXqk-EYIQGWPHv0ttTQk"/></a></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface-canvas"><div class="flex flex-col w-full">
+<div class="flex items-center justify-between px-space-md py-space-xs mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<button aria-label="Go back" class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">Artistic Postcard Studio</span>
+<span class="font-caption text-caption text-secondary font-medium uppercase tracking-wider">Kansai Memoir • Oct 2026</span>
+</div>
+</div>
+<button class="flex items-center gap-1.5 px-space-sm py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-md hover:bg-primary-container active:scale-95 transition-all" id="quick-export-btn" type="button">
+<span class="material-symbols-outlined text-[16px]">download</span>
+<span>Export (3x PNG)</span>
+</button>
+</div>
+<div class="px-space-md flex flex-col items-center">
+<div class="w-full flex items-center justify-between mb-space-2xs text-text-secondary px-space-2xs">
+<span class="font-caption text-caption uppercase tracking-widest flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-tertiary">palette</span>
+        Live Render Boundary
+      </span>
+<span class="font-caption text-caption text-secondary font-medium flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-forest-vivid inline-block"></span>
+        GPU 60fps
+      </span>
+</div>
+<div class="w-full max-w-sm transition-all duration-300 relative" id="postcard-viewport">
+<div class="w-full bg-surface-canvas rounded-xl shadow-xl overflow-hidden flex flex-col p-4 relative select-none" id="postcard-canvas">
+<div class="absolute inset-2 border-2 border-dashed border-outline-variant/60 rounded-lg pointer-events-none z-20"></div>
+<div class="flex items-center justify-between pb-2 border-b border-outline-variant/40 relative z-10">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary tracking-wider uppercase font-bold">WayMark Journey Postcard</span>
+<span class="font-caption text-caption text-text-secondary tracking-widest uppercase">Kyoto • Nara • Osaka • Oct 2026</span>
+</div>
+<div class="flex items-center gap-1 px-2 py-1 bg-surface-card rounded-md shadow-sm">
+<span class="material-symbols-outlined text-[15px] text-primary">verified</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">NO. 849</span>
+</div>
+</div>
+<div class="mt-3 relative w-full h-36 rounded-lg overflow-hidden shadow-sm bg-surface-container-low transition-all duration-200" id="postcard-map-container">
+<div class="w-full h-full bg-cover bg-center filter grayscale contrast-125 opacity-40" data-location="Kyoto, Japan" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDLcklfAEXnMvJRKUzL0Sx2fLJVCpayczziOYXLKY3H8ujiaoOzh8kXr15evTPWIMwLQFaV7KmKW5FPFYJyM0YLnkPKa0GZJMKFoD2lfZoUsQxxqCHBT_1s8biNslcHog0IhDxhnFlTjC8dfWJRt9Tu99InbFcr9w2EozGEqkwPK09kIiP0-GS8YMTj1_F3WMa94Iew9WVza2tX9Us9JaKPMSW42shqEUbIoX_p9weVY14MnykRJlox')"></div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none z-10" fill="none" viewbox="0 0 320 144">
+<path d="M 50,110 C 100,85 130,40 180,65 C 220,85 240,45 280,30" stroke="#9f3b2e" stroke-dasharray="4 3" stroke-linecap="round" stroke-width="2.5"></path>
+<circle cx="50" cy="110" fill="#3B82F6" fill-opacity="0.2" r="10"></circle>
+<circle cx="50" cy="110" fill="#3B82F6" r="5"></circle>
+<text fill="#181d1a" font-family="Outfit" font-size="9" font-weight="600" text-anchor="middle" x="50" y="132">A: Osaka</text>
+<circle cx="180" cy="65" fill="#8B5CF6" fill-opacity="0.2" r="10"></circle>
+<circle cx="180" cy="65" fill="#8B5CF6" r="5"></circle>
+<text fill="#181d1a" font-family="Outfit" font-size="9" font-weight="600" text-anchor="middle" x="180" y="87">B: Nara Deer</text>
+<circle cx="280" cy="30" fill="#F43F5E" fill-opacity="0.2" r="10"></circle>
+<circle cx="280" cy="30" fill="#F43F5E" r="5"></circle>
+<text fill="#181d1a" font-family="Outfit" font-size="9" font-weight="600" text-anchor="middle" x="280" y="20">C: Kyoto</text>
+</svg>
+<div class="absolute top-2 left-2 z-20 flex items-center gap-1 bg-surface-card/90 backdrop-blur-sm px-2 py-0.5 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-[12px] text-route-start">near_me</span>
+<span class="font-caption text-caption text-on-surface font-medium">GPS Drift Verified</span>
+</div>
+</div>
+<div class="relative mt-4 mb-3 h-44 w-full flex items-center justify-center" id="polaroid-stage">
+<div class="polaroid-item absolute -left-1 top-1 w-44 p-2 bg-surface-card rounded-md shadow-xl transform -rotate-3 transition-transform duration-200 hover:rotate-0 hover:scale-105 hover:z-30 cursor-pointer">
+<div class="w-full h-24 overflow-hidden rounded bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Traditional vermilion Japanese Torii gates tunnel at Fushimi Inari Taisha shrouded in soft morning mist, sunbeams filtering through ancient cedar trees, captured in warm Kodachrome vintage tones with soft shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9iNYgpsfec6aYzV8ItBo9-bifqz9GULLv00NSyQhak-wlwQ2opTqqJgmxdDPMBLCYGEcGuq84j8XXI5dWXcpOncAro63FKuygG6jSXQ3rbUNjR0CT9tM5uvdPu7Qyfq5JvoJp-Oyc-svUDV1GPnvFVjW89Vc8zpjZ4JpPttPAjbLV4A2Juv_e7WLzKhJXuztgatsC7gdpRzLdRnoHqCvRBS0eDWbW1Iz8Vtsk1dh7BAGCtnVDgzFC"/>
+</div>
+<div class="pt-2 pb-1 px-1 flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface text-[13px] leading-tight">Fushimi Inari Torii</span>
+<span class="font-body-sm text-body-sm text-text-secondary text-[11px] italic">Morning mist at 1,000 gates</span>
+</div>
+</div>
+<div class="polaroid-item absolute -right-1 top-3 w-44 p-2 bg-surface-card rounded-md shadow-xl transform rotate-3 transition-transform duration-200 hover:rotate-0 hover:scale-105 hover:z-30 cursor-pointer">
+<div class="w-full h-24 overflow-hidden rounded bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Gentle Sika deer bowing respectfully under golden autumn maple leaves at Nara deer park, warm dappled sunlight, soft focus bokeh background with ancient temple eaves in warm tactile aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPYYboJU4n-SW0Pnj9wN7iR7Kk11f0IdscYY-kFVOoA-6qMPvyRuQHBmpmY_f4WIV5e8MXbhrCwvhyqWXxSXA-Yv_b26z8X6mMN7T8niDJSlp12F1fewNvNSBVRFzj0UhR-gjlxNFlXEWWs3pI6ykG8wyCWpefV81PY0xnd3yOVxPIwFaI3JbenxUDC_BRdSyujaH_AmwzNzDZv1ALXXErzWPVFy1HVt70NNLBzkm-H9iTZ-7lBYjw"/>
+</div>
+<div class="pt-2 pb-1 px-1 flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface text-[13px] leading-tight">Nara Deer Sanctuary</span>
+<span class="font-body-sm text-body-sm text-text-secondary text-[11px] italic">Friendly companions in the grove</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-1.5 p-2 bg-surface-card rounded-lg shadow-sm mb-3">
+<div class="flex flex-col items-center text-center">
+<span class="font-caption text-caption text-text-secondary uppercase">Dist</span>
+<span class="font-headline-sm text-headline-sm text-[13px] text-primary">142.8 km</span>
+</div>
+<div class="flex flex-col items-center text-center">
+<span class="font-caption text-caption text-text-secondary uppercase">Stops</span>
+<span class="font-headline-sm text-headline-sm text-[13px] text-on-surface">8 Marks</span>
+</div>
+<div class="flex flex-col items-center text-center">
+<span class="font-caption text-caption text-text-secondary uppercase">Duration</span>
+<span class="font-headline-sm text-headline-sm text-[13px] text-on-surface">5 Days</span>
+</div>
+<div class="flex flex-col items-center text-center">
+<span class="font-caption text-caption text-text-secondary uppercase">Elevation</span>
+<span class="font-headline-sm text-headline-sm text-[13px] text-secondary">340m</span>
+</div>
+</div>
+<div class="flex items-center justify-between px-2.5 py-1.5 bg-surface-container-low rounded-md mb-3 transition-all" id="weather-banner">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">wb_sunny</span>
+<span class="font-label-sm text-label-sm text-on-surface">Avg 21°C • Mild Autumn Drift</span>
+</div>
+<span class="font-caption text-caption text-text-secondary">EXIF Synced</span>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-outline-variant/40">
+<div class="flex items-center gap-2">
+<div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px] uppercase border border-primary/20">
+              WM
+            </div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">WayMark Travel Memoir</span>
+<span class="font-caption text-caption text-text-secondary">Verified Local Drift Store • SHA-256</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 bg-surface-card p-1 rounded border border-outline-variant/30">
+<svg class="w-6 h-6 text-on-surface" fill="currentColor" viewbox="0 0 24 24">
+<path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14-2h4v2h-4v-2zm-4 0h2v4h-2v-4zm4 4h4v4h-4v-4zm-2 2h2v2h-2v-2zm-2-2h2v2h-2v-2z"></path>
+</svg>
+<span class="font-caption text-caption text-[8px] leading-tight text-text-secondary">SCAN<br/>DRIFT</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="px-space-md mt-space-md flex flex-col gap-space-sm pb-6">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">style</span>
+        Postcard Aesthetic Style
+      </label>
+<div class="grid grid-cols-3 gap-1 bg-surface-container-high p-1 rounded-full text-center">
+<button class="style-toggle py-1.5 px-2 rounded-full font-label-sm text-label-sm bg-surface-card text-primary font-bold shadow-sm transition-all" id="style-vintage" type="button">
+          Vintage Journal
+        </button>
+<button class="style-toggle py-1.5 px-2 rounded-full font-label-sm text-label-sm text-text-secondary hover:text-on-surface transition-all" id="style-minimal" type="button">
+          Minimal Modern
+        </button>
+<button class="style-toggle py-1.5 px-2 rounded-full font-label-sm text-label-sm text-text-secondary hover:text-on-surface transition-all" id="style-cyber" type="button">
+          Cyber Glow
+        </button>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">aspect_ratio</span>
+        Export Canvas Ratio
+      </label>
+<div class="flex items-center gap-2">
+<button class="ratio-btn flex-1 py-1.5 px-3 rounded-xl bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center gap-1.5 shadow-sm transition-all" id="ratio-story" type="button">
+<span class="material-symbols-outlined text-[14px]">smartphone</span>
+<span>9:16 Story</span>
+</button>
+<button class="ratio-btn flex-1 py-1.5 px-3 rounded-xl bg-surface-container text-on-surface hover:bg-surface-container-high font-label-sm text-label-sm flex items-center justify-center gap-1.5 transition-all" id="ratio-feed" type="button">
+<span class="material-symbols-outlined text-[14px]">crop_5_4</span>
+<span>4:5 Feed</span>
+</button>
+<button class="ratio-btn flex-1 py-1.5 px-3 rounded-xl bg-surface-container text-on-surface hover:bg-surface-container-high font-label-sm text-label-sm flex items-center justify-center gap-1.5 transition-all" id="ratio-square" type="button">
+<span class="material-symbols-outlined text-[14px]">crop_square</span>
+<span>1:1 Square</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-1.5 bg-surface-card p-3 rounded-xl shadow-sm">
+<span class="font-label-sm text-label-sm text-text-secondary uppercase tracking-wider mb-1">Canvas Elements &amp; Layers</span>
+<div class="flex items-center justify-between py-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">polyline</span>
+<span class="font-body-md text-body-md text-on-surface">Show Map Route Polyline</span>
+</div>
+<input checked="" class="w-5 h-5 accent-primary cursor-pointer rounded" id="toggle-map" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between py-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-tertiary">wb_sunny</span>
+<span class="font-body-md text-body-md text-on-surface">Show Weather &amp; Ambient Data</span>
+</div>
+<input checked="" class="w-5 h-5 accent-primary cursor-pointer rounded" id="toggle-weather" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between py-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">photo_library</span>
+<span class="font-body-md text-body-md text-on-surface">Photo Layout</span>
+</div>
+<button class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high transition-colors" id="grid-toggle-btn" type="button">
+          2 Polaroids (Duo)
+        </button>
+</div>
+</div>
+<div class="flex flex-col gap-2 mt-2">
+<button class="w-full py-3.5 px-space-md rounded-full bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-[0_12px_28px_rgba(226,109,92,0.28)] hover:bg-primary-container active:scale-[0.98] transition-all" id="save-gallery-btn" type="button">
+<span class="material-symbols-outlined text-[20px]">save_alt</span>
+<span>Save to Gallery (3x Retina PNG)</span>
+</button>
+<button class="w-full py-3 px-space-md rounded-full bg-secondary-container text-on-secondary-container font-headline-sm text-headline-sm flex items-center justify-center gap-2 hover:bg-secondary hover:text-on-secondary transition-all active:scale-[0.98]" id="share-postcard-btn" type="button">
+<span class="material-symbols-outlined text-[20px]">ios_share</span>
+<span>Share Postcard (Instagram / AirDrop)</span>
+</button>
+</div>
+</div>
+<div class="fixed top-20 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-inverse-surface text-inverse-on-surface rounded-full shadow-lg font-label-md text-label-md flex items-center gap-2 opacity-0 pointer-events-none transition-opacity duration-300 z-50" id="toast">
+<span class="material-symbols-outlined text-[18px] text-forest-vivid">check_circle</span>
+<span id="toast-text">Postcard saved to local gallery!</span>
+</div>
+</div>
+<script>
+  (() => {
+    const canvas = document.getElementById('postcard-canvas');
+    const viewport = document.getElementById('postcard-viewport');
+    const mapContainer = document.getElementById('postcard-map-container');
+    const weatherBanner = document.getElementById('weather-banner');
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toast-text');
+
+    const showToast = (msg) => {
+      toastText.textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2400);
+    };
+
+    const styleVintage = document.getElementById('style-vintage');
+    const styleMinimal = document.getElementById('style-minimal');
+    const styleCyber = document.getElementById('style-cyber');
+    const styleToggles = [styleVintage, styleMinimal, styleCyber];
+
+    const resetStyleBtns = () => {
+      styleToggles.forEach(btn => {
+        btn.className = 'style-toggle py-1.5 px-2 rounded-full font-label-sm text-label-sm text-text-secondary hover:text-on-surface transition-all';
+      });
+    };
+
+    styleVintage.addEventListener('click', () => {
+      resetStyleBtns();
+      styleVintage.className = 'style-toggle py-1.5 px-2 rounded-full font-label-sm text-label-sm bg-surface-card text-primary font-bold shadow-sm transition-all';
+      canvas.className = 'w-full bg-surface-canvas rounded-xl shadow-xl overflow-hidden flex flex-col p-4 relative select-none';
+      showToast('Switched to Vintage Journal layout');
+    });
+
+    styleMinimal.addEventListener('click', () => {
+      resetStyleBtns();
+      styleMinimal.className = 'style-toggle py-1.5 px-2 rounded-full font-label-sm text-label-sm bg-surface-card text-primary font-bold shadow-sm transition-all';
+      canvas.className = 'w-full bg-surface-card rounded-xl shadow-xl overflow-hidden flex flex-col p-4 relative select-none';
+      showToast('Switched to Minimal Modern layout');
+    });
+
+    styleCyber.addEventListener('click', () => {
+      resetStyleBtns();
+      styleCyber.className = 'style-toggle py-1.5 px-2 rounded-full font-label-sm text-label-sm bg-surface-card text-primary font-bold shadow-sm transition-all';
+      canvas.className = 'w-full bg-surface-container-high rounded-xl shadow-xl overflow-hidden flex flex-col p-4 relative select-none';
+      showToast('Switched to Cyber Glow layout');
+    });
+
+    const ratioStory = document.getElementById('ratio-story');
+    const ratioFeed = document.getElementById('ratio-feed');
+    const ratioSquare = document.getElementById('ratio-square');
+    const ratioBtns = [ratioStory, ratioFeed, ratioSquare];
+
+    const resetRatioBtns = () => {
+      ratioBtns.forEach(btn => {
+        btn.className = 'ratio-btn flex-1 py-1.5 px-3 rounded-xl bg-surface-container text-on-surface hover:bg-surface-container-high font-label-sm text-label-sm flex items-center justify-center gap-1.5 transition-all';
+      });
+    };
+
+    ratioStory.addEventListener('click', () => {
+      resetRatioBtns();
+      ratioStory.className = 'ratio-btn flex-1 py-1.5 px-3 rounded-xl bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center gap-1.5 shadow-sm transition-all';
+      viewport.style.maxWidth = '24rem';
+    });
+
+    ratioFeed.addEventListener('click', () => {
+      resetRatioBtns();
+      ratioFeed.className = 'ratio-btn flex-1 py-1.5 px-3 rounded-xl bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center gap-1.5 shadow-sm transition-all';
+      viewport.style.maxWidth = '22rem';
+    });
+
+    ratioSquare.addEventListener('click', () => {
+      resetRatioBtns();
+      ratioSquare.className = 'ratio-btn flex-1 py-1.5 px-3 rounded-xl bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center gap-1.5 shadow-sm transition-all';
+      viewport.style.maxWidth = '20rem';
+    });
+
+    document.getElementById('toggle-map').addEventListener('change', (e) => {
+      mapContainer.style.display = e.target.checked ? 'block' : 'none';
+    });
+
+    document.getElementById('toggle-weather').addEventListener('change', (e) => {
+      weatherBanner.style.display = e.target.checked ? 'flex' : 'none';
+    });
+
+    const gridToggleBtn = document.getElementById('grid-toggle-btn');
+    let quadMode = false;
+    gridToggleBtn.addEventListener('click', () => {
+      quadMode = !quadMode;
+      gridToggleBtn.textContent = quadMode ? '4 Snaps (Quad)' : '2 Polaroids (Duo)';
+      showToast(quadMode ? 'Updated to Quad Snap grid' : 'Restored to Duo Polaroid view');
+    });
+
+    document.getElementById('quick-export-btn').addEventListener('click', () => {
+      showToast('Exporting high-res 3x PNG (2880x1620)...');
+    });
+
+    document.getElementById('save-gallery-btn').addEventListener('click', () => {
+      showToast('Saved to Local Drift Gallery & Device Photos!');
+    });
+
+    document.getElementById('share-postcard-btn').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'WayMark Travel Memoir',
+          text: 'Check out my journey through Kyoto, Nara, and Osaka!',
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        showToast('Opening native Share Sheet...');
+      }
+    });
+  })();
+</script></main><div class="fixed bottom-24 right-margin z-40"><a aria-label="Record Travel Memory" class="flex items-center justify-center w-14 h-14 rounded-full bg-primary text-on-primary shadow-[0_12px_28px_rgba(226,109,92,0.3)] hover:scale-105 active:scale-95 transition-transform duration-150" data-path="new-memory" href="#"><span class="material-symbols-outlined text-[26px]">edit_location_alt</span></a></div><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-card/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(31,36,33,0.05)]" data-active-classes="text-primary font-semibold"><div class="flex justify-around items-center h-16 px-space-xs"><a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-on-surface transition-all" data-path="journeys" href="#"><span class="material-symbols-outlined text-[22px]">photo_album</span><span class="font-label-sm text-label-sm">Journeys</span></a><a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-on-surface transition-all" data-path="explore-map" href="#"><span class="material-symbols-outlined text-[22px]">polyline</span><span class="font-label-sm text-label-sm">Explore</span></a><a aria-current="page" class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 transition-all text-primary font-semibold" data-path="studio" href="#"><span class="material-symbols-outlined text-[22px]">auto_awesome</span><span class="font-label-sm text-label-sm">Studio</span></a><a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-on-surface transition-all" data-path="profile" href="#"><span class="material-symbols-outlined text-[22px]">person_pin</span><span class="font-label-sm text-label-sm">Profile</span></a></div></nav></body></html>

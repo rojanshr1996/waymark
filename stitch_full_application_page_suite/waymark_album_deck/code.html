@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { width: 100vw; margin: 0; padding: 0; } body { overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-error": "#ffffff", "on-tertiary-container": "#fffbff", "on-error-container": "#93000a", "on-secondary-fixed": "#002110", "surface-card": "#FFFFFF", "text-secondary": "#6C757D", "error": "#ba1a1a", "on-surface-variant": "#57423f", "surface-canvas": "#FBF9F5", "surface-variant": "#dfe4df", "inverse-on-surface": "#edf2ed", "primary-fixed-dim": "#ffb4a8", "on-primary-fixed": "#410000", "on-primary-fixed-variant": "#82261b", "background": "#f6fbf5", "surface-container-lowest": "#ffffff", "secondary": "#286a46", "surface": "#f6fbf5", "outline": "#8a716e", "surface-dim": "#d7dbd6", "tertiary-fixed-dim": "#ffba27", "primary": "#9f3b2e", "outline-variant": "#ddc0bb", "route-start": "#3B82F6", "error-container": "#ffdad6", "surface-container-highest": "#dfe4df", "tertiary-container": "#996c00", "surface-container-low": "#f0f5f0", "on-tertiary-fixed": "#271900", "tertiary-fixed": "#ffdea9", "secondary-fixed": "#adf2c3", "on-surface": "#181d1a", "on-secondary-container": "#2f704b", "inverse-surface": "#2c322e", "on-secondary": "#ffffff", "surface-bright": "#f6fbf5", "primary-fixed": "#ffdad4", "on-primary": "#ffffff", "forest-vivid": "#38B000", "tertiary": "#7a5500", "on-secondary-fixed-variant": "#065230", "inverse-primary": "#ffb4a8", "surface-container": "#ebefea", "secondary-fixed-dim": "#92d5a8", "on-tertiary-fixed-variant": "#5e4100", "surface-container-high": "#e5e9e4", "route-end": "#F43F5E", "route-mid": "#8B5CF6", "on-primary-container": "#fffbff", "on-tertiary": "#ffffff", "primary-container": "#bf5343", "on-background": "#181d1a", "secondary-container": "#adf2c3", "surface-tint": "#a23d30", "border-divider": "#E9ECEF" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-lg": "1.5rem", "space-2xl": "3rem", "space-xl": "2rem", "space-xs": "0.5rem", "space-sm": "0.75rem", "margin-desktop": "2.5rem", "margin-tablet": "1.5rem", "space-md": "1rem", "gutter-desktop": "1.5rem", "gutter": "1rem", "space-2xs": "0.25rem", "margin": "1rem" }, fontFamily: { "headline-sm": ["Outfit"], "body-lg": ["Inter"], "caption": ["Inter"], "display-md": ["Outfit"], "body-md": ["Inter"], "display-lg-mobile": ["Outfit"], "headline-lg": ["Outfit"], "display-lg": ["Outfit"], "label-sm": ["Inter"], "body-sm": ["Inter"], "headline-md": ["Outfit"], "label-md": ["Inter"] }, fontSize: { "headline-sm": ["16px", { lineHeight: "22px", letterSpacing: "0em", fontWeight: "600" }], "body-lg": ["16px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "400" }], "caption": ["10px", { lineHeight: "12px", letterSpacing: "0.04em", fontWeight: "500" }], "display-md": ["36px", { lineHeight: "44px", letterSpacing: "-0.015em", fontWeight: "600" }], "body-md": ["14px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }], "display-lg-mobile": ["32px", { lineHeight: "38px", letterSpacing: "-0.015em", fontWeight: "600" }], "headline-lg": ["28px", { lineHeight: "34px", letterSpacing: "-0.01em", fontWeight: "600" }], "display-lg": ["44px", { lineHeight: "52px", letterSpacing: "-0.02em", fontWeight: "600" }], "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.03em", fontWeight: "500" }], "body-sm": ["13px", { lineHeight: "18px", letterSpacing: "0em", fontWeight: "400" }], "headline-md": ["20px", { lineHeight: "26px", letterSpacing: "0em", fontWeight: "700" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }] } } } };</script></head><body class="bg-surface-canvas text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-canvas/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-16 px-margin flex items-center justify-between"><div class="flex items-center gap-space-xs"><div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[20px]">explore</span></div><div class="flex flex-col"><div class="flex items-center gap-space-2xs"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">WayMark</span><span class="font-caption text-caption text-text-secondary">•</span><span class="font-headline-sm text-headline-sm text-primary tracking-tight">Journeys</span></div><div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-forest-vivid animate-pulse"></span><span class="font-caption text-caption text-secondary font-medium tracking-wide uppercase">Drift Synced</span></div></div></div><div class="flex items-center gap-space-xs"><button aria-label="Notifications" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-full hover:bg-surface-variant/40"><span class="material-symbols-outlined text-[22px]">notifications</span></button><a class="w-11 h-11 flex items-center justify-center" data-path="profile" href="#"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-[0_2px_8px_rgba(31,36,33,0.08)]" src="https://lh3.googleusercontent.com/aida/AEtjO1UqlIz9IWXqapE7oHDgxPCtzbbpkCrYWbD1B5QygVi278h1CWy7GISHZb-TR1jITJkr6m7-rxd3amkKWFP5i2flxeKwoS39OD2zAV5dJlVL4uK5mHULtM_IrL7WUv2gawsArdAIkCn4d8lqvn5O67q7UGmCT7S5euqQMAq8SUfDqV6TqEx-lromIq4KiPSqM_zrTefS_WbYjm-OLbXo4xYPBw_4cxVTuUa7i-gzXqk-EYIQGWPHv0ttTQk"/></a></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface-canvas"><div class="flex flex-col w-full px-margin pb-6 gap-space-lg">
+<!-- Greeting Header & Mini Metrics -->
+<div class="flex flex-col gap-1 pt-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5 bg-secondary-container/60 text-on-secondary-container px-2.5 py-0.5 rounded-full w-fit">
+<span class="material-symbols-outlined text-[14px]">offline_pin</span>
+<span class="font-caption text-caption tracking-wider uppercase font-semibold">Offline Ready • Cached to Device</span>
+</div>
+<span class="font-caption text-caption text-text-secondary">Synced 3m ago</span>
+</div>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-surface tracking-tight mt-1">
+      Welcome back, Elena
+    </h1>
+<p class="font-body-sm text-body-sm text-text-secondary flex items-center gap-1.5">
+<span class="inline-block w-2 h-2 rounded-full bg-primary"></span>
+      3 journeys recorded <span class="text-text-secondary/50">•</span> 412 km traveled
+    </p>
+</div>
+<!-- Filter Segmented Control -->
+<div class="flex items-center gap-space-xs overflow-x-auto no-scrollbar py-0.5" id="filter-chips">
+<button class="filter-chip px-3.5 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap active:scale-95" data-filter="all">
+<span>All</span>
+<span class="bg-white/20 text-on-primary px-1.5 py-0.2 rounded-full font-caption text-caption">4</span>
+</button>
+<button class="filter-chip px-3.5 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md transition-all hover:bg-surface-container-high flex items-center gap-1.5 whitespace-nowrap active:scale-95" data-filter="ongoing">
+<span>Ongoing</span>
+<span class="bg-secondary-fixed text-on-secondary-fixed font-caption text-caption px-1.5 py-0.2 rounded-full">1</span>
+</button>
+<button class="filter-chip px-3.5 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md transition-all hover:bg-surface-container-high flex items-center gap-1.5 whitespace-nowrap active:scale-95" data-filter="completed">
+<span>Completed</span>
+<span class="bg-surface-container-highest text-on-surface font-caption text-caption px-1.5 py-0.2 rounded-full">3</span>
+</button>
+<button class="filter-chip px-3.5 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md transition-all hover:bg-surface-container-high flex items-center gap-1 whitespace-nowrap active:scale-95" data-filter="favorites">
+<span class="material-symbols-outlined text-[14px]">bookmark</span>
+<span>Favorites</span>
+</button>
+</div>
+<!-- Hero Featured Active Journey Card (Tactile Field Log Style) -->
+<div class="flex flex-col">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-sm text-label-sm text-text-secondary uppercase tracking-wider font-semibold">Active Expedition</span>
+<span class="flex items-center gap-1 text-secondary font-label-sm text-label-sm font-semibold">
+<span class="w-2 h-2 rounded-full bg-forest-vivid animate-pulse"></span>
+        GPS Tracking Active
+      </span>
+</div>
+<div class="bg-surface-card rounded-xl p-4 shadow-[0_4px_20px_rgba(31,36,33,0.06)] flex flex-col gap-space-sm relative overflow-hidden transition-all duration-300 hover:shadow-[0_8px_24px_rgba(31,36,33,0.1)]">
+<!-- Top banner image with Polaroid tactile edge -->
+<div class="relative w-full h-44 rounded-lg overflow-hidden group">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Sunlit mountain landscape in Kyoto Japan with vermilion torii gate trail winding through ancient cedar and fiery autumn maple leaves, soft morning golden hour mist, film grain texture, rich earthy tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlbCB7OuyVKM6WtNzTf9wvYnIn2Il_4H8E3TzA4Z8ru6mnNUaOU0wW5NXglNnZyvpL__OmN07Ls2ETvkkDGqEZlQVDjSurI49xfDfYm0TRRExallq9ymCJy01o9W4AgL-DTTDrWJTKU548gyQ__Y9xf1sdJDcPCRFj6uDyukKLM8qh3bIO2vu7GzbTFLU9xqWVE-Ng-kdK0ksZq_5iKSfD_oDOg6S7-k_3oIeHsFLEURf27D8erjzx"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
+<!-- Live Status Pill Overlaid -->
+<div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-secondary-fixed text-on-secondary-fixed px-2.5 py-1 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-[14px]">hiking</span>
+<span class="font-label-sm text-label-sm font-semibold">Ongoing Expedition</span>
+</div>
+<div class="absolute top-2.5 right-2.5 bg-surface-card/90 backdrop-blur-md text-on-surface px-2 py-0.5 rounded-full font-caption text-caption flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[13px] text-tertiary">wb_sunny</span>
+<span>Day 6 of 8</span>
+</div>
+<!-- Overlaid Title and Dates on Image Base -->
+<div class="absolute bottom-2.5 left-3 right-3 text-white flex flex-col">
+<h2 class="font-headline-md text-headline-md text-white drop-shadow-sm tracking-tight leading-snug">
+            Autumn in Kyoto &amp; Kansai Highlands
+          </h2>
+<span class="font-caption text-caption text-white/90 flex items-center gap-1.5 mt-0.5">
+<span class="material-symbols-outlined text-[13px]">calendar_today</span>
+            Oct 12 – Oct 20 • 8 Days
+          </span>
+</div>
+</div>
+<!-- Distance and Stats Bar -->
+<div class="grid grid-cols-3 gap-2 bg-surface-container-low p-2.5 rounded-lg">
+<div class="flex flex-col">
+<span class="font-caption text-caption text-text-secondary">Distance</span>
+<span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">142.8 <span class="font-caption text-caption font-normal">km</span></span>
+</div>
+<div class="flex flex-col border-l border-border-divider/60 pl-2">
+<span class="font-caption text-caption text-text-secondary">Waypoints</span>
+<span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">8 <span class="font-caption text-caption font-normal">logged</span></span>
+</div>
+<div class="flex flex-col border-l border-border-divider/60 pl-2">
+<span class="font-caption text-caption text-text-secondary">Pace Log</span>
+<span class="font-headline-sm text-headline-sm text-secondary tracking-tight">On Track</span>
+</div>
+</div>
+<!-- Route Polyline Canvas Mini Preview -->
+<div class="bg-surface-container-low rounded-lg p-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">alt_route</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Route Drift Trace</span>
+<span class="font-caption text-caption text-text-secondary">Higashiyama to Mount Hiei Ridge</span>
+</div>
+</div>
+<!-- Stylized Micro Route SVG -->
+<svg class="w-24 h-7 text-primary" fill="none" viewbox="0 0 100 28" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 22 C 20 22, 25 6, 45 10 C 65 14, 75 4, 96 12" stroke="currentColor" stroke-dasharray="0.5 3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+<circle class="fill-route-start" cx="4" cy="22" r="3.5"></circle>
+<circle class="fill-route-mid" cx="45" cy="10" r="2.5"></circle>
+<circle class="fill-route-end animate-pulse" cx="96" cy="12" r="3.5"></circle>
+</svg>
+</div>
+<!-- Tags & Waypoint Markers -->
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="bg-primary/10 text-primary font-label-sm text-label-sm px-2.5 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">backpack</span>
+          Backpacking
+        </span>
+<span class="bg-surface-container-high text-on-surface font-label-sm text-label-sm px-2.5 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">temple_buddhist</span>
+          Temples
+        </span>
+<span class="bg-secondary-container/70 text-on-secondary-container font-label-sm text-label-sm px-2.5 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">landscape</span>
+          Tea Trails
+        </span>
+</div>
+<!-- Quick Action Buttons -->
+<div class="flex items-center gap-2 pt-1">
+<button class="flex-1 bg-primary text-on-primary font-headline-sm text-headline-sm py-2.5 px-3 rounded-lg shadow-[0_8px_18px_rgba(159,59,46,0.22)] hover:bg-primary/95 active:scale-98 transition-all flex items-center justify-center gap-1.5" onclick="this.classList.toggle('scale-95')">
+<span class="material-symbols-outlined text-[18px]">auto_stories</span>
+<span>Continue Memoir</span>
+</button>
+<button aria-label="Add waypoint pin" class="w-11 h-11 bg-surface-container text-on-surface font-label-md rounded-lg hover:bg-surface-container-high active:scale-95 transition-all flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">add_location</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Recent Discoveries & Waypoints (Horizontal Scroll Cards) -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-primary">pin_drop</span>
+<h3 class="font-headline-md text-headline-md text-on-surface tracking-tight">Recent Discoveries</h3>
+</div>
+<a class="font-label-sm text-label-sm text-primary font-semibold flex items-center hover:underline" href="#">
+        See map
+        <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</a>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar py-1 -mx-margin px-margin">
+<!-- Waypoint Card 1 -->
+<div class="w-60 shrink-0 bg-surface-card rounded-xl p-3 shadow-[0_3px_12px_rgba(31,36,33,0.05)] flex flex-col gap-2 transition-transform duration-200 hover:-translate-y-0.5">
+<div class="w-full h-28 rounded-lg overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Close up architectural detail of bright red wooden Fushimi Inari shrine gates in Kyoto, vibrant vermilion red paint, gentle warm sunlight filtering between pillars" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDspnBIBA7N6T1qUgean01sE-_x3mJq2pPvUaIVxBEfbRSWCcl3EK4f8A_hhnjnayV8jzfUI2cJtri3nSaJm8zDS_c3-ShuxM-9P6RQq7wE_6dqWlvSvECLOsB36TfP03_PflXtnpWAsCX0hV9CiTkGtjIdYjsnUDZ0w7DUH-1lrt4Og6Ia1PtwdUMHhKLL-mKjbyGvohlcZEo-8HIiWc_6hLNyxvCNBTS1rezZLCyVx8FB6hEbdGdG"/>
+<div class="absolute bottom-1.5 left-1.5 bg-black/60 backdrop-blur-sm text-white font-caption text-caption px-2 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[11px] text-tertiary-fixed">wb_sunny</span>
+<span>21°C</span>
+</div>
+<div class="absolute top-1.5 right-1.5 bg-surface-card/90 p-1 rounded-full text-primary shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<div class="flex flex-col">
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">Fushimi Inari Taisha</h4>
+<span class="font-caption text-caption text-text-secondary mt-0.5">Oct 18 • 14:20 • Sunny</span>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-border-divider/50">
+<span class="font-caption text-caption text-secondary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">location_on</span>
+            Mile 118.4
+          </span>
+<span class="font-label-sm text-label-sm text-primary font-medium flex items-center">
+            Notes (3)
+          </span>
+</div>
+</div>
+<!-- Waypoint Card 2 -->
+<div class="w-60 shrink-0 bg-surface-card rounded-xl p-3 shadow-[0_3px_12px_rgba(31,36,33,0.05)] flex flex-col gap-2 transition-transform duration-200 hover:-translate-y-0.5">
+<div class="w-full h-28 rounded-lg overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Gentle wild deer bowing under giant ancient mossy wooden temple gates of Todaiji temple in Nara Japan, misty drizzle ambiance, wet stone pathway, peaceful travel photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABjf9V8br9CVM4YEQvZB6QfjRb_bnwECb4gqzq_H5X_vpXRly79UFu6r1S2c1Llux5wzRMVg9_0jFiRG4YhAhExdGTKl6p_JjptlxW5scPBrXbwIQ4XxopWsAkn5J-PgBX-SXzTTIPnkWfoyawT9KjGGLCCJPKueV_11vjhDYD7BvuBzouhjwOUpQ72ISY_0fkgeZubyTXlQ-cC8yQY6y6qW3WTK8-DK2c4e24YWNTBkpjasKUtowa"/>
+<div class="absolute bottom-1.5 left-1.5 bg-black/60 backdrop-blur-sm text-white font-caption text-caption px-2 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[11px] text-route-start">rainy</span>
+<span>18°C</span>
+</div>
+</div>
+<div class="flex flex-col">
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">Nara Deer Park &amp; Todaiji</h4>
+<span class="font-caption text-caption text-text-secondary mt-0.5">Oct 17 • 11:45 • Light Rain</span>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-border-divider/50">
+<span class="font-caption text-caption text-secondary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">location_on</span>
+            Mile 94.2
+          </span>
+<span class="font-label-sm text-label-sm text-primary font-medium flex items-center">
+            Audio Memo
+          </span>
+</div>
+</div>
+<!-- Waypoint Card 3 -->
+<div class="w-60 shrink-0 bg-surface-card rounded-xl p-3 shadow-[0_3px_12px_rgba(31,36,33,0.05)] flex flex-col gap-2 transition-transform duration-200 hover:-translate-y-0.5">
+<div class="w-full h-28 rounded-lg overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Towering green bamboo grove in Arashiyama Kyoto at dawn, crisp rays of morning light piercing through towering stalks, quiet empty path, serene zen atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKSrUh5-A9_aNdihsSDWZ1xXlijm_nADFez46qZzXO0OFM0iJ3e4uMma-46PQWVWCYPNiKXU1zinbPqrolAjUwsAjkb9xO-6s6XC5w1pyRRcaSKTZt6LSv9e6-HdY7_42C4u5S8GCtpkWQQuyE0ViIwmHy62PapDUrJRZfqTZkW1A1yia6SdyWNUDBvx-Dmev58fGMrm1fRFPNMHMtKHGtcbHI3JbBbVgoInqGwideDOyNhxq4jWwh"/>
+<div class="absolute bottom-1.5 left-1.5 bg-black/60 backdrop-blur-sm text-white font-caption text-caption px-2 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[11px] text-tertiary-fixed">ac_unit</span>
+<span>15°C</span>
+</div>
+</div>
+<div class="flex flex-col">
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">Arashiyama Bamboo Grove</h4>
+<span class="font-caption text-caption text-text-secondary mt-0.5">Oct 16 • 07:30 • Crisp</span>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-border-divider/50">
+<span class="font-caption text-caption text-secondary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">location_on</span>
+            Mile 42.0
+          </span>
+<span class="font-label-sm text-label-sm text-primary font-medium flex items-center">
+            Sketch Log
+          </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Past Completed Journeys Grid -->
+<div class="flex flex-col gap-space-sm mt-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">verified</span>
+<h3 class="font-headline-md text-headline-md text-on-surface tracking-tight">Archived Memoirs</h3>
+</div>
+<span class="font-caption text-caption text-text-secondary">3 completed</span>
+</div>
+<!-- Past Journey Item 1: Amalfi -->
+<div class="bg-surface-card rounded-xl p-3 shadow-[0_2px_10px_rgba(31,36,33,0.04)] flex gap-3 items-center group cursor-pointer active:scale-[0.99] transition-all">
+<div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Vibrant coastal cliffs of Amalfi Coast Italy with pastel houses perched over deep turquoise Mediterranean waters under brilliant summer sunshine" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpp4OqcJrscbV3BJcooVW0m_2lLsmevrGrcJbFHUrtqCKrrLZ3QZs_ZsuTlqgRY_mwWh0yHDM1DezEux0zN65QB7lksAz2NxR7aO6x2ZvwaOybe9Ls0Bwj7OQZATrjwxPN62vv-xTnwXxhRve8ZpNplrEmw2c58rAuS-5-DH0RvJYXZNoq5BxTEveyxY9SYwaAfkBKkuJYZlswYtXRBWZUAudQsKV3gnRW4cctMatTUuj3inOCP2qx"/>
+<div class="absolute inset-0 bg-primary/10 mix-blend-multiply"></div>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<span class="font-caption text-caption text-secondary font-semibold uppercase tracking-wider">Completed</span>
+<span class="font-caption text-caption text-text-secondary">May 2026</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">
+          Amalfi Coast Coastal Ridge Hike
+        </h4>
+<div class="flex items-center gap-2 mt-1 text-text-secondary font-body-sm text-body-sm">
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">straighten</span>
+            64.2 km
+          </span>
+<span>•</span>
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">place</span>
+            12 places
+          </span>
+</div>
+</div>
+<span class="material-symbols-outlined text-text-secondary text-[20px] group-hover:text-primary transition-colors">
+        arrow_forward_ios
+      </span>
+</div>
+<!-- Past Journey Item 2: Iceland -->
+<div class="bg-surface-card rounded-xl p-3 shadow-[0_2px_10px_rgba(31,36,33,0.04)] flex gap-3 items-center group cursor-pointer active:scale-[0.99] transition-all">
+<div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Dramatic black sand beach and volcanic moss mountains along Iceland Ring Road under moody northern sky, majestic glacial river delta, cinematic adventure photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA45_eeEwD1PBni5YVB1wBwIKz6kPfMNAfOyCKAKRSRezuVbbpCJEVIZgBnlSnz8No1biH-QfQdEV178Gk4b8G2ZJbwVgwQjDBPqeG6q35X0DqqeHfDsDmTUmXa2u1QmnM_jk5Zp4TwU9Ih2cP1H780_VjpRDdTpPLQdgtZ_excShTwd5prZ_RhoXS_wftGhf3EmuoEvo8BqnM_7zD8WEwMaMloxtR0wO_uP10vgl323Ws78GWaMeLv"/>
+<div class="absolute inset-0 bg-primary/10 mix-blend-multiply"></div>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<span class="font-caption text-caption text-secondary font-semibold uppercase tracking-wider">Completed</span>
+<span class="font-caption text-caption text-text-secondary">Sept 2025</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">
+          Iceland Ring Road Odyssey
+        </h4>
+<div class="flex items-center gap-2 mt-1 text-text-secondary font-body-sm text-body-sm">
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">straighten</span>
+            820.5 km
+          </span>
+<span>•</span>
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">place</span>
+            24 places
+          </span>
+</div>
+</div>
+<span class="material-symbols-outlined text-text-secondary text-[20px] group-hover:text-primary transition-colors">
+        arrow_forward_ios
+      </span>
+</div>
+<!-- Tactile Empty Notebook Prompt / Little Delight -->
+<div class="bg-surface-container-low/70 rounded-xl p-3.5 flex items-center justify-between border-dashed border-2 border-border-divider mt-1">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-[20px]">auto_stories</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">Export as Field Journal</span>
+<span class="font-caption text-caption text-text-secondary">Compile your Kansai logs into a printable PDF booklet</span>
+</div>
+</div>
+<button class="px-3 py-1.5 rounded-lg bg-surface-card text-on-surface font-label-md text-label-md shadow-sm hover:bg-surface-container-high transition-colors whitespace-nowrap">
+        Preview
+      </button>
+</div>
+</div>
+<!-- Primary Floating Action Quick Access (Start Journey) -->
+<div class="w-full pt-1">
+<button class="w-full bg-primary text-on-primary py-3 px-4 rounded-xl font-headline-sm text-headline-sm shadow-[0_10px_24px_rgba(159,59,46,0.25)] flex items-center justify-center gap-2 hover:bg-primary-container active:scale-[0.98] transition-all" onclick="alert('Ready to mark a new trail!')">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+<span>+ Start New Journey</span>
+</button>
+</div>
+</div>
+<script>
+  // Simple Filter Toggle Micro-interaction
+  document.querySelectorAll('#filter-chips .filter-chip').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#filter-chips .filter-chip').forEach(b => {
+        b.classList.remove('bg-primary', 'text-on-primary');
+        b.classList.add('bg-surface-container', 'text-on-surface-variant');
+      });
+      this.classList.remove('bg-surface-container', 'text-on-surface-variant');
+      this.classList.add('bg-primary', 'text-on-primary');
+    });
+  });
+</script></main><div class="fixed bottom-24 right-margin z-40"><a aria-label="Record Travel Memory" class="flex items-center justify-center w-14 h-14 rounded-full bg-primary text-on-primary shadow-[0_12px_28px_rgba(226,109,92,0.3)] hover:scale-105 active:scale-95 transition-transform duration-150" data-path="new-memory" href="#"><span class="material-symbols-outlined text-[26px]">edit_location_alt</span></a></div><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-card/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(31,36,33,0.05)]" data-active-classes="text-primary font-semibold"><div class="flex justify-around items-center h-16 px-space-xs"><a aria-current="page" class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 transition-all text-primary font-semibold" data-path="journeys" href="#"><span class="material-symbols-outlined text-[22px]">photo_album</span><span class="font-label-sm text-label-sm">Journeys</span></a><a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-on-surface transition-all" data-path="explore-map" href="#"><span class="material-symbols-outlined text-[22px]">polyline</span><span class="font-label-sm text-label-sm">Explore</span></a><a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-on-surface transition-all" data-path="studio" href="#"><span class="material-symbols-outlined text-[22px]">auto_awesome</span><span class="font-label-sm text-label-sm">Studio</span></a><a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-on-surface transition-all" data-path="profile" href="#"><span class="material-symbols-outlined text-[22px]">person_pin</span><span class="font-label-sm text-label-sm">Profile</span></a></div></nav></body></html>
