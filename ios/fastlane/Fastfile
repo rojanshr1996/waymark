@@ -1,0 +1,90 @@
+# WayMark iOS Fastfile
+# Requires: gem install fastlane && fastlane add_plugin firebase_app_distribution
+# Code signing via match (configure before use)
+
+default_platform(:ios)
+
+platform :ios do
+  before_all do
+    # Ensure the build number is set to current timestamp for uniqueness
+    increment_build_number(
+      build_number: Time.now.strftime("%Y%m%d%H%M%S")
+    ) if ENV["SET_BUILD_NUMBER"] == "true"
+  end
+
+  # ── Dev Lane ──────────────────────────────────────────────────────
+  desc "Build and distribute Dev flavor to Firebase App Distribution"
+  lane :distribute_dev do |options|
+    notes = options[:notes] || "Dev build"
+    # match(type: "adhoc", app_identifier: "com.waymark.app.dev")  # Uncomment after match setup
+    build_ios_app(
+      scheme: "dev",
+      configuration: "Release",
+      export_method: "ad-hoc",
+      output_name: "waymark-dev.ipa"
+    )
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID_IOS_DEV"],
+      release_notes: notes,
+      groups: "dev-testers",
+      firebase_cli_token: ENV["FIREBASE_TOKEN"]
+    )
+  end
+
+  # ── QA Lane ───────────────────────────────────────────────────────
+  desc "Build and distribute QA flavor to Firebase App Distribution"
+  lane :distribute_qa do |options|
+    notes = options[:notes] || "QA build"
+    # match(type: "adhoc", app_identifier: "com.waymark.app.qa")
+    build_ios_app(
+      scheme: "qa",
+      configuration: "Release",
+      export_method: "ad-hoc",
+      output_name: "waymark-qa.ipa"
+    )
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID_IOS_QA"],
+      release_notes: notes,
+      groups: "qa-testers",
+      firebase_cli_token: ENV["FIREBASE_TOKEN"]
+    )
+  end
+
+  # ── UAT Lane ──────────────────────────────────────────────────────
+  desc "Build and distribute UAT flavor to Firebase App Distribution"
+  lane :distribute_uat do |options|
+    notes = options[:notes] || "UAT build"
+    # match(type: "adhoc", app_identifier: "com.waymark.app.uat")
+    build_ios_app(
+      scheme: "uat",
+      configuration: "Release",
+      export_method: "ad-hoc",
+      output_name: "waymark-uat.ipa"
+    )
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID_IOS_UAT"],
+      release_notes: notes,
+      groups: "uat-testers",
+      firebase_cli_token: ENV["FIREBASE_TOKEN"]
+    )
+  end
+
+  # ── Production Lane ───────────────────────────────────────────────
+  desc "Build and distribute Production flavor to Firebase App Distribution"
+  lane :distribute_prod do |options|
+    notes = options[:notes] || "Production build"
+    # match(type: "adhoc", app_identifier: "com.waymark.app")
+    build_ios_app(
+      scheme: "production",
+      configuration: "Release",
+      export_method: "ad-hoc",
+      output_name: "waymark-prod.ipa"
+    )
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID_IOS_PROD"],
+      release_notes: notes,
+      groups: "prod-testers",
+      firebase_cli_token: ENV["FIREBASE_TOKEN"]
+    )
+  end
+end

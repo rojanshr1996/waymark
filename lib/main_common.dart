@@ -8,7 +8,7 @@ Future<void> mainCommon(AppFlavorConfig config) async {
   if (config.enableLogging) {
     debugPrint('----------------------------------------');
     debugPrint('Starting Waymark [Flavor: ${config.flavor.name}]');
-    debugPrint('Base URL: ${config.apiBaseUrl}');
+    // debugPrint('Base URL: ${config.apiBaseUrl}');
     debugPrint('----------------------------------------');
   }
 

@@ -5,7 +5,6 @@ void main() {
   AppFlavorConfig.initialize(
     flavor: Flavor.qa,
     appTitle: 'Waymark QA',
-    apiBaseUrl: 'https://qa-api.waymark.app',
     enableLogging: true,
   );
 

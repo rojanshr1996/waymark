@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:waymark/core/theme/waymark_colors.dart';
 import 'package:waymark/core/constants/waymark_spacing.dart';
+import 'package:waymark/core/theme/waymark_colors.dart';
+import 'package:waymark/core/theme/waymark_typography.dart';
 
 class WaymarkCard extends StatelessWidget {
   final Widget child;
@@ -12,11 +13,12 @@ class WaymarkCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: WaymarkColors.surfaceCard,
+        color: colors.surfaceCard,
         borderRadius: BorderRadius.circular(WaymarkSpacing.radiusDefault),
-        border: Border.all(color: WaymarkColors.borderDivider, width: 1.0),
+        border: Border.all(color: colors.borderDivider, width: 1.0),
         boxShadow: [
           BoxShadow(
             color: const Color(0x0A1F2421), // rgba(31, 36, 33, 0.04)
@@ -56,7 +58,7 @@ class WaymarkPolaroid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: WaymarkColors.surfaceCard,
+        color: context.colorScheme.surfaceCard,
         boxShadow: [
           BoxShadow(
             color: const Color(0x261F2421), // rgba(31, 36, 33, 0.15)
@@ -87,8 +89,7 @@ class WaymarkPolaroid extends StatelessWidget {
                   Text(
                     caption!,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontFamily: 'Inter',
+                    style: context.textTheme.bodySmall?.copyWith(
                       fontStyle: FontStyle.italic,
                     ),
                   ),

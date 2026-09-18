@@ -1,0 +1,1322 @@
+{
+  "@@locale": "en",
+  "appName": "WayMark",
+  "@appName": {
+    "description": "The name of the application"
+  },
+  "navJourneys": "Journeys",
+  "@navJourneys": {
+    "description": "Bottom nav label for journeys"
+  },
+  "navExplore": "Explore",
+  "@navExplore": {
+    "description": "Bottom nav label for explore map"
+  },
+  "navStudio": "Studio",
+  "@navStudio": {
+    "description": "Bottom nav label for postcard studio"
+  },
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Bottom nav label for traveler profile"
+  },
+  "btnBackToJourneys": "Back to Journeys",
+  "@btnBackToJourneys": {
+    "description": "Back button label to journeys list"
+  },
+  "journeysWelcome": "Welcome, {name}",
+  "@journeysWelcome": {
+    "description": "Welcome message on empty journeys deck",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Rojan"
+      }
+    }
+  },
+  "journeysWelcomeBack": "Welcome back, {name}",
+  "@journeysWelcomeBack": {
+    "description": "Welcome back message on journeys deck with content",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Rojan"
+      }
+    }
+  },
+  "journeysOfflineReady": "Offline Ready",
+  "@journeysOfflineReady": {
+    "description": "Offline status badge text"
+  },
+  "journeysTravelerDossier": "Traveler Dossier",
+  "@journeysTravelerDossier": {
+    "description": "Traveler dossier label on empty state header"
+  },
+  "journeysCleanSlateDossier": "Clean Slate",
+  "@journeysCleanSlateDossier": {
+    "description": "Clean slate label on empty state header"
+  },
+  "journeysMetricsSummary": "{count, plural, =1{1 memoir} other{{count} memoirs}} • {km} km logged",
+  "@journeysMetricsSummary": {
+    "description": "Summary stats row on journeys dashboard",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      },
+      "km": {
+        "type": "String",
+        "example": "219.8"
+      }
+    }
+  },
+  "journeysRecordTravelMemory": "Record Travel Memory",
+  "@journeysRecordTravelMemory": {
+    "description": "FAB tooltip on journeys dashboard"
+  },
+  "journeysStartNewJourney": "Start New Journey",
+  "@journeysStartNewJourney": {
+    "description": "Bottom CTA button on journeys dashboard"
+  },
+  "travelerProfileTitle": "Traveler Profile",
+  "@travelerProfileTitle": {
+    "description": "Main title on traveler profile screen"
+  },
+  "profileClaimCompassDesc": "Claim your compass. Your dossier, your expedition identity.",
+  "@profileClaimCompassDesc": {
+    "description": "Subtitle on traveler profile screen"
+  },
+  "profileFullNameLabel": "Full Name",
+  "@profileFullNameLabel": {
+    "description": "Label for full name field on profile"
+  },
+  "profileFullNamePlaceholder": "e.g. Rojan Shrestha",
+  "@profileFullNamePlaceholder": {
+    "description": "Placeholder for full name field on profile"
+  },
+  "profileHandleLabel": "Compass ID / Email",
+  "@profileHandleLabel": {
+    "description": "Label for handle/email field on profile"
+  },
+  "profileHandlePlaceholder": "e.g. rojan@waymark.app",
+  "@profileHandlePlaceholder": {
+    "description": "Placeholder for handle field on profile"
+  },
+  "profileHandleClaimed": "CLAIMED",
+  "@profileHandleClaimed": {
+    "description": "Badge when handle/email is entered on profile"
+  },
+  "profileArchetypeLabel": "Traveler Type",
+  "@profileArchetypeLabel": {
+    "description": "Label for archetype selector on profile"
+  },
+  "profileBioLabel": "Field Philosophy / Bio",
+  "@profileBioLabel": {
+    "description": "Label for bio text field on profile"
+  },
+  "profileBioFieldNote": "optional",
+  "@profileBioFieldNote": {
+    "description": "Note indicating bio is optional"
+  },
+  "profileBioPlaceholder": "What drives your wanderlust?",
+  "@profileBioPlaceholder": {
+    "description": "Placeholder for bio field on profile"
+  },
+  "emptyDeckBtnStart": "Start Your First Journey",
+  "@emptyDeckBtnStart": {
+    "description": "Button label in empty deck view"
+  },
+  "emptyDeckHowItWorksTitle": "How WayMark Works",
+  "@emptyDeckHowItWorksTitle": {
+    "description": "Title in how-it-works card on empty deck"
+  },
+  "emptyDeckHowItWorksSubtitle": "Your offline field journal",
+  "@emptyDeckHowItWorksSubtitle": {
+    "description": "Subtitle in how-it-works card on empty deck"
+  },
+  "emptyDeckStep1Title": "Snap & Batch Import",
+  "@emptyDeckStep1Title": {
+    "description": "Step 1 title in guide"
+  },
+  "emptyDeckStep1Badge": "Capture",
+  "@emptyDeckStep1Badge": {
+    "description": "Step 1 badge in guide"
+  },
+  "emptyDeckStep1Desc": "Take photos during your journey or import entire albums at once. EXIF metadata is automatically parsed for GPS coordinates and timestamps.",
+  "@emptyDeckStep1Desc": {
+    "description": "Step 1 description in guide"
+  },
+  "emptyDeckStep2Title": "Continuous Vector Trails",
+  "@emptyDeckStep2Title": {
+    "description": "Step 2 title in guide"
+  },
+  "emptyDeckStep2Badge": "Track",
+  "@emptyDeckStep2Badge": {
+    "description": "Step 2 badge in guide"
+  },
+  "emptyDeckStep2Desc": "Waymark connects your photo stops with dynamic polyline routes rendered from your GPS breadcrumbs, creating a vivid visual trail of your path.",
+  "@emptyDeckStep2Desc": {
+    "description": "Step 2 description in guide"
+  },
+  "emptyDeckStep3Title": "Tactile Postcards",
+  "@emptyDeckStep3Title": {
+    "description": "Step 3 title in guide"
+  },
+  "emptyDeckStep3Badge": "Export",
+  "@emptyDeckStep3Badge": {
+    "description": "Step 3 badge in guide"
+  },
+  "emptyDeckStep3Desc": "Export tactile aesthetic postcards with coordinates, altitude, and weather data stamped directly onto them.",
+  "@emptyDeckStep3Desc": {
+    "description": "Step 3 description in guide"
+  },
+  "createJourneyTitle": "New Travel Memoir",
+  "@createJourneyTitle": {
+    "description": "Title in create journey bottom sheet"
+  },
+  "createJourneySubtitle": "Start tracking an expedition with local offline storage.",
+  "@createJourneySubtitle": {
+    "description": "Subtitle in create journey bottom sheet"
+  },
+  "createJourneyNameLabel": "Journey Title",
+  "@createJourneyNameLabel": {
+    "description": "Label for journey title input"
+  },
+  "createJourneyNameHint": "e.g. Autumn in Kyoto & Kansai",
+  "@createJourneyNameHint": {
+    "description": "Hint for journey title input"
+  },
+  "createJourneyDescLabel": "Expedition Creed / Description",
+  "@createJourneyDescLabel": {
+    "description": "Label for journey description input"
+  },
+  "createJourneyDescHint": "Brief field notes on this voyage...",
+  "@createJourneyDescHint": {
+    "description": "Hint for journey description input"
+  },
+  "createJourneyStartDate": "Start Date",
+  "@createJourneyStartDate": {
+    "description": "Start date label in create journey"
+  },
+  "createJourneyEndDate": "End Date",
+  "@createJourneyEndDate": {
+    "description": "End date label in create journey"
+  },
+  "createJourneyBtnCreate": "Create Journey Album",
+  "@createJourneyBtnCreate": {
+    "description": "Button to create journey album"
+  },
+  "sampleDataLoadedToast": "Kansai Expedition loaded into local SQLite vault!",
+  "@sampleDataLoadedToast": {
+    "description": "Toast message when sample route is seeded"
+  },
+  "profileAvatarLabel": "Traveler Portrait",
+  "@profileAvatarLabel": {
+    "description": "Label for avatar selection bottom sheet on profile"
+  },
+  "profileSaveSuccessToast": "Profile settings updated successfully",
+  "@profileSaveSuccessToast": {
+    "description": "Toast message when traveler profile is saved"
+  },
+  "profileBtnSaveChanges": "Save Changes",
+  "@profileBtnSaveChanges": {
+    "description": "Button to save traveler profile edits"
+  },
+  "profileTravelAlbumsSectionTitle": "Travel Albums & Memoirs",
+  "@profileTravelAlbumsSectionTitle": {
+    "description": "Section header for travel albums on traveler profile"
+  },
+  "profileTravelAlbumsSubtitle": "Archived in local SQLite vault",
+  "@profileTravelAlbumsSubtitle": {
+    "description": "Subtitle for travel albums section on traveler profile"
+  },
+  "profileTravelAlbumsEmpty": "No travel albums in your offline vault yet",
+  "@profileTravelAlbumsEmpty": {
+    "description": "Empty state text for travel albums on traveler profile"
+  },
+  "profileTravelAlbumsEmptyDesc": "Your recorded expeditions and field memoirs will be safely chronicled here.",
+  "@profileTravelAlbumsEmptyDesc": {
+    "description": "Empty state description for travel albums on traveler profile"
+  },
+  "profileStartFirstJourney": "Start Your First Journey",
+  "@profileStartFirstJourney": {
+    "description": "CTA button to start first journey when albums list is empty"
+  },
+  "profileMemoirsCount": "{count, plural, =1{1 Memoir} other{{count} Memoirs}}",
+  "@profileMemoirsCount": {
+    "description": "Count of travel memoirs on profile",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "profileTotalDistanceRecorded": "{distance} km recorded",
+  "@profileTotalDistanceRecorded": {
+    "description": "Total distance traveled displayed on profile",
+    "placeholders": {
+      "distance": {
+        "type": "String",
+        "example": "219.8"
+      }
+    }
+  },
+  "profileTotalPlacesRecorded": "{count, plural, =1{1 place visited} other{{count} places visited}}",
+  "@profileTotalPlacesRecorded": {
+    "description": "Total places recorded displayed on profile",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "emptyExploreTitle": "No Waypoints Explored Yet",
+  "@emptyExploreTitle": {
+    "description": "Title for empty explore map view"
+  },
+  "emptyExploreDesc": "Record journeys to automatically map GPS breadcrumbs and chart your travel footprints across the globe.",
+  "@emptyExploreDesc": {
+    "description": "Description for empty explore map view"
+  },
+  "emptyExploreBtn": "Start a Journey to Map Footprints",
+  "@emptyExploreBtn": {
+    "description": "Button for empty explore map view"
+  },
+  "emptyStudioTitle": "No Postcards Created Yet",
+  "@emptyStudioTitle": {
+    "description": "Title for empty postcard studio"
+  },
+  "emptyStudioDesc": "Start a journey and capture photo stops along your path to generate bespoke vintage travel postcards.",
+  "@emptyStudioDesc": {
+    "description": "Description for empty postcard studio"
+  },
+  "emptyStudioBtn": "Record Your First Memory",
+  "@emptyStudioBtn": {
+    "description": "Button for empty postcard studio"
+  },
+  "emptyOngoingTitle": "No Active Expedition",
+  "@emptyOngoingTitle": {
+    "description": "Title when no active ongoing journey exists"
+  },
+  "emptyOngoingDesc": "You do not have an ongoing journey in progress right now.",
+  "@emptyOngoingDesc": {
+    "description": "Description when no active ongoing journey exists"
+  },
+  "emptyOngoingBtn": "Start New Journey",
+  "@emptyOngoingBtn": {
+    "description": "Button when no active ongoing journey exists"
+  },
+  "emptyDeckJourneyAwaitsTitle": "Your Journey Awaits",
+  "@emptyDeckJourneyAwaitsTitle": {
+    "description": "Title for clean empty journeys deck"
+  },
+  "emptyDeckJourneyAwaitsDesc": "No journeys recorded in your vault yet. Begin your first expedition to trace steps, pin stops, and preserve memories.",
+  "@emptyDeckJourneyAwaitsDesc": {
+    "description": "Description for clean empty journeys deck"
+  },
+  "notificationsPrivateToast": "All trips and memoirs are stored privately on this device.",
+  "@notificationsPrivateToast": {
+    "description": "Toast message confirming private on-device storage"
+  },
+  "emptyAlbumStopsTitle": "No Stops Recorded Yet",
+  "@emptyAlbumStopsTitle": {
+    "description": "Title for empty album stops"
+  },
+  "emptyAlbumStopsDesc": "Add waypoints, milestones, and photo stops to build your journey timeline.",
+  "@emptyAlbumStopsDesc": {
+    "description": "Description for empty album stops"
+  },
+  "emptyAlbumStopsBtn": "Add First Waypoint",
+  "@emptyAlbumStopsBtn": {
+    "description": "Button to add first waypoint"
+  },
+  "settingsTitle": "Settings & Vault",
+  "@settingsTitle": {
+    "description": "Title for settings screen"
+  },
+  "settingsSubtitle": "Local offline configuration & storage",
+  "@settingsSubtitle": {
+    "description": "Subtitle for settings screen"
+  },
+  "settingsVaultSection": "Local SQLite Vault",
+  "@settingsVaultSection": {
+    "description": "Header for vault section in settings"
+  },
+  "settingsClearDatabaseBtn": "Wipe & Clear Entire Database",
+  "@settingsClearDatabaseBtn": {
+    "description": "Button to erase the entire database"
+  },
+  "settingsClearDatabaseDesc": "Permanently erase all journeys, waypoints, media, and reset profile.",
+  "@settingsClearDatabaseDesc": {
+    "description": "Description for database wipe action"
+  },
+  "settingsClearDatabaseConfirm": "Are you sure you want to completely erase the database? This action is irreversible.",
+  "@settingsClearDatabaseConfirm": {
+    "description": "Confirmation message before wiping database"
+  },
+  "settingsClearDatabaseSuccess": "Database wiped clean. Starting fresh.",
+  "@settingsClearDatabaseSuccess": {
+    "description": "Toast message when database is wiped clean"
+  },
+  "settingsAboutSection": "About WayMark",
+  "@settingsAboutSection": {
+    "description": "Header for about section in settings"
+  },
+  "settingsStorageClearedToast": "All journey memoirs cleared successfully",
+  "@settingsStorageClearedToast": {
+    "description": "Toast message when all journeys are cleared"
+  },
+  "placeLoggerTitle": "Log a New Stop",
+  "@placeLoggerTitle": {
+    "description": "Title of the place logger bottom sheet"
+  },
+  "placeLoggerSubtitle": "Pin a waypoint, milestone, or memory to your expedition.",
+  "@placeLoggerSubtitle": {
+    "description": "Subtitle of the place logger bottom sheet"
+  },
+  "placeLoggerNameLabel": "Place Name",
+  "@placeLoggerNameLabel": {
+    "description": "Label for place name input"
+  },
+  "placeLoggerNameHint": "e.g. Fushimi Inari Shrine",
+  "@placeLoggerNameHint": {
+    "description": "Hint for place name input"
+  },
+  "placeLoggerCategoryLabel": "Category",
+  "@placeLoggerCategoryLabel": {
+    "description": "Label for category picker"
+  },
+  "placeLoggerNotesLabel": "Field Notes",
+  "@placeLoggerNotesLabel": {
+    "description": "Label for notes input"
+  },
+  "placeLoggerNotesHint": "Observations, impressions...",
+  "@placeLoggerNotesHint": {
+    "description": "Hint for notes input"
+  },
+  "placeLoggerBtnSave": "Log Waypoint",
+  "@placeLoggerBtnSave": {
+    "description": "Button to save the logged waypoint"
+  },
+  "placeLoggerSuccessToast": "Waypoint logged to your expedition!",
+  "@placeLoggerSuccessToast": {
+    "description": "Toast when waypoint is saved"
+  },
+  "placeLoggerUpdatedToast": "Waypoint updated successfully!",
+  "@placeLoggerUpdatedToast": {
+    "description": "Toast when waypoint is updated"
+  },
+  "placeLoggerLogNewPlace": "Log New Place",
+  "@placeLoggerLogNewPlace": {
+    "description": "Title of log new place story sheet"
+  },
+  "placeLoggerEditPlace": "Edit Place",
+  "@placeLoggerEditPlace": {
+    "description": "Title of edit place story sheet"
+  },
+  "placeLoggerSavePlace": "Save Place",
+  "@placeLoggerSavePlace": {
+    "description": "Top action button to save place"
+  },
+  "placeLoggerSearchPlaceholder": "Search landmark, cafe, or coordinates...",
+  "@placeLoggerSearchPlaceholder": {
+    "description": "Placeholder for global location search bar"
+  },
+  "placeLoggerDetectedGpsTitle": "Detected GPS from photo",
+  "@placeLoggerDetectedGpsTitle": {
+    "description": "Smart GPS detection banner title"
+  },
+  "placeLoggerMatched": "Matched",
+  "@placeLoggerMatched": {
+    "description": "Status badge for matched coordinates"
+  },
+  "placeLoggerDragPinCalibrate": "Drag pin to calibrate",
+  "@placeLoggerDragPinCalibrate": {
+    "description": "Floating pill beneath the beacon pin marker"
+  },
+  "placeLoggerPlaceIdentity": "PLACE IDENTITY",
+  "@placeLoggerPlaceIdentity": {
+    "description": "Header for place identity section"
+  },
+  "placeLoggerCategoryTag": "Category Tag",
+  "@placeLoggerCategoryTag": {
+    "description": "Label for category tag chips"
+  },
+  "placeLoggerVisitedTime": "Visited Time",
+  "@placeLoggerVisitedTime": {
+    "description": "Label for visited time card"
+  },
+  "placeLoggerSkyAndTemp": "Sky & Temp",
+  "@placeLoggerSkyAndTemp": {
+    "description": "Label for sky and temperature card"
+  },
+  "placeLoggerVisualRelics": "Visual Relics & Photos",
+  "@placeLoggerVisualRelics": {
+    "description": "Header for visual relics and photos section"
+  },
+  "placeLoggerCoverBadge": "Cover",
+  "@placeLoggerCoverBadge": {
+    "description": "Cover badge on primary photo"
+  },
+  "placeLoggerAddPhoto": "Add Photo",
+  "@placeLoggerAddPhoto": {
+    "description": "Label for add photo card"
+  },
+  "placeLoggerMaxPhotos": "Max 6 photos",
+  "@placeLoggerMaxPhotos": {
+    "description": "Caption beneath add photo"
+  },
+  "placeLoggerSensoryImpressions": "Sensory Impressions",
+  "@placeLoggerSensoryImpressions": {
+    "description": "Header for sensory impressions section"
+  },
+  "placeLoggerSensoryHint": "How did the wind smell? What sounds echoed? Record fleeting moments...",
+  "@placeLoggerSensoryHint": {
+    "description": "Placeholder for sensory notes field"
+  },
+  "placeLoggerLogToJourney": "Log Place to {title}",
+  "@placeLoggerLogToJourney": {
+    "description": "Bottom action button to log place to journey",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "placeLoggerUpdatePlaceInJourney": "Update Place in {title}",
+  "@placeLoggerUpdatePlaceInJourney": {
+    "description": "Bottom action button to update place in journey",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "placeLoggerSyncSubtitle": "Synchronized with offline storage • Auto-assigns to Route {order}",
+  "@placeLoggerSyncSubtitle": {
+    "description": "Footer under bottom action button",
+    "placeholders": {
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "journeyDetailMapPreview": "Route polyline renders once multiple waypoints are added",
+  "@journeyDetailMapPreview": {
+    "description": "Map preview placeholder subtitle"
+  },
+  "journeyDetailTimeline": "JOURNEY TIMELINE",
+  "@journeyDetailTimeline": {
+    "description": "Timeline section label"
+  },
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "Common cancel button label"
+  },
+  "commonConfirm": "Confirm",
+  "@commonConfirm": {
+    "description": "Common confirm button label"
+  },
+  "commonSave": "Save",
+  "@commonSave": {
+    "description": "Common save button label"
+  },
+  "commonRequired": "Required",
+  "@commonRequired": {
+    "description": "Common required validation message"
+  },
+  "commonOptional": "Optional",
+  "@commonOptional": {
+    "description": "Common optional text"
+  },
+  "settingsDialogClearTitle": "Clear Journey Records",
+  "@settingsDialogClearTitle": {
+    "description": "Title of clear journeys dialog"
+  },
+  "settingsDialogClearDesc": "Are you sure you want to clear all journey memoirs, waypoints, and photos? Your profile settings will be preserved.",
+  "@settingsDialogClearDesc": {
+    "description": "Description of clear journeys dialog"
+  },
+  "settingsDialogClearConfirm": "Clear Journeys",
+  "@settingsDialogClearConfirm": {
+    "description": "Confirm button for clearing journeys"
+  },
+  "settingsDialogWipeConfirm": "Wipe Everything",
+  "@settingsDialogWipeConfirm": {
+    "description": "Confirm button for wiping database"
+  },
+  "settingsDriftEngineTitle": "Drift SQLite Engine",
+  "@settingsDriftEngineTitle": {
+    "description": "Title of drift sqlite card in settings"
+  },
+  "settingsDriftEngineSubtitle": "Local, zero-cloud encrypted storage vault",
+  "@settingsDriftEngineSubtitle": {
+    "description": "Subtitle of drift sqlite card in settings"
+  },
+  "settingsStatusActive": "ACTIVE",
+  "@settingsStatusActive": {
+    "description": "Active status label in settings"
+  },
+  "settingsClearMemoirsTitle": "Clear All Journey Memoirs",
+  "@settingsClearMemoirsTitle": {
+    "description": "Title for clear memoirs item in settings"
+  },
+  "settingsClearMemoirsDesc": "Removes all trips, waypoints, and photos, but keeps your traveler profile.",
+  "@settingsClearMemoirsDesc": {
+    "description": "Description for clear memoirs item in settings"
+  },
+  "settingsBtnClear": "Clear",
+  "@settingsBtnClear": {
+    "description": "Clear button in settings"
+  },
+  "settingsBtnWipeVault": "Wipe Vault",
+  "@settingsBtnWipeVault": {
+    "description": "Wipe vault button in settings"
+  },
+  "settingsAppDescription": "WayMark: Memoir & Living Atlas",
+  "@settingsAppDescription": {
+    "description": "App description in settings"
+  },
+  "settingsAppVersion": "v1.0.0",
+  "@settingsAppVersion": {
+    "description": "App version in settings"
+  },
+  "settingsEnvFlavor": "Environment Flavor",
+  "@settingsEnvFlavor": {
+    "description": "Environment flavor label in settings"
+  },
+  "settingsStorageArch": "Storage Architecture",
+  "@settingsStorageArch": {
+    "description": "Storage architecture label in settings"
+  },
+  "settingsStorageArchValue": "SQLite 3 / Drift ORM",
+  "@settingsStorageArchValue": {
+    "description": "Storage architecture value in settings"
+  },
+  "studioBadgeClosed": "STUDIO CLOSED",
+  "@studioBadgeClosed": {
+    "description": "Badge when studio has no memories"
+  },
+  "studioNoMemoriesTitle": "No memories to print",
+  "@studioNoMemoriesTitle": {
+    "description": "Title when studio has no memories"
+  },
+  "studioNoMemoriesDesc": "Add a journey and places to start making postcards.",
+  "@studioNoMemoriesDesc": {
+    "description": "Description when studio has no memories"
+  },
+  "studioBadgeAtelier": "POSTCARD ATELIER",
+  "@studioBadgeAtelier": {
+    "description": "Studio atelier badge"
+  },
+  "studioMemoryPrintsTitle": "Memory Prints",
+  "@studioMemoryPrintsTitle": {
+    "description": "Studio memory prints header"
+  },
+  "studioMemoryPrintsSubtitle": "Craft bespoke vintage travel postcards from your expedition stops",
+  "@studioMemoryPrintsSubtitle": {
+    "description": "Studio memory prints subtitle"
+  },
+  "studioBannerNotice": "Select a memory below to generate a postcard. Full generator coming soon.",
+  "@studioBannerNotice": {
+    "description": "Studio banner notice"
+  },
+  "studioSectionMemories": "JOURNEY MEMORIES",
+  "@studioSectionMemories": {
+    "description": "Studio section header for memories"
+  },
+  "studioGeneratorTitle": "Postcard Generator",
+  "@studioGeneratorTitle": {
+    "description": "Postcard generator promo title"
+  },
+  "studioGeneratorDesc": "Export high-resolution vintage postcards with your GPS coordinates, altitude, and weather stamped into the design. Coming in the next update.",
+  "@studioGeneratorDesc": {
+    "description": "Postcard generator promo description"
+  },
+  "studioBtnCreatePostcard": "Create Postcard",
+  "@studioBtnCreatePostcard": {
+    "description": "Button to create postcard"
+  },
+  "studioComingSoonToast": "Postcard generator coming soon for {name}!",
+  "@studioComingSoonToast": {
+    "description": "Toast when postcard card is tapped",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Kyoto"
+      }
+    }
+  },
+  "exploreBadgeUnmapped": "UNMAPPED HORIZONS",
+  "@exploreBadgeUnmapped": {
+    "description": "Badge on explore empty state"
+  },
+  "exploreFootprintsTitle": "Explore Your Footprints",
+  "@exploreFootprintsTitle": {
+    "description": "Explore screen hero title"
+  },
+  "exploreFootprintsSubtitle": "Interactive map coming soon",
+  "@exploreFootprintsSubtitle": {
+    "description": "Explore screen hero subtitle"
+  },
+  "exploreBadgeComingSoon": "INTERACTIVE MAP COMING SOON",
+  "@exploreBadgeComingSoon": {
+    "description": "Explore screen hero badge"
+  },
+  "exploreStatsSummary": "{albumsCount, plural, =1{1 Journey} other{{albumsCount} Journeys}}  •  {waypointsCount, plural, =1{1 Waypoint} other{{waypointsCount} Waypoints}}",
+  "@exploreStatsSummary": {
+    "description": "Explore screen summary stats",
+    "placeholders": {
+      "albumsCount": {
+        "type": "int",
+        "example": "2"
+      },
+      "waypointsCount": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "exploreRecentWaypointsTitle": "Recent Waypoints",
+  "@exploreRecentWaypointsTitle": {
+    "description": "Recent waypoints section title"
+  },
+  "exploreWaypointComingSoonToast": "Waypoint detail coming in next update",
+  "@exploreWaypointComingSoonToast": {
+    "description": "Toast when waypoint card is tapped"
+  },
+  "journeyDetailExportReportToast": "Exporting expedition report",
+  "@journeyDetailExportReportToast": {
+    "description": "Toast when exporting expedition report"
+  },
+  "journeyDetailLogWaypointTooltip": "Log Waypoint",
+  "@journeyDetailLogWaypointTooltip": {
+    "description": "Tooltip on log waypoint FAB"
+  },
+  "journeyStatusOngoing": "ONGOING",
+  "@journeyStatusOngoing": {
+    "description": "Ongoing journey status pill"
+  },
+  "journeyStatusCompleted": "COMPLETED",
+  "@journeyStatusCompleted": {
+    "description": "Completed journey status pill"
+  },
+  "journeyDatePresent": "Present",
+  "@journeyDatePresent": {
+    "description": "Present date text for active journeys"
+  },
+  "journeyPlacesCount": "{count, plural, =1{1 place} other{{count} places}}",
+  "@journeyPlacesCount": {
+    "description": "Places count text on journey detail",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "journeyDetailRouteMap": "Route Map",
+  "@journeyDetailRouteMap": {
+    "description": "Route map title on detail card"
+  },
+  "journeyDetailExpeditionLogbook": "EXPEDITION LOGBOOK",
+  "@journeyDetailExpeditionLogbook": {
+    "description": "Badge on journey detail empty state"
+  },
+  "placeLoggerWeatherLabel": "Weather Condition (Optional)",
+  "@placeLoggerWeatherLabel": {
+    "description": "Weather label in place logger"
+  },
+  "placeLoggerGpsNotice": "GPS: Location will be pinned automatically",
+  "@placeLoggerGpsNotice": {
+    "description": "GPS status text in place logger"
+  },
+  "placeLoggerFailedToast": "Failed to log waypoint.",
+  "@placeLoggerFailedToast": {
+    "description": "Toast on place logger error"
+  },
+  "weatherSunny": "Sunny",
+  "@weatherSunny": {
+    "description": "Weather condition sunny"
+  },
+  "weatherCloudy": "Cloudy",
+  "@weatherCloudy": {
+    "description": "Weather condition cloudy"
+  },
+  "weatherRainy": "Rainy",
+  "@weatherRainy": {
+    "description": "Weather condition rainy"
+  },
+  "weatherCold": "Cold",
+  "@weatherCold": {
+    "description": "Weather condition cold"
+  },
+  "weatherFoggy": "Foggy",
+  "@weatherFoggy": {
+    "description": "Weather condition foggy"
+  },
+  "categoryGeneral": "GENERAL",
+  "@categoryGeneral": {
+    "description": "Category general"
+  },
+  "categorySightseeing": "SIGHTSEEING",
+  "@categorySightseeing": {
+    "description": "Category sightseeing"
+  },
+  "categoryFood": "FOOD",
+  "@categoryFood": {
+    "description": "Category food"
+  },
+  "categoryStay": "STAY",
+  "@categoryStay": {
+    "description": "Category stay"
+  },
+  "categoryHike": "HIKE",
+  "@categoryHike": {
+    "description": "Category hike"
+  },
+  "categoryTransit": "TRANSIT",
+  "@categoryTransit": {
+    "description": "Category transit"
+  },
+  "createJourneyTitleValidation": "Please enter a title",
+  "@createJourneyTitleValidation": {
+    "description": "Validation error for empty journey title"
+  },
+  "createJourneySuccessToast": "Created expedition \"{title}\"",
+  "@createJourneySuccessToast": {
+    "description": "Toast when journey is created",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "Kyoto"
+      }
+    }
+  },
+  "createJourneyErrorToast": "Failed to create journey: {error}",
+  "@createJourneyErrorToast": {
+    "description": "Toast when journey creation fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "database error"
+      }
+    }
+  },
+  "profileBtnTakePhoto": "Take Photo",
+  "@profileBtnTakePhoto": {
+    "description": "Button to take avatar photo"
+  },
+  "profileBtnFromGallery": "From Gallery",
+  "@profileBtnFromGallery": {
+    "description": "Button to pick avatar from gallery"
+  },
+  "profileChoosePresetTitle": "CHOOSE AVATAR PRESET",
+  "@profileChoosePresetTitle": {
+    "description": "Header for avatar presets"
+  },
+  "profileCameraError": "Unable to access camera: {error}",
+  "@profileCameraError": {
+    "description": "Toast when camera fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "permission denied"
+      }
+    }
+  },
+  "profileGalleryError": "Unable to access photo library: {error}",
+  "@profileGalleryError": {
+    "description": "Toast when gallery fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "permission denied"
+      }
+    }
+  },
+  "onboardingPortraitTitle": "Traveler Portrait",
+  "@onboardingPortraitTitle": {
+    "description": "Portrait title in onboarding"
+  },
+  "onboardingPortraitSubtitle": "Take a photo, choose from gallery, or select an avatar.",
+  "@onboardingPortraitSubtitle": {
+    "description": "Portrait subtitle in onboarding"
+  },
+  "archetypeModalTitle": "Choose Your Travel Style",
+  "@archetypeModalTitle": {
+    "description": "Archetype selector modal title"
+  },
+  "archetypeModalSubtitle": "Select the travel style that best matches how you like to journey.",
+  "@archetypeModalSubtitle": {
+    "description": "Archetype selector modal subtitle"
+  },
+  "archetypeBtnChange": "Change",
+  "@archetypeBtnChange": {
+    "description": "Button to change archetype"
+  },
+  "onboardingVaultTitle": "Private Travel Storage",
+  "@onboardingVaultTitle": {
+    "description": "Vault card title in onboarding"
+  },
+  "onboardingVaultSubtitle": "Private • On-Device Only",
+  "@onboardingVaultSubtitle": {
+    "description": "Vault card subtitle in onboarding"
+  },
+  "onboardingVaultOfflinePill": "100% Offline",
+  "@onboardingVaultOfflinePill": {
+    "description": "Offline pill text in onboarding vault card"
+  },
+  "journeysStopNumber": "Stop #{order}",
+  "@journeysStopNumber": {
+    "description": "Stop sequence number in recent discoveries",
+    "placeholders": {
+      "order": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "tagBackpacking": "Backpacking",
+  "@tagBackpacking": {
+    "description": "Tag backpacking"
+  },
+  "tagTemples": "Temples",
+  "@tagTemples": {
+    "description": "Tag temples"
+  },
+  "tagTeaTrails": "Tea Trails",
+  "@tagTeaTrails": {
+    "description": "Tag tea trails"
+  },
+  "appPhilosophy": "Your Journey.  Your Story.",
+  "@appPhilosophy": {
+    "description": "App philosophy headline on splash screen"
+  },
+  "verbTravel": "Travel",
+  "@verbTravel": {
+    "description": "Travel action verb on splash screen"
+  },
+  "verbJournal": "Journal",
+  "@verbJournal": {
+    "description": "Journal action verb on splash screen"
+  },
+  "verbRelive": "Relive",
+  "@verbRelive": {
+    "description": "Relive action verb on splash screen"
+  },
+  "interactiveRouteMapsTitle": "Interactive Route Maps",
+  "@interactiveRouteMapsTitle": {
+    "description": "Feature column title on splash"
+  },
+  "interactiveRouteMapsDesc": "Vector polylines & elevation profiles",
+  "@interactiveRouteMapsDesc": {
+    "description": "Feature column description on splash"
+  },
+  "artisticJourneyPostcardsTitle": "Artistic Journey Postcards",
+  "@artisticJourneyPostcardsTitle": {
+    "description": "Feature column title on splash"
+  },
+  "artisticJourneyPostcardsDesc": "Vintage typography & metadata stamps",
+  "@artisticJourneyPostcardsDesc": {
+    "description": "Feature column description on splash"
+  },
+  "offlineFirstTitle": "100% Offline First",
+  "@offlineFirstTitle": {
+    "description": "Feature column title on splash"
+  },
+  "offlineFirstDesc": "Private sqlite vault with no tracking",
+  "@offlineFirstDesc": {
+    "description": "Feature column description on splash"
+  },
+  "moreThanJustPhotos": "— More Than Just Photos —",
+  "@moreThanJustPhotos": {
+    "description": "Bottom tagline on splash"
+  },
+  "initializingLocalVault": "Initializing local vault...",
+  "@initializingLocalVault": {
+    "description": "Loading vault status text on splash"
+  },
+  "journeysRecentDiscoveries": "Recent Discoveries",
+  "@journeysRecentDiscoveries": {
+    "description": "Header for recent discoveries carousel"
+  },
+  "journeysSeeMap": "See Map",
+  "@journeysSeeMap": {
+    "description": "Action button to view map in recent discoveries"
+  },
+  "journeysArchivedMemoirs": "Archived Memoirs",
+  "@journeysArchivedMemoirs": {
+    "description": "Header for archived memoirs section"
+  },
+  "journeysCompletedCount": "{count, plural, =1{1 completed} other{{count} completed}}",
+  "@journeysCompletedCount": {
+    "description": "Count of completed memoirs",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "Filter tab all"
+  },
+  "filterOngoing": "Ongoing",
+  "@filterOngoing": {
+    "description": "Filter tab ongoing"
+  },
+  "filterCompleted": "Completed",
+  "@filterCompleted": {
+    "description": "Filter tab completed"
+  },
+  "filterFavorites": "Favorites",
+  "@filterFavorites": {
+    "description": "Filter tab favorites"
+  },
+  "journeysExportFieldJournalTitle": "Export Field Journal",
+  "@journeysExportFieldJournalTitle": {
+    "description": "Title in export field journal banner"
+  },
+  "journeysExportFieldJournalDesc": "Generate an archival PDF dossier of your journeys with high-res photos and route logs.",
+  "@journeysExportFieldJournalDesc": {
+    "description": "Description in export field journal banner"
+  },
+  "journeysBtnPreview": "Preview",
+  "@journeysBtnPreview": {
+    "description": "Button to preview journal in export banner"
+  },
+  "journeysActiveExpedition": "Active Expedition",
+  "@journeysActiveExpedition": {
+    "description": "Badge in active journey hero card"
+  },
+  "journeysGpsTrackingActive": "GPS Tracking Active",
+  "@journeysGpsTrackingActive": {
+    "description": "Live GPS tracking status in active journey hero card"
+  },
+  "journeysOngoingExpedition": "Ongoing Expedition",
+  "@journeysOngoingExpedition": {
+    "description": "Ongoing expedition badge in active journey hero card"
+  },
+  "journeysDayOf": "Day {current} of {total}",
+  "@journeysDayOf": {
+    "description": "Day counter in active journey hero card",
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "example": "1"
+      },
+      "total": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+  "journeysDistanceLabel": "Distance",
+  "@journeysDistanceLabel": {
+    "description": "Distance stat label in active journey hero card"
+  },
+  "journeysWaypointsLabel": "Waypoints",
+  "@journeysWaypointsLabel": {
+    "description": "Waypoints stat label in active journey hero card"
+  },
+  "journeysWaypointsLogged": "{count, plural, =1{1 waypoint} other{{count} waypoints}} logged",
+  "@journeysWaypointsLogged": {
+    "description": "Waypoints logged stat in active journey hero card",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "journeysPaceLogLabel": "Pace Log",
+  "@journeysPaceLogLabel": {
+    "description": "Pace log stat label in active journey hero card"
+  },
+  "journeysPaceOnTrack": "On Track",
+  "@journeysPaceOnTrack": {
+    "description": "Pace on track value in active journey hero card"
+  },
+  "journeysRouteTraceTitle": "ROUTE TRACE",
+  "@journeysRouteTraceTitle": {
+    "description": "Title for route trace section in active journey card"
+  },
+  "journeysRouteTraceSubtitle": "Waypoints connected in order",
+  "@journeysRouteTraceSubtitle": {
+    "description": "Subtitle for route trace section in active journey card"
+  },
+  "journeysBtnContinueMemoir": "Continue Memoir",
+  "@journeysBtnContinueMemoir": {
+    "description": "Button to continue memoir in active journey card"
+  },
+  "emptyDeckSecurityFooter": "Private SQLite Vault • 100% Offline • Zero Data Tracking",
+  "@emptyDeckSecurityFooter": {
+    "description": "Security footer on empty deck view"
+  },
+  "onboardingHeroTitle": "WayMark",
+  "@onboardingHeroTitle": {
+    "description": "Hero title on onboarding screen"
+  },
+  "onboardingHeroTitleItalic": "Expeditions",
+  "@onboardingHeroTitleItalic": {
+    "description": "Hero italic subtitle on onboarding screen"
+  },
+  "onboardingHeroDesc": "An offline-first travel journal that turns your routes and memories into artistic memoirs.",
+  "@onboardingHeroDesc": {
+    "description": "Hero description on onboarding screen"
+  },
+  "onboardingFeature1Title": "Interactive Route Maps",
+  "@onboardingFeature1Title": {
+    "description": "Feature 1 title on onboarding"
+  },
+  "onboardingFeature1Badge": "VECTOR",
+  "@onboardingFeature1Badge": {
+    "description": "Feature 1 badge on onboarding"
+  },
+  "onboardingFeature1Desc": "Real-time breadcrumb tracking with high-res polyline mapping.",
+  "@onboardingFeature1Desc": {
+    "description": "Feature 1 description on onboarding"
+  },
+  "onboardingFeature2Title": "Artistic Postcards",
+  "@onboardingFeature2Title": {
+    "description": "Feature 2 title on onboarding"
+  },
+  "onboardingFeature2Badge": "STUDIO",
+  "@onboardingFeature2Badge": {
+    "description": "Feature 2 badge on onboarding"
+  },
+  "onboardingFeature2Desc": "Generate vintage expedition postcards stamped with GPS and weather data.",
+  "@onboardingFeature2Desc": {
+    "description": "Feature 2 description on onboarding"
+  },
+  "onboardingFeature3Title": "Private Local Vault",
+  "@onboardingFeature3Title": {
+    "description": "Feature 3 title on onboarding"
+  },
+  "onboardingFeature3Badge": "100% OFFLINE",
+  "@onboardingFeature3Badge": {
+    "description": "Feature 3 badge on onboarding"
+  },
+  "onboardingFeature3Desc": "Your data never leaves your device. Fully encrypted local SQLite storage.",
+  "@onboardingFeature3Desc": {
+    "description": "Feature 3 description on onboarding"
+  },
+  "onboardingBtnBeginSetup": "Begin Expedition Setup",
+  "@onboardingBtnBeginSetup": {
+    "description": "Button to begin setup on onboarding"
+  },
+  "onboardingRestoreBackupPrefix": "Have an existing vault? ",
+  "@onboardingRestoreBackupPrefix": {
+    "description": "Prefix text for restore backup on onboarding"
+  },
+  "onboardingRestoreBackupFile": "Restore Backup",
+  "@onboardingRestoreBackupFile": {
+    "description": "Clickable text for restore backup on onboarding"
+  },
+  "onboardingRestoreBackupSuffix": " to continue where you left off.",
+  "@onboardingRestoreBackupSuffix": {
+    "description": "Suffix text for restore backup on onboarding"
+  },
+  "profileClaimCompassTitle": "Claim Your Compass",
+  "@profileClaimCompassTitle": {
+    "description": "Title in onboarding step 2"
+  },
+  "profileBtnInitializeVault": "Initialize Local Vault",
+  "@profileBtnInitializeVault": {
+    "description": "Button to initialize vault on profile/onboarding"
+  },
+  "profileOfflineFirst": "100% Offline",
+  "@profileOfflineFirst": {
+    "description": "Offline badge on traveler avatar picker"
+  },
+  "onboardingSkip": "Skip",
+  "@onboardingSkip": {
+    "description": "Skip button in onboarding header"
+  },
+  "onboardingStep1Badge": "STEP 1 OF 2",
+  "@onboardingStep1Badge": {
+    "description": "Step 1 badge in onboarding header"
+  },
+  "onboardingStep2Badge": "STEP 2 OF 2",
+  "@onboardingStep2Badge": {
+    "description": "Step 2 badge in onboarding header"
+  },
+  "profileMeasurementStandards": "Measurement Standards",
+  "@profileMeasurementStandards": {
+    "description": "Measurement standards label in vault settings card"
+  },
+  "profileMetricUnit": "Metric (km, m, °C)",
+  "@profileMetricUnit": {
+    "description": "Metric unit option in vault settings card"
+  },
+  "profileImperialUnit": "Imperial (mi, ft, °F)",
+  "@profileImperialUnit": {
+    "description": "Imperial unit option in vault settings card"
+  },
+  "profileAutoExifTitle": "Auto-Extract EXIF Data",
+  "@profileAutoExifTitle": {
+    "description": "Auto EXIF setting title in vault settings card"
+  },
+  "profileAutoExifDesc": "Extract GPS coordinates and timestamps from photos automatically",
+  "@profileAutoExifDesc": {
+    "description": "Auto EXIF setting description in vault settings card"
+  },
+  "profileDbTargetLabel": "Database Target",
+  "@profileDbTargetLabel": {
+    "description": "Database target label in vault settings card"
+  },
+  "profileDbAllocated": "Allocated",
+  "@profileDbAllocated": {
+    "description": "Allocated badge in vault settings card"
+  },
+  "settingsPrivacySection": "Privacy & Architecture",
+  "@settingsPrivacySection": {
+    "description": "Header for privacy section on settings screen"
+  },
+  "settingsZeroCloudTitle": "Zero Cloud Tracking",
+  "@settingsZeroCloudTitle": {
+    "description": "Title for zero cloud tracking point"
+  },
+  "settingsZeroCloudDesc": "All journeys, coordinates, and memoirs remain strictly on your device.",
+  "@settingsZeroCloudDesc": {
+    "description": "Description for zero cloud tracking point"
+  },
+  "settingsNativeExifTitle": "Native Hardware EXIF Extraction",
+  "@settingsNativeExifTitle": {
+    "description": "Title for native EXIF extraction point"
+  },
+  "settingsNativeExifDesc": "Stamps date, time, and coordinates from your original photos without internet.",
+  "@settingsNativeExifDesc": {
+    "description": "Description for native EXIF extraction point"
+  },
+  "settingsOfflineTrailsTitle": "Offline Vector Trails",
+  "@settingsOfflineTrailsTitle": {
+    "description": "Title for offline vector trails point"
+  },
+  "settingsOfflineTrailsDesc": "Calculates smooth geographic trajectories through on-device interpolation.",
+  "@settingsOfflineTrailsDesc": {
+    "description": "Description for offline vector trails point"
+  },
+  "profileStopsCount": "{count, plural, =1{1 stop} other{{count} stops}}",
+  "@profileStopsCount": {
+    "description": "Stops count formatted",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "profileTravelAlbumsEmptyBadge": "EXPEDITION LOGS",
+  "@profileTravelAlbumsEmptyBadge": {
+    "description": "Badge on profile travel albums empty state"
+  },
+  "profilePrivateBadge": "100% Private",
+  "@profilePrivateBadge": {
+    "description": "Badge indicating 100% private storage"
+  },
+  "onboardingHeroArchive": "WAYMARK ARCHIVE",
+  "@onboardingHeroArchive": {
+    "description": "Archive label on onboarding hero card"
+  },
+  "onboardingHeroPlateNo": "PLATE NO. 12",
+  "@onboardingHeroPlateNo": {
+    "description": "Plate number label on onboarding hero card"
+  },
+  "onboardingRestoreBackupSnackbar": "Select your encrypted .waymark archive file to restore local trips and journal snapshots.",
+  "@onboardingRestoreBackupSnackbar": {
+    "description": "Snackbar info text for restore backup on onboarding"
+  },
+  "onboardingVaultInitError": "Failed to initialize vault: {error}",
+  "@onboardingVaultInitError": {
+    "description": "Error message when initializing vault fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Permission denied"
+      }
+    }
+  },
+  "vaultPrivateStorageTitle": "Private Travel Storage",
+  "@vaultPrivateStorageTitle": {
+    "description": "Title for private travel storage card"
+  },
+  "vaultPrivateStorageSubtitle": "Private • On-Device Only",
+  "@vaultPrivateStorageSubtitle": {
+    "description": "Subtitle for private travel storage card"
+  },
+  "vaultOfflineBadge": "100% Offline",
+  "@vaultOfflineBadge": {
+    "description": "Offline badge on private travel storage card"
+  },
+  "emptyDeckBadge": "OFFLINE FIELD JOURNAL",
+  "@emptyDeckBadge": {
+    "description": "Badge on empty journeys deck"
+  },
+  "weatherClear": "Clear",
+  "@weatherClear": {
+    "description": "Default clear weather fallback"
+  },
+  "journeysStopOrder": "Stop #{order}",
+  "@journeysStopOrder": {
+    "description": "Stop order indicator on waypoint card",
+    "placeholders": {
+      "order": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "journeysExportFieldJournalPreparing": "Field Journal PDF compiler is preparing your printable layout...",
+  "@journeysExportFieldJournalPreparing": {
+    "description": "Snackbar text when preparing field journal export"
+  },
+  "journeysExpeditionStatusBadge": "EXPEDITION STATUS",
+  "@journeysExpeditionStatusBadge": {
+    "description": "Badge for expedition status on journeys dashboard"
+  },
+  "journeysSelectedWaypoint": "Selected waypoint: {name}",
+  "@journeysSelectedWaypoint": {
+    "description": "Snackbar text when a waypoint is tapped",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Phewa Lake"
+      }
+    }
+  },
+  "journeysTagBackpacking": "Backpacking",
+  "@journeysTagBackpacking": {
+    "description": "Tag label for backpacking"
+  },
+  "journeysTagTemples": "Temples",
+  "@journeysTagTemples": {
+    "description": "Tag label for temples"
+  },
+  "journeysTagTeaTrails": "Tea Trails",
+  "@journeysTagTeaTrails": {
+    "description": "Tag label for tea trails"
+  },
+  "createJourneyTitleRequired": "Please enter a title",
+  "@createJourneyTitleRequired": {
+    "description": "Validation message when title is empty in create journey form"
+  },
+  "createJourneyOptional": "Optional",
+  "@createJourneyOptional": {
+    "description": "Optional label in create journey form"
+  },
+  "createJourneyFailedToast": "Failed to create journey: {error}",
+  "@createJourneyFailedToast": {
+    "description": "Error toast when creating a journey fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Database error"
+      }
+    }
+  }
+}

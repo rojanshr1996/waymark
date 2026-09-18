@@ -20,7 +20,6 @@ enum Flavor {
 class AppFlavorConfig {
   final Flavor flavor;
   final String appTitle;
-  final String apiBaseUrl;
   final bool enableLogging;
   final Map<String, dynamic> extraConfig;
 
@@ -29,7 +28,6 @@ class AppFlavorConfig {
   AppFlavorConfig._({
     required this.flavor,
     required this.appTitle,
-    required this.apiBaseUrl,
     required this.enableLogging,
     required this.extraConfig,
   });
@@ -48,14 +46,12 @@ class AppFlavorConfig {
   static void initialize({
     required Flavor flavor,
     required String appTitle,
-    required String apiBaseUrl,
     bool enableLogging = false,
     Map<String, dynamic> extraConfig = const {},
   }) {
     _instance = AppFlavorConfig._(
       flavor: flavor,
       appTitle: appTitle,
-      apiBaseUrl: apiBaseUrl,
       enableLogging: enableLogging,
       extraConfig: extraConfig,
     );

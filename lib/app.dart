@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:waymark/core/config/flavor_config.dart';
+import 'package:waymark/core/constants/waymark_spacing.dart';
+import 'package:waymark/core/l10n/app_localizations.dart';
+import 'package:waymark/core/presentation/widgets/widgets.dart';
+import 'package:waymark/core/router/app_router.dart';
 import 'package:waymark/core/theme/waymark_theme.dart';
+import 'package:waymark/core/theme/waymark_typography.dart';
 
 class WaymarkApp extends StatelessWidget {
   const WaymarkApp({super.key});
@@ -15,90 +21,147 @@ class WaymarkApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
+        return MaterialApp.router(
           title: config.appTitle,
           debugShowCheckedModeBanner: !config.flavor.isProduction,
           theme: WaymarkTheme.lightTheme,
-          home: FlavorHomeScreen(config: config),
+          scrollBehavior: const WaymarkNoOverscrollScrollBehavior(),
+          routerConfig: AppRouter.router,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
         );
       },
     );
   }
 }
 
-class FlavorHomeScreen extends StatelessWidget {
+class FlavorHomeScreen extends StatefulWidget {
   final AppFlavorConfig config;
 
   const FlavorHomeScreen({super.key, required this.config});
 
   @override
+  State<FlavorHomeScreen> createState() => _FlavorHomeScreenState();
+}
+
+class _FlavorHomeScreenState extends State<FlavorHomeScreen> {
+  final ValueNotifier<int> _currentNavIndexNotifier = ValueNotifier<int>(0);
+
+  @override
+  void dispose() {
+    _currentNavIndexNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(config.appTitle),
-        centerTitle: true,
-        actions: [
-          if (!config.flavor.isProduction)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Chip(
-                label: Text(
-                  config.flavor.name.toUpperCase(),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+    final config = widget.config;
+
+    return ValueListenableBuilder<int>(
+      valueListenable: _currentNavIndexNotifier,
+      builder: (context, currentNavIndex, _) {
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          extendBody: true,
+          appBar: WaymarkLiquidGlassAppBar(
+            showBrandMasthead: true,
+            sectionName: switch (currentNavIndex) {
+              0 => 'Journeys',
+              1 => 'Explore',
+              2 => 'Studio',
+              3 => 'Profile',
+              _ => 'Journeys',
+            },
+            actions: [
+              if (!config.flavor.isProduction)
+                Padding(
+                  padding: EdgeInsets.only(right: 8.w),
+                  child: WaymarkStatusPill(
+                    label: config.flavor.name.toUpperCase(),
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              IconButton(
+                icon: const Icon(Icons.notifications_none_rounded),
+                onPressed: () {},
               ),
-            ),
-        ],
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.verified_user_outlined,
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Environment: ${config.flavor.displayName}',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
+            ],
+          ),
+          bottomNavigationBar: WaymarkLiquidGlassBottomNavBar(
+            currentIndex: currentNavIndex,
+            onTap: (index) {
+              _currentNavIndexNotifier.value = index;
+            },
+          ),
+          body: Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: WaymarkSpacing.margin(context),
+                vertical: 100.h,
+              ),
+              child: WaymarkCard(
+                padding: EdgeInsets.all(WaymarkSpacing.spaceLg),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.verified_user_outlined,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 28.sp,
                         ),
-                      ),
-                    ],
-                  ),
-                  const Divider(height: 24),
-                  _buildInfoRow('App Name', config.appTitle),
-                  _buildInfoRow('Flavor Identifier', config.flavor.name),
-                  _buildInfoRow('API Endpoint', config.apiBaseUrl),
-                  _buildInfoRow(
-                    'Debug Logging',
-                    config.enableLogging ? 'Enabled' : 'Disabled',
-                  ),
-                ],
+                        SizedBox(width: 10.w),
+                        Expanded(
+                          child: Text(
+                            'Environment: ${config.flavor.displayName}',
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(height: 24.h),
+                    _buildInfoRow(context, 'App Name', config.appTitle),
+                    _buildInfoRow(
+                      context,
+                      'Flavor Identifier',
+                      config.flavor.name,
+                    ),
+                    _buildInfoRow(
+                      context,
+                      'Active Tab',
+                      WaymarkLiquidGlassBottomNavBar.defaultItems(
+                        context,
+                      )[currentNavIndex].label,
+                    ),
+                    _buildInfoRow(
+                      context,
+                      'Debug Logging',
+                      config.enableLogging ? 'Enabled' : 'Disabled',
+                    ),
+                    SizedBox(height: WaymarkSpacing.spaceMd),
+                    Text(
+                      'Liquid Glass Effect active on App Bar and Bottom Nav Bar with backdrop blur, specular gradients, and ambient shadows.',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -108,7 +171,7 @@ class FlavorHomeScreen extends StatelessWidget {
             width: 140,
             child: Text(
               label,
-              style: const TextStyle(
+              style: context.textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Colors.grey,
               ),
@@ -117,7 +180,9 @@ class FlavorHomeScreen extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: context.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],

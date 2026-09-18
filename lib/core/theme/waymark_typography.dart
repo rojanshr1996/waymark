@@ -3,6 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'waymark_colors.dart';
 
+/// Single source of truth for Typography, font families, font sizes,
+/// and font weights throughout WayMark.
+///
+/// Strictly aligns with `DESIGN.md`:
+/// - Headings & Display: Outfit
+/// - Body, Labels & Captions: Inter
+/// - Brand Script / Signatures: Caveat
 class WaymarkTypography {
   static TextTheme getTextTheme() {
     return TextTheme(
@@ -75,9 +82,8 @@ class WaymarkTypography {
         color: WaymarkColors.textSecondary,
       ),
 
-      // Labels & Captions
+      // Labels & Buttons
       labelLarge: GoogleFonts.inter(
-        // Used for buttons often
         fontSize: 14.sp,
         fontWeight: FontWeight.w600,
         height: 20 / 14,
@@ -100,4 +106,40 @@ class WaymarkTypography {
       ),
     );
   }
+}
+
+/// Convenience extensions for accessing the centralized typography
+/// tokens directly from [BuildContext] and [TextTheme].
+extension WaymarkTextThemeExtension on TextTheme {
+  /// Micro metadata caption (Inter 10sp w500 from DESIGN.md)
+  TextStyle get caption => GoogleFonts.inter(
+    fontSize: 10.sp,
+    fontWeight: FontWeight.w500,
+    height: 12 / 10,
+    letterSpacing: 0.04 * 10.sp,
+    color: WaymarkColors.textSecondary,
+  );
+
+  /// Brand brush/cursive display script (Caveat 52sp w700)
+  TextStyle get brandScript => GoogleFonts.caveat(
+    fontSize: 52.sp,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0.5,
+    color: Colors.white,
+  );
+
+  /// Brand signature cursive style for the app name "WayMark" across all screens.
+  /// Uses Caveat with FontWeight.w700, matching the signature font from splash screen.
+  TextStyle get brandTitle => GoogleFonts.caveat(
+    fontSize: 21.sp,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.2,
+    height: 1.1,
+    color: WaymarkColors.textMain,
+  );
+}
+
+extension WaymarkThemeContextExtension on BuildContext {
+  /// Direct access to the centralized TextTheme
+  TextTheme get textTheme => Theme.of(this).textTheme;
 }

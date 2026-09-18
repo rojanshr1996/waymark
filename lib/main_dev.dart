@@ -5,7 +5,6 @@ void main() {
   AppFlavorConfig.initialize(
     flavor: Flavor.dev,
     appTitle: 'Waymark Dev',
-    apiBaseUrl: 'https://dev-api.waymark.app',
     enableLogging: true,
   );
 

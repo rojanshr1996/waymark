@@ -1,0 +1,86 @@
+# WayMark Android Fastfile
+# Requires: gem install fastlane && fastlane add_plugin firebase_app_distribution
+
+default_platform(:android)
+
+platform :android do
+  # ── Dev Lane ──────────────────────────────────────────────────────
+  desc "Build and distribute Dev flavor APK to Firebase App Distribution"
+  lane :distribute_dev do |options|
+    notes = options[:notes] || "Dev build"
+    gradle(
+      task: "assemble",
+      flavor: "Dev",
+      build_type: "Release",
+      project_dir: "../android"
+    )
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID_ANDROID_DEV"],
+      release_notes: notes,
+      groups: "dev-testers",
+      firebase_cli_token: ENV["FIREBASE_TOKEN"],
+      android_artifact_type: "APK",
+      android_artifact_path: "build/app/outputs/flutter-apk/app-dev-release.apk"
+    )
+  end
+
+  # ── QA Lane ───────────────────────────────────────────────────────
+  desc "Build and distribute QA flavor APK to Firebase App Distribution"
+  lane :distribute_qa do |options|
+    notes = options[:notes] || "QA build"
+    gradle(
+      task: "assemble",
+      flavor: "Qa",
+      build_type: "Release",
+      project_dir: "../android"
+    )
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID_ANDROID_QA"],
+      release_notes: notes,
+      groups: "qa-testers",
+      firebase_cli_token: ENV["FIREBASE_TOKEN"],
+      android_artifact_type: "APK",
+      android_artifact_path: "build/app/outputs/flutter-apk/app-qa-release.apk"
+    )
+  end
+
+  # ── UAT Lane ──────────────────────────────────────────────────────
+  desc "Build and distribute UAT flavor APK to Firebase App Distribution"
+  lane :distribute_uat do |options|
+    notes = options[:notes] || "UAT build"
+    gradle(
+      task: "assemble",
+      flavor: "Uat",
+      build_type: "Release",
+      project_dir: "../android"
+    )
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID_ANDROID_UAT"],
+      release_notes: notes,
+      groups: "uat-testers",
+      firebase_cli_token: ENV["FIREBASE_TOKEN"],
+      android_artifact_type: "APK",
+      android_artifact_path: "build/app/outputs/flutter-apk/app-uat-release.apk"
+    )
+  end
+
+  # ── Production Lane ───────────────────────────────────────────────
+  desc "Build and distribute Production flavor APK to Firebase App Distribution"
+  lane :distribute_prod do |options|
+    notes = options[:notes] || "Production build"
+    gradle(
+      task: "assemble",
+      flavor: "Production",
+      build_type: "Release",
+      project_dir: "../android"
+    )
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID_ANDROID_PROD"],
+      release_notes: notes,
+      groups: "prod-testers",
+      firebase_cli_token: ENV["FIREBASE_TOKEN"],
+      android_artifact_type: "APK",
+      android_artifact_path: "build/app/outputs/flutter-apk/app-production-release.apk"
+    )
+  end
+end

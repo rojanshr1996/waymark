@@ -7,35 +7,40 @@ class WaymarkPrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
+  final IconData? trailingIcon;
+  final bool isLoading;
 
   const WaymarkPrimaryButton({
     super.key,
     required this.label,
     this.onPressed,
     this.icon,
+    this.trailingIcon,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colorScheme;
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(
           WaymarkSpacing.radiusFull,
         ), // Pill shape
-        boxShadow: onPressed == null
+        boxShadow: (onPressed == null || isLoading)
             ? null
             : [
                 BoxShadow(
-                  color: WaymarkColors.primary.withOpacity(0.28),
+                  color: colors.primary.withValues(alpha: 0.28),
                   blurRadius: 28.r,
                   offset: Offset(0, 12.h),
                 ),
               ],
       ),
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: WaymarkColors.primary,
+          backgroundColor: colors.primary,
           foregroundColor: Colors.white,
           elevation: 0, // Handled by Container's boxShadow
           padding: EdgeInsets.symmetric(
@@ -48,18 +53,37 @@ class WaymarkPrimaryButton extends StatelessWidget {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (icon != null) ...[
+            if (isLoading) ...[
+              SizedBox(
+                width: 16.w,
+                height: 16.w,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              SizedBox(width: WaymarkSpacing.spaceXs),
+            ] else if (icon != null) ...[
               Icon(icon, size: 20.sp),
               SizedBox(width: WaymarkSpacing.spaceXs),
             ],
-            Text(
-              label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
+            Flexible(
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
+            if (trailingIcon != null) ...[
+              SizedBox(width: WaymarkSpacing.spaceXs),
+              Icon(trailingIcon, size: 20.sp),
+            ],
           ],
         ),
       ),
@@ -81,12 +105,13 @@ class WaymarkSecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colorScheme;
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: WaymarkColors.secondary,
-        backgroundColor: WaymarkColors.background,
-        side: const BorderSide(color: WaymarkColors.secondary, width: 1.5),
+        foregroundColor: colors.secondary,
+        backgroundColor: colors.surface,
+        side: BorderSide(color: colors.secondary, width: 1.5),
         padding: EdgeInsets.symmetric(
           horizontal: WaymarkSpacing.spaceLg,
           vertical: WaymarkSpacing.spaceMd,
@@ -105,7 +130,7 @@ class WaymarkSecondaryButton extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: WaymarkColors.secondary,
+              color: colors.secondary,
               fontWeight: FontWeight.w600,
             ),
           ),

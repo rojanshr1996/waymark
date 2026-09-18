@@ -5,7 +5,6 @@ void main() {
   AppFlavorConfig.initialize(
     flavor: Flavor.uat,
     appTitle: 'Waymark UAT',
-    apiBaseUrl: 'https://uat-api.waymark.app',
     enableLogging: true,
   );
 

@@ -1,0 +1,6 @@
+# WayMark iOS Appfile
+# Replace with your actual Apple ID and app identifier
+app_identifier("com.waymark.app")
+apple_id("your_apple_id@example.com")
+itc_team_id("")  # App Store Connect Team ID
+team_id("")      # Developer Portal Team ID
