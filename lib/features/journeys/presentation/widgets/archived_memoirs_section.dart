@@ -18,12 +18,17 @@ class ArchivedMemoirsSection extends StatelessWidget {
   final ValueChanged<TripAlbum>? onAlbumEdit;
   final String? title;
 
+  /// Optional map of albumId → live distance (km) overrides.
+  /// When provided, shown instead of [TripAlbum.totalDistanceKm].
+  final Map<String, double>? albumDistances;
+
   const ArchivedMemoirsSection({
     super.key,
     required this.albums,
     this.onAlbumTap,
     this.onAlbumEdit,
     this.title,
+    this.albumDistances,
   });
 
   @override
@@ -191,7 +196,7 @@ class ArchivedMemoirsSection extends StatelessWidget {
                           color: colors.textSecondary,
                         ),
                         Text(
-                          '${album.totalDistanceKm.toStringAsFixed(1)} km',
+                          '${(albumDistances?[album.id] ?? album.totalDistanceKm).toStringAsFixed(1)} km',
                           style: context.textTheme.caption.copyWith(
                             color: colors.textSecondary,
                             fontSize: 11.sp,

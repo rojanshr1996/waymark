@@ -6,8 +6,10 @@ import 'package:waymark/core/router/route_names.dart';
 import 'package:waymark/features/journeys/presentation/screens/all_active_expeditions_screen.dart';
 import 'package:waymark/features/journeys/presentation/screens/journey_album_detail_screen.dart';
 import 'package:waymark/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:waymark/features/settings/presentation/screens/settings_info_screens.dart';
 import 'package:waymark/features/settings/presentation/screens/settings_screen.dart';
 import 'package:waymark/features/splash/presentation/screens/splash_screen.dart';
+import 'package:waymark/features/studio/presentation/screens/postcard_studio_screen.dart';
 
 /// Centralized application router using GoRouter with declarative routing
 /// and persistent StatefulShellRoute navigation for bottom tabs.
@@ -50,6 +52,32 @@ class AppRouter {
         path: AppRoutes.settings,
         name: AppRoutes.settingsName,
         builder: (context, state) => const SettingsScreen(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.helpSupport,
+        name: AppRoutes.helpSupportName,
+        builder: (context, state) => const HelpSupportScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.faq,
+        name: AppRoutes.faqName,
+        builder: (context, state) => const FaqScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.about,
+        name: AppRoutes.aboutName,
+        builder: (context, state) => const AboutScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.privacyPolicy,
+        name: AppRoutes.privacyPolicyName,
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.termsConditions,
+        name: AppRoutes.termsConditionsName,
+        builder: (context, state) => const TermsConditionsScreen(),
       ),
 
       // 4. Main Shell Page with 4 Child Screens & Detail Subroute
@@ -96,6 +124,14 @@ class AppRouter {
         name: AppRoutes.profileName,
         builder: (context, state) =>
             const WaymarkNavigationShell(initialIndex: 3),
+      ),
+
+      GoRoute(
+        path: AppRoutes.postcardGenerator,
+        name: AppRoutes.postcardGeneratorName,
+        builder: (context, state) => PostcardStudioScreen(
+          initialAlbumId: state.pathParameters['albumId'],
+        ),
       ),
     ],
   );

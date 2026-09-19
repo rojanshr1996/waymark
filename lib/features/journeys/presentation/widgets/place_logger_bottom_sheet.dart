@@ -14,6 +14,7 @@ import 'package:uuid/uuid.dart';
 import 'package:waymark/core/constants/waymark_spacing.dart';
 import 'package:waymark/core/database/app_database.dart';
 import 'package:waymark/core/l10n/l10n_extension.dart';
+import 'package:waymark/core/presentation/widgets/waymark_shimmer.dart';
 import 'package:waymark/core/presentation/widgets/waymark_snackbar.dart';
 import 'package:waymark/core/services/location_search_service.dart';
 import 'package:waymark/core/theme/waymark_colors.dart';
@@ -450,18 +451,20 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
     _searchDebounce?.cancel();
     final clean = query.trim();
     if (clean.isEmpty) {
+      _searchCancelToken?.cancel();
       _searchStateNotifier.value = const _SearchState();
       return;
     }
+
+    _searchStateNotifier.value = _searchStateNotifier.value.copyWith(
+      isSearching: true,
+      showAll: false,
+    );
 
     _searchDebounce = Timer(const Duration(milliseconds: 350), () async {
       _searchCancelToken?.cancel();
       _searchCancelToken = CancelToken();
 
-      _searchStateNotifier.value = _searchStateNotifier.value.copyWith(
-        isSearching: true,
-        showAll: false,
-      );
       try {
         final results = await LocationSearchService.instance.search(
           clean,
@@ -582,66 +585,239 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
     showModalBottomSheet(
       context: context,
       backgroundColor: colors.surfaceCard,
+      isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
       builder: (ctx) {
         return SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: WaymarkSpacing.margin(ctx),
-              vertical: WaymarkSpacing.spaceMd,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ListTile(
-                  leading: Icon(
-                    Icons.camera_alt_rounded,
-                    color: colors.primary,
+                // Top Grab Handle
+                Center(
+                  child: Container(
+                    width: 44.w,
+                    height: 4.h,
+                    margin: EdgeInsets.only(bottom: 16.h),
+                    decoration: BoxDecoration(
+                      color: colors.borderDivider.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
                   ),
-                  title: Text(
-                    ctx.l10n.profileBtnTakePhoto,
-                    style: ctx.textTheme.titleMedium,
+                ),
+
+                // Header
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 3.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(
+                          WaymarkSpacing.radiusFull,
+                        ),
+                      ),
+                      child: Text(
+                        'VISUAL RELICS',
+                        style: ctx.textTheme.labelSmall?.copyWith(
+                          color: colors.primary,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.1,
+                          fontSize: 10.sp,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 6.h),
+                Text(
+                  'Attach Photo Artifact',
+                  style: ctx.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: colors.textPrimary,
                   ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  'Preserve photographic memories alongside this waypoint stop.',
+                  style: ctx.textTheme.caption.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                ),
+                SizedBox(height: 18.h),
+
+                // Option 1: Take Photo (Camera)
+                _buildPhotoSourceTile(
+                  context: ctx,
+                  colors: colors,
+                  title: 'Take Camera Photo',
+                  subtitle:
+                      'Capture a live shot directly from your device camera',
+                  gradient: const [Color(0xFFE07A5F), Color(0xFFC85A17)],
+                  icon: Icons.photo_camera_rounded,
                   onTap: () {
                     Navigator.of(ctx).pop();
                     _pickPhoto(ImageSource.camera);
                   },
                 ),
-                ListTile(
-                  leading: Icon(
-                    Icons.photo_library_rounded,
-                    color: colors.secondary,
-                  ),
-                  title: Text(
-                    ctx.l10n.profileBtnFromGallery,
-                    style: ctx.textTheme.titleMedium,
-                  ),
+                SizedBox(height: 10.h),
+
+                // Option 2: Gallery Picker
+                _buildPhotoSourceTile(
+                  context: ctx,
+                  colors: colors,
+                  title: 'Choose from Gallery',
+                  subtitle:
+                      'Select high-resolution snapshots from your library',
+                  gradient: const [Color(0xFF2A9D8F), Color(0xFF1B6B62)],
+                  icon: Icons.photo_library_rounded,
                   onTap: () {
                     Navigator.of(ctx).pop();
                     _pickPhoto(ImageSource.gallery);
                   },
                 ),
-                ListTile(
-                  leading: Icon(
-                    Icons.collections_rounded,
-                    color: colors.tertiary,
-                  ),
-                  title: Text(
-                    'Sample Travel Photos',
-                    style: ctx.textTheme.titleMedium,
-                  ),
+                SizedBox(height: 10.h),
+
+                // Option 3: Sample Travel Photos
+                _buildPhotoSourceTile(
+                  context: ctx,
+                  colors: colors,
+                  title: 'Sample Travel Photos',
+                  subtitle:
+                      'Explore curated demo shots (Kyoto, shrines, landscapes)',
+                  gradient: const [Color(0xFF457B9D), Color(0xFF1D3557)],
+                  icon: Icons.collections_rounded,
+                  badge: 'DEMO',
                   onTap: () {
                     Navigator.of(ctx).pop();
                     _showSamplePhotoPicker();
                   },
                 ),
+                SizedBox(height: 12.h),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildPhotoSourceTile({
+    required BuildContext context,
+    required ColorScheme colors,
+    required String title,
+    required String subtitle,
+    required List<Color> gradient,
+    required IconData icon,
+    required VoidCallback onTap,
+    String? badge,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16.r),
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: colors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: colors.borderDivider.withValues(alpha: 0.5),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 44.w,
+                height: 44.w,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: gradient,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: gradient.last.withValues(alpha: 0.35),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Icon(icon, color: Colors.white, size: 22.sp),
+              ),
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            title,
+                            style: context.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: colors.textPrimary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (badge != null) ...[
+                          SizedBox(width: 6.w),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 6.w,
+                              vertical: 1.5.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colors.tertiary.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                            child: Text(
+                              badge,
+                              style: context.textTheme.caption.copyWith(
+                                color: colors.tertiary,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 9.sp,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      subtitle,
+                      style: context.textTheme.caption.copyWith(
+                        color: colors.textSecondary,
+                        fontSize: 11.5.sp,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: colors.textSecondary.withValues(alpha: 0.6),
+                size: 20.sp,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -683,24 +859,51 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
     showModalBottomSheet(
       context: context,
       backgroundColor: colors.surfaceCard,
+      isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
       builder: (ctx) {
         return SafeArea(
           child: Padding(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(20.w),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: Container(
+                    width: 44.w,
+                    height: 4.h,
+                    margin: EdgeInsets.only(bottom: 12.h),
+                    decoration: BoxDecoration(
+                      color: colors.borderDivider.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Sample Travel Photos',
-                      style: ctx.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Curated Travel Photos',
+                            style: ctx.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 17.sp,
+                            ),
+                          ),
+                          SizedBox(height: 2.h),
+                          Text(
+                            'Select any sample image to attach to this place',
+                            style: ctx.textTheme.caption.copyWith(
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     IconButton(
@@ -709,28 +912,40 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
                     ),
                   ],
                 ),
-                SizedBox(height: 12.h),
+                SizedBox(height: 14.h),
                 SizedBox(
-                  height: 220.h,
+                  height: 260.h,
                   child: GridView.builder(
                     itemCount: sampleImages.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
                         ),
                     itemBuilder: (context, index) {
                       final asset = sampleImages[index];
                       return InkWell(
-                        borderRadius: BorderRadius.circular(8.r),
+                        borderRadius: BorderRadius.circular(12.r),
                         onTap: () {
                           Navigator.of(ctx).pop();
                           _addSamplePhoto(asset);
                         },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.r),
-                          child: Image.asset(asset, fit: BoxFit.cover),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12.r),
+                            child: Image.asset(asset, fit: BoxFit.cover),
+                          ),
                         ),
                       );
                     },
@@ -739,6 +954,155 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+
+  void _showPhotoLightbox(BuildContext context, int initialIndex) {
+    final colors = context.colorScheme;
+    final photos = _photos;
+    if (photos.isEmpty || initialIndex >= photos.length) return;
+
+    int currentIndex = initialIndex;
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final photo = photos[currentIndex];
+
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: EdgeInsets.symmetric(
+                horizontal: 14.w,
+                vertical: 20.h,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Lightbox Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Photo ${currentIndex + 1} of ${photos.length}',
+                              style: context.textTheme.titleMedium?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '${(photo.fileSizeBytes / 1024).round()} KB • ${photo.format}',
+                              style: context.textTheme.caption.copyWith(
+                                color: Colors.white70,
+                                fontSize: 11.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.of(dialogContext).pop(),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12.h),
+
+                  // Interactive Pinch-to-Zoom Image
+                  Flexible(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14.r),
+                      child: InteractiveViewer(
+                        minScale: 0.8,
+                        maxScale: 4.0,
+                        child: Center(
+                          child: _buildPhotoThumbnail(photo.path, colors),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 14.h),
+
+                  // Bottom Action Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Set as Cover Button
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: photo.isCover
+                              ? colors.primary
+                              : Colors.white.withValues(alpha: 0.2),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              WaymarkSpacing.radiusFull,
+                            ),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 10.h,
+                          ),
+                        ),
+                        icon: Icon(
+                          photo.isCover
+                              ? Icons.star_rounded
+                              : Icons.star_border_rounded,
+                          size: 18.sp,
+                          color: photo.isCover
+                              ? Colors.amberAccent
+                              : Colors.white,
+                        ),
+                        label: Text(
+                          photo.isCover ? 'Cover Photo' : 'Set as Cover',
+                          style: context.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        onPressed: () {
+                          for (final p in photos) {
+                            p.isCover = false;
+                          }
+                          photo.isCover = true;
+                          _photosNotifier.value = List.of(photos);
+                          setDialogState(() {});
+                        },
+                      ),
+                      SizedBox(width: 12.w),
+
+                      // Delete Button
+                      IconButton(
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.red.withValues(alpha: 0.2),
+                          foregroundColor: Colors.redAccent,
+                        ),
+                        icon: const Icon(Icons.delete_outline_rounded),
+                        onPressed: () {
+                          final updated = List<_AttachedPhotoItem>.from(photos);
+                          updated.removeAt(currentIndex);
+                          if (photo.isCover && updated.isNotEmpty) {
+                            updated.first.isCover = true;
+                          }
+                          _photosNotifier.value = updated;
+                          Navigator.of(dialogContext).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
@@ -854,6 +1218,8 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
           );
         }
 
+        unawaited(_updateAlbumDistance(db, widget.albumId));
+
         if (mounted) {
           Navigator.of(context).pop();
           WaymarkSnackbar.showSuccess(
@@ -919,6 +1285,8 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
           );
         }
 
+        unawaited(_updateAlbumDistance(db, widget.albumId));
+
         if (mounted) {
           Navigator.of(context).pop();
           WaymarkSnackbar.showSuccess(
@@ -936,6 +1304,44 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
         _isSavingNotifier.value = false;
       }
     }
+  }
+
+  Future<void> _updateAlbumDistance(AppDatabase db, String albumId) async {
+    try {
+      final places = await db.tripPlaceDao.getPlacesForAlbum(albumId);
+      if (places.length < 2) return;
+
+      final waypoints = places
+          .map((p) => (latitude: p.latitude, longitude: p.longitude))
+          .toList();
+
+      double total = 0.0;
+      const distCalc = Distance();
+      for (int i = 0; i < places.length - 1; i++) {
+        total += distCalc.as(
+          LengthUnit.Kilometer,
+          LatLng(places[i].latitude, places[i].longitude),
+          LatLng(places[i + 1].latitude, places[i + 1].longitude),
+        );
+      }
+
+      final result = await LocationSearchService.instance.fetchRoutePolyline(
+        waypoints,
+      );
+      final resolvedKm = (result != null && result.points.isNotEmpty)
+          ? result.distanceKm
+          : total;
+
+      final album = await db.tripAlbumDao.getAlbumById(albumId);
+      if (album != null) {
+        await db.tripAlbumDao.updateAlbum(
+          album.copyWith(
+            totalDistanceKm: resolvedKm,
+            updatedAt: DateTime.now(),
+          ),
+        );
+      }
+    } catch (_) {}
   }
 
   String _getCategoryLabel(BuildContext context, String key) {
@@ -1169,11 +1575,14 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
                         ),
                       ),
 
-                      // Search Suggestions Dropdown (Max 10 with View All option)
-                      if (searchResults.isNotEmpty) ...[
+                      // Search Suggestions Dropdown or Shimmer Loading Skeleton
+                      if (isSearching) ...[
                         SizedBox(height: 6.h),
                         Container(
-                          constraints: BoxConstraints(maxHeight: 280.h),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 14.w,
+                            vertical: 12.h,
+                          ),
                           decoration: BoxDecoration(
                             color: colors.surfaceCard,
                             borderRadius: BorderRadius.circular(12.r),
@@ -1185,8 +1594,91 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
                               ),
                             ],
                           ),
-                          child: ClipRRect(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 14.w,
+                                    height: 14.w,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: colors.primary,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Text(
+                                    'Searching places & addresses...',
+                                    style: context.textTheme.caption.copyWith(
+                                      color: colors.textSecondary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 11.5.sp,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10.h),
+                              ...List.generate(3, (index) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 6.h),
+                                  child: Row(
+                                    children: [
+                                      WaymarkShimmerBox(
+                                        width: 32.w,
+                                        height: 32.w,
+                                        borderRadius: BorderRadius.circular(
+                                          8.r,
+                                        ),
+                                      ),
+                                      SizedBox(width: 12.w),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            WaymarkShimmerBox(
+                                              width: 130.w + (index * 25.w),
+                                              height: 13.h,
+                                              borderRadius:
+                                                  BorderRadius.circular(4.r),
+                                            ),
+                                            SizedBox(height: 5.h),
+                                            WaymarkShimmerBox(
+                                              width: double.infinity,
+                                              height: 10.h,
+                                              borderRadius:
+                                                  BorderRadius.circular(3.r),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
+                      ] else if (searchResults.isNotEmpty) ...[
+                        SizedBox(height: 6.h),
+                        Container(
+                          constraints: BoxConstraints(maxHeight: 280.h),
+                          decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: colors.surfaceCard,
+                            borderRadius: BorderRadius.circular(12.r),
+                            clipBehavior: Clip.antiAlias,
                             child: ListView(
                               shrinkWrap: true,
                               padding: EdgeInsets.zero,
@@ -2067,14 +2559,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
                               alignment: Alignment.center,
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(14.r),
-                                onTap: () {
-                                  // Tap to set as cover
-                                  for (final p in photos) {
-                                    p.isCover = false;
-                                  }
-                                  item.isCover = true;
-                                  _photosNotifier.value = List.of(photos);
-                                },
+                                onTap: () => _showPhotoLightbox(context, index),
                                 child: Container(
                                   width: 125.w,
                                   padding: EdgeInsets.all(6.w),
@@ -2268,23 +2753,30 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.menu_book_rounded,
-                              color: colors.primary,
-                              size: 20.sp,
-                            ),
-                            SizedBox(width: 6.w),
-                            Text(
-                              'Description & Notes',
-                              style: context.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: colors.textPrimary,
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.menu_book_rounded,
+                                color: colors.primary,
+                                size: 20.sp,
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 6.w),
+                              Flexible(
+                                child: Text(
+                                  'Description & Notes',
+                                  style: context.textTheme.titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: colors.textPrimary,
+                                      ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        SizedBox(width: 8.w),
                         ValueListenableBuilder<TextEditingValue>(
                           valueListenable: _notesController,
                           builder: (context, _, _) {
@@ -2351,24 +2843,30 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.recommend_rounded,
-                                  color: const Color(0xFFD97706),
-                                  size: 20.sp,
-                                ),
-                                SizedBox(width: 6.w),
-                                Text(
-                                  'Recommendation Scale',
-                                  style: context.textTheme.titleMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: colors.textPrimary,
-                                      ),
-                                ),
-                              ],
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.recommend_rounded,
+                                    color: const Color(0xFFD97706),
+                                    size: 20.sp,
+                                  ),
+                                  SizedBox(width: 6.w),
+                                  Flexible(
+                                    child: Text(
+                                      'Recommendation Scale',
+                                      style: context.textTheme.titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: colors.textPrimary,
+                                          ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+                            SizedBox(width: 8.w),
                             // Animated badge displaying the score
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 250),

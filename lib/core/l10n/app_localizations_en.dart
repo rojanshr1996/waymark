@@ -797,15 +797,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get journeysDistanceLabel => 'Distance';
 
   @override
-  String get journeysWaypointsLabel => 'Waypoints';
+  String get journeysWaypointsLabel => 'Places';
 
   @override
   String journeysWaypointsLogged(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count waypoints',
-      one: '1 waypoint',
+      other: '$count places',
+      one: '1 place',
     );
     return '$_temp0 logged';
   }

@@ -49,7 +49,7 @@ class WaymarkLiquidGlassBottomNavBar extends StatelessWidget {
   /// Background color tint. Defaults to [ColorScheme.surfaceCard].
   final Color? backgroundColor;
 
-  /// Opacity of the background tint. Defaults to 0.90.
+  /// Opacity of the background tint. Defaults to 0.65.
   final double backgroundAlpha;
 
   const WaymarkLiquidGlassBottomNavBar({
@@ -61,7 +61,7 @@ class WaymarkLiquidGlassBottomNavBar extends StatelessWidget {
     this.enableHaptics = true,
     this.isFloatingDock = false,
     this.backgroundColor,
-    this.backgroundAlpha = 0.90,
+    this.backgroundAlpha = 0.65,
   });
 
   /// Default localized Stitch Suite 4-tab configuration
@@ -107,6 +107,7 @@ class WaymarkLiquidGlassBottomNavBar extends StatelessWidget {
         child: WaymarkLiquidGlass(
           width: isFloatingDock ? 360.w : double.infinity,
           height: totalHeight,
+          blurSigma: 8.0,
           margin: isFloatingDock
               ? EdgeInsets.only(
                   left: WaymarkSpacing.spaceMd,

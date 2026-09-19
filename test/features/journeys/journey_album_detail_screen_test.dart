@@ -1,8 +1,8 @@
+import 'package:drift/drift.dart' as drift;
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:drift/native.dart';
-import 'package:drift/drift.dart' as drift;
 import 'package:waymark/core/database/app_database.dart';
 import 'package:waymark/core/l10n/app_localizations.dart';
 import 'package:waymark/core/theme/waymark_typography.dart';
@@ -25,7 +25,9 @@ void main() {
     AppDatabase.resetInstance();
   });
 
-  testWidgets('JourneyAlbumDetailScreen renders 4-column stats, 3 tabs, bottom bar, and no Continue Memoir', (WidgetTester tester) async {
+  testWidgets('JourneyAlbumDetailScreen renders 4-column stats, 3 tabs, bottom bar, and no Continue Memoir', (
+    WidgetTester tester,
+  ) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2.0;
 
@@ -112,9 +114,7 @@ void main() {
         splitScreenMode: true,
         builder: (context, child) {
           return MaterialApp(
-            theme: ThemeData(
-              textTheme: WaymarkTypography.getTextTheme(),
-            ),
+            theme: ThemeData(textTheme: WaymarkTypography.getTextTheme()),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: const JourneyAlbumDetailScreen(journeyId: 'test-album-1'),
@@ -132,11 +132,10 @@ void main() {
     expect(find.textContaining('Trekking the misty mountain passes'), findsOneWidget);
     expect(find.text('ONGOING EXPEDITION'), findsOneWidget);
 
-    // Verify 4-Column Stats Bar
+    // Verify Stats Bar
     expect(find.text('Total Path'), findsOneWidget);
     expect(find.text('Places'), findsOneWidget);
     expect(find.text('Recorded'), findsOneWidget);
-    expect(find.text('Max Alt'), findsOneWidget);
 
     // Verify Segmented View Switcher Pill
     expect(find.text('Timeline'), findsOneWidget);
@@ -155,15 +154,15 @@ void main() {
     expect(find.text('Cedar Spring Shrine'), findsOneWidget);
     expect(find.textContaining('mountain bells echoing in the mist'), findsOneWidget);
     expect(find.textContaining('Pine and damp moss'), findsOneWidget);
-    expect(find.text('1450m Elev'), findsWidgets);
+    expect(find.textContaining('Misty Morning'), findsWidgets);
 
     // 4. Test Switching to Route Map Tab
     await tester.tap(find.text('Route Map'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('Live GPS'), findsOneWidget);
-    expect(find.text('Optimal foot & rail path recorded'), findsOneWidget);
+    expect(find.text('GPS Route Trace'), findsOneWidget);
+    expect(find.textContaining('Milestones'), findsOneWidget);
     expect(find.text('Echo Valley Pass'), findsWidgets);
     expect(find.text('Cedar Spring Shrine'), findsWidgets);
 

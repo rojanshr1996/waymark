@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:waymark/core/constants/waymark_spacing.dart';
@@ -14,6 +15,7 @@ import 'package:waymark/core/presentation/widgets/waymark_liquid_glass_app_bar.d
 import 'package:waymark/core/presentation/widgets/waymark_scroll_behavior.dart';
 import 'package:waymark/core/presentation/widgets/waymark_shimmer.dart';
 import 'package:waymark/core/presentation/widgets/waymark_snackbar.dart';
+import 'package:waymark/core/router/route_names.dart';
 import 'package:waymark/core/services/location_search_service.dart';
 import 'package:waymark/core/theme/waymark_colors.dart';
 import 'package:waymark/core/theme/waymark_typography.dart';
@@ -48,6 +50,9 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
   final ValueNotifier<double?> _roadDistanceKmNotifier = ValueNotifier<double?>(
     null,
   );
+  final ValueNotifier<bool> _isRouteLoadingNotifier = ValueNotifier<bool>(
+    false,
+  );
   String? _lastRouteKey;
 
   late Stream<TripAlbum?> _albumStream;
@@ -67,6 +72,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
     _wallDateRangeFilterNotifier.dispose();
     _roadRoutePointsNotifier.dispose();
     _roadDistanceKmNotifier.dispose();
+    _isRouteLoadingNotifier.dispose();
     _mapController.dispose();
     super.dispose();
   }
@@ -112,12 +118,15 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
     if (places.length < 2) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
+          _isRouteLoadingNotifier.value = false;
           _roadRoutePointsNotifier.value = null;
           _roadDistanceKmNotifier.value = null;
         }
       });
       return;
     }
+
+    _isRouteLoadingNotifier.value = true;
 
     final straightKm = _calculateStraightLineKm(places);
     final waypoints = places
@@ -126,15 +135,31 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
 
     LocationSearchService.instance.fetchRoutePolyline(waypoints).then((result) {
       if (!mounted) return;
+      _isRouteLoadingNotifier.value = false;
+
+      final double resolvedKm;
       if (result != null && result.points.isNotEmpty) {
         _roadRoutePointsNotifier.value = result.points
             .map((pt) => LatLng(pt.latitude, pt.longitude))
             .toList();
-        _roadDistanceKmNotifier.value = result.distanceKm;
+        resolvedKm = result.distanceKm;
       } else {
         _roadRoutePointsNotifier.value = null;
-        _roadDistanceKmNotifier.value = straightKm;
+        resolvedKm = straightKm;
       }
+      _roadDistanceKmNotifier.value = resolvedKm;
+
+      // Persist the resolved distance so the dashboard (and any other screen)
+      // reads the same value from the DB instead of a stale 0.
+      AppDatabase.instance.tripAlbumDao.getAlbumById(widget.journeyId).then((
+        album,
+      ) async {
+        if (album == null) return;
+        if ((album.totalDistanceKm - resolvedKm).abs() < 0.01) return;
+        await AppDatabase.instance.tripAlbumDao.updateAlbum(
+          album.copyWith(totalDistanceKm: resolvedKm),
+        );
+      });
     });
   }
 
@@ -219,17 +244,14 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                     title: 'Journey Detail',
                     subtitle: 'WayMark Journal',
                     actions: [
-                      IconButton(
-                        icon: const Icon(Icons.share_outlined),
-                        color: colors.onSurfaceVariant,
-                        tooltip: 'Share Journey',
-                        onPressed: () {
-                          WaymarkSnackbar.showInfo(
-                            context,
-                            'Sharing expedition summary for ${album.title}',
-                          );
-                        },
-                      ),
+                      // IconButton(
+                      //   icon: const Icon(Icons.share_outlined),
+                      //   color: colors.onSurfaceVariant,
+                      //   tooltip: 'Share Journey',
+                      //   onPressed: () {
+                      //     WaymarkSnackbar.showInfo(context, 'Sharing expedition summary for ${album.title}');
+                      //   },
+                      // ),
                     ],
                   ),
                   bottomNavigationBar: _buildStickyBottomActionBar(
@@ -274,7 +296,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                                       right: WaymarkSpacing.margin(context),
                                       top: 16.h,
                                       bottom:
-                                          120.h, // Space for sticky bottom bar
+                                          16.h, // Space for sticky bottom bar
                                     ),
                                     child: _buildActiveTabContent(
                                       context: context,
@@ -495,68 +517,94 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
         ? album.endDate!.difference(album.startDate).inDays + 1
         : DateTime.now().difference(album.startDate).inDays + 1;
 
-    return ValueListenableBuilder<double?>(
-      valueListenable: _roadDistanceKmNotifier,
-      builder: (context, roadDistanceKm, _) {
-        final dynamicDistance =
-            roadDistanceKm ?? _calculateStraightLineKm(places);
-        final totalKm = album.totalDistanceKm > 0.05
-            ? album.totalDistanceKm
-            : dynamicDistance;
-        final hasValidDistance = totalKm > 0.05;
+    return ValueListenableBuilder<bool>(
+      valueListenable: _isRouteLoadingNotifier,
+      builder: (context, isLoading, _) {
+        return ValueListenableBuilder<double?>(
+          valueListenable: _roadDistanceKmNotifier,
+          builder: (context, roadDistanceKm, _) {
+            final dynamicDistance =
+                roadDistanceKm ?? _calculateStraightLineKm(places);
+            final totalKm = album.totalDistanceKm > 0.05
+                ? album.totalDistanceKm
+                : dynamicDistance;
+            // Show the distance slot whenever we're loading (≥2 places) or
+            // there's already a valid distance resolved.
+            final willHaveDistance = places.length >= 2 || totalKm > 0.05;
 
-        return Container(
-          margin: EdgeInsets.symmetric(
-            horizontal: WaymarkSpacing.margin(context),
-            vertical: 8.h,
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          decoration: BoxDecoration(
-            color: colors.surfaceCard,
-            borderRadius: BorderRadius.circular(16.r),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0x0A1F2421),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
+            return Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: WaymarkSpacing.margin(context),
+                vertical: 8.h,
               ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Stat 1: Total Path (Dynamically fetched or computed; hidden if 0)
-              if (hasValidDistance) ...[
-                _buildStatColumn(
-                  context,
-                  value: totalKm.toStringAsFixed(1),
-                  unit: 'km',
-                  label: 'Total Path',
-                  valueColor: colors.primary,
-                ),
-                _buildStatDivider(colors),
-              ],
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              decoration: BoxDecoration(
+                color: colors.surfaceCard,
+                borderRadius: BorderRadius.circular(16.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0x0A1F2421),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Stat 1: Total Path — shimmer while loading, value when ready
+                  if (willHaveDistance) ...[
+                    if (isLoading)
+                      Expanded(
+                        child: Column(
+                          children: [
+                            WaymarkShimmerBox(
+                              width: 60.w,
+                              height: 18.h,
+                              borderRadius: BorderRadius.circular(6.r),
+                            ),
+                            SizedBox(height: 4.h),
+                            WaymarkShimmerBox(
+                              width: 48.w,
+                              height: 11.h,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      _buildStatColumn(
+                        context,
+                        value: totalKm.toStringAsFixed(1),
+                        unit: 'km',
+                        label: 'Total Path',
+                        valueColor: colors.primary,
+                      ),
+                    _buildStatDivider(colors),
+                  ],
 
-              // Stat 2: Places
-              _buildStatColumn(
-                context,
-                value: '${places.length}',
-                unit: '',
-                label: 'Places',
-                valueColor: colors.textPrimary,
-              ),
-              _buildStatDivider(colors),
+                  // Stat 2: Places
+                  _buildStatColumn(
+                    context,
+                    value: '${places.length}',
+                    unit: '',
+                    label: 'Places',
+                    valueColor: colors.textPrimary,
+                  ),
+                  _buildStatDivider(colors),
 
-              // Stat 3: Recorded Days
-              _buildStatColumn(
-                context,
-                value: '$daysRecorded',
-                unit: 'days',
-                label: 'Recorded',
-                valueColor: colors.secondary,
+                  // Stat 3: Recorded Days
+                  _buildStatColumn(
+                    context,
+                    value: '$daysRecorded',
+                    unit: 'days',
+                    label: 'Recorded',
+                    valueColor: colors.secondary,
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -1163,27 +1211,119 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8.w,
-                                      vertical: 2.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: colors.primary.withValues(
-                                        alpha: 0.08,
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8.w,
+                                          vertical: 2.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: colors.primary.withValues(
+                                            alpha: 0.08,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            WaymarkSpacing.radiusFull,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          place.category.toUpperCase(),
+                                          style: context.textTheme.caption
+                                              .copyWith(
+                                                color: colors.primary,
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 9.sp,
+                                              ),
+                                        ),
                                       ),
-                                      borderRadius: BorderRadius.circular(
-                                        WaymarkSpacing.radiusFull,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      place.category.toUpperCase(),
-                                      style: context.textTheme.caption.copyWith(
-                                        color: colors.primary,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 9.sp,
-                                      ),
-                                    ),
+                                      if (!isReordering) ...[
+                                        SizedBox(width: 4.w),
+                                        PopupMenuButton<String>(
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
+                                          icon: Icon(
+                                            Icons.more_vert_rounded,
+                                            size: 18.sp,
+                                            color: colors.textSecondary
+                                                .withValues(alpha: 0.7),
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12.r,
+                                            ),
+                                          ),
+                                          onSelected: (action) {
+                                            if (action == 'edit') {
+                                              PlaceLoggerBottomSheet.show(
+                                                context,
+                                                albumId: album.id,
+                                                albumTitle: album.title,
+                                                placeToEdit: place,
+                                              );
+                                            } else if (action == 'delete') {
+                                              _confirmDeletePlace(
+                                                context,
+                                                place,
+                                                album,
+                                                places,
+                                              );
+                                            }
+                                          },
+                                          itemBuilder: (ctx) => [
+                                            PopupMenuItem(
+                                              value: 'edit',
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.edit_outlined,
+                                                    size: 16.sp,
+                                                    color: colors.textPrimary,
+                                                  ),
+                                                  SizedBox(width: 8.w),
+                                                  Text(
+                                                    'Edit Place',
+                                                    style: ctx
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          color: colors
+                                                              .textPrimary,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            PopupMenuItem(
+                                              value: 'delete',
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons
+                                                        .delete_outline_rounded,
+                                                    size: 16.sp,
+                                                    color: Colors.redAccent,
+                                                  ),
+                                                  SizedBox(width: 8.w),
+                                                  Text(
+                                                    'Delete Place',
+                                                    style: ctx
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          color:
+                                                              Colors.redAccent,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ],
                                   ),
                                 ],
                               ),
@@ -2586,6 +2726,16 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
     TripAlbum album,
     int placesCount,
   ) {
+    if (album.id.isNotEmpty) {
+      context.push(
+        AppRoutes.postcardGenerator.replaceFirst(
+          ':albumId',
+          Uri.encodeComponent(album.id),
+        ),
+      );
+      return;
+    }
+
     final colors = context.colorScheme;
     final dateFmt = DateFormat('MMM d, yyyy');
 
@@ -2607,21 +2757,26 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.palette_rounded,
-                          color: colors.tertiary,
-                          size: 20.sp,
-                        ),
-                        SizedBox(width: 8.w),
-                        Text(
-                          'Postcard Memoir',
-                          style: ctx.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.palette_rounded,
+                            color: colors.tertiary,
+                            size: 20.sp,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 8.w),
+                          Flexible(
+                            child: Text(
+                              'Postcard Memoir',
+                              style: ctx.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close_rounded),
@@ -2834,5 +2989,306 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
         ],
       ),
     );
+  }
+
+  void _confirmDeletePlace(
+    BuildContext context,
+    TripPlace place,
+    TripAlbum album,
+    List<TripPlace> allPlaces,
+  ) {
+    final colors = context.colorScheme;
+    final isDeletingNotifier = ValueNotifier<bool>(false);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: colors.surfaceCard,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top grab handle
+                Center(
+                  child: Container(
+                    width: 44.w,
+                    height: 4.h,
+                    margin: EdgeInsets.only(bottom: 16.h),
+                    decoration: BoxDecoration(
+                      color: colors.borderDivider.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
+                  ),
+                ),
+
+                // Icon & Title
+                Row(
+                  children: [
+                    Container(
+                      width: 44.w,
+                      height: 44.w,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.delete_outline_rounded,
+                        color: Colors.redAccent,
+                        size: 24.sp,
+                      ),
+                    ),
+                    SizedBox(width: 14.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Delete Place Entry?',
+                            style: sheetContext.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colors.textPrimary,
+                            ),
+                          ),
+                          SizedBox(height: 2.h),
+                          Text(
+                            'This action cannot be undone',
+                            style: sheetContext.textTheme.caption.copyWith(
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+
+                // Place Summary Card
+                Container(
+                  padding: EdgeInsets.all(12.w),
+                  decoration: BoxDecoration(
+                    color: colors.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: colors.borderDivider.withValues(alpha: 0.6),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8.w),
+                        decoration: BoxDecoration(
+                          color: colors.primary.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.place_rounded,
+                          color: colors.primary,
+                          size: 20.sp,
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              place.name,
+                              style: sheetContext.textTheme.titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: colors.textPrimary,
+                                  ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (place.locationAddress != null &&
+                                place.locationAddress!.isNotEmpty) ...[
+                              SizedBox(height: 2.h),
+                              Text(
+                                place.locationAddress!,
+                                style: sheetContext.textTheme.caption.copyWith(
+                                  color: colors.textSecondary,
+                                  fontSize: 11.sp,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 14.h),
+
+                Text(
+                  'Are you sure you want to remove "${place.name}" from ${album.title}? '
+                  'Its associated photographic relics and stop order will be permanently removed.',
+                  style: sheetContext.textTheme.bodyMedium?.copyWith(
+                    color: colors.textSecondary,
+                    height: 1.4,
+                  ),
+                ),
+                SizedBox(height: 20.h),
+
+                // Action Buttons Row
+                ValueListenableBuilder<bool>(
+                  valueListenable: isDeletingNotifier,
+                  builder: (context, isDeleting, _) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  WaymarkSpacing.radiusFull,
+                                ),
+                              ),
+                              side: BorderSide(color: colors.borderDivider),
+                            ),
+                            onPressed: isDeleting
+                                ? null
+                                : () => Navigator.of(sheetContext).pop(),
+                            child: Text(
+                              'Cancel',
+                              style: context.textTheme.labelLarge?.copyWith(
+                                color: colors.textPrimary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  WaymarkSpacing.radiusFull,
+                                ),
+                              ),
+                              elevation: 2,
+                            ),
+                            icon: isDeleting
+                                ? SizedBox(
+                                    width: 18.w,
+                                    height: 18.w,
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.delete_forever_rounded,
+                                    size: 20,
+                                  ),
+                            label: Text(
+                              isDeleting ? 'Deleting...' : 'Delete Place',
+                              style: context.textTheme.labelLarge?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onPressed: isDeleting
+                                ? null
+                                : () async {
+                                    isDeletingNotifier.value = true;
+                                    Navigator.of(sheetContext).pop();
+                                    await _deletePlace(place, album, allPlaces);
+                                  },
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                SizedBox(height: 8.h),
+              ],
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      isDeletingNotifier.dispose();
+    });
+  }
+
+  Future<void> _deletePlace(
+    TripPlace place,
+    TripAlbum album,
+    List<TripPlace> allPlaces,
+  ) async {
+    try {
+      _isRouteLoadingNotifier.value = true;
+      final db = AppDatabase.instance;
+
+      // 1. Delete media files for this place
+      await db.placeMediaDao.deleteMediaForPlace(place.id);
+
+      // 2. Delete the place record
+      await db.tripPlaceDao.deletePlace(place.id);
+
+      // 3. Re-index visit orders of remaining places
+      final remaining = allPlaces.where((p) => p.id != place.id).toList();
+      await db.tripPlaceDao.updateVisitOrders(
+        remaining.map((p) => p.id).toList(),
+      );
+
+      // 4. Calculate new distance
+      double newDistance = 0.0;
+      if (remaining.length >= 2) {
+        final waypoints = remaining
+            .map((p) => (latitude: p.latitude, longitude: p.longitude))
+            .toList();
+        final routeResult = await LocationSearchService.instance
+            .fetchRoutePolyline(waypoints);
+        if (routeResult != null && routeResult.points.isNotEmpty) {
+          newDistance = routeResult.distanceKm;
+        } else {
+          newDistance = _calculateStraightLineKm(remaining);
+        }
+      }
+
+      // 5. Update Album metadata
+      await db.tripAlbumDao.updateAlbum(
+        album.copyWith(
+          totalPlacesCount: remaining.length,
+          totalDistanceKm: newDistance,
+          updatedAt: DateTime.now(),
+        ),
+      );
+
+      _roadDistanceKmNotifier.value = newDistance;
+      _roadRoutePointsNotifier.value = null; // Forces re-fetch on next map load
+
+      if (mounted) {
+        WaymarkSnackbar.showSuccess(
+          context,
+          'Place "${place.name}" removed from journey',
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        WaymarkSnackbar.showError(context, 'Failed to delete place: $e');
+      }
+    } finally {
+      if (mounted) {
+        _isRouteLoadingNotifier.value = false;
+      }
+    }
   }
 }

@@ -1438,16 +1438,16 @@ abstract class AppLocalizations {
   /// **'Distance'**
   String get journeysDistanceLabel;
 
-  /// Waypoints stat label in active journey hero card
+  /// Places stat label in active journey hero card
   ///
   /// In en, this message translates to:
-  /// **'Waypoints'**
+  /// **'Places'**
   String get journeysWaypointsLabel;
 
-  /// Waypoints logged stat in active journey hero card
+  /// Places logged stat in active journey hero card
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 waypoint} other{{count} waypoints}} logged'**
+  /// **'{count, plural, =1{1 place} other{{count} places}} logged'**
   String journeysWaypointsLogged(int count);
 
   /// Pace log stat label in active journey hero card

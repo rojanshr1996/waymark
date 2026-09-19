@@ -37,9 +37,7 @@ void main() {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp(
-          theme: ThemeData(
-            textTheme: WaymarkTypography.getTextTheme(),
-          ),
+          theme: ThemeData(textTheme: WaymarkTypography.getTextTheme()),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
@@ -63,8 +61,7 @@ void main() {
     );
   }
 
-  testWidgets('PlaceLoggerBottomSheet renders Create Mode with all Stitch elements',
-      (WidgetTester tester) async {
+  testWidgets('PlaceLoggerBottomSheet renders Create Mode with all Stitch elements', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2.0;
 
@@ -81,9 +78,7 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(
-      createSubject(albumId: 'test-album-1', albumTitle: 'Kyoto Autumn Journey'),
-    );
+    await tester.pumpWidget(createSubject(albumId: 'test-album-1', albumTitle: 'Kyoto Autumn Journey'));
     await tester.pumpAndSettle();
 
     // Tap button to open sheet
@@ -105,35 +100,24 @@ void main() {
     expect(find.text('Sightseeing'), findsOneWidget);
     expect(find.text('Dining'), findsOneWidget);
 
-    // Verify Visited Time & Sky & Temp
+    // Verify Visited Time & Live Weather
     expect(find.text('Visited Time'), findsOneWidget);
-    expect(find.text('Sky & Temp'), findsOneWidget);
+    expect(find.text('Live Weather'), findsOneWidget);
 
     // Verify Visual Relics & Photos section
     expect(find.text('Visual Relics & Photos'), findsOneWidget);
     expect(find.text('Add Photo'), findsOneWidget);
 
-    // Verify Sensory Impressions
-    expect(find.text('Sensory Impressions'), findsOneWidget);
-    expect(find.text('+ Incense scent'), findsOneWidget);
-    expect(find.text('+ Distant chanting'), findsOneWidget);
-
-    // Drag SingleChildScrollView to reveal sensory impressions and tap prompt pill
-    await tester.drag(find.byType(SingleChildScrollView).first, const Offset(0, -500));
-    await tester.pump();
-    await tester.tap(find.text('+ Incense scent'), warnIfMissed: false);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
-
-    // Check notes textarea has updated text
-    expect(find.textContaining('Incense scent'), findsOneWidget);
+    // Verify Description & Notes and Recommendation Scale
+    expect(find.text('Description & Notes'), findsOneWidget);
+    expect(find.text('Recommendation Scale'), findsOneWidget);
+    expect(find.text('8 / 10'), findsOneWidget);
 
     // Verify Bottom CTA Button is always visible in bottomNavigationBar
     expect(find.text('Log Place to Kyoto Autumn Journey'), findsOneWidget);
   });
 
-  testWidgets('PlaceLoggerBottomSheet renders Edit Mode with pre-filled place data',
-      (WidgetTester tester) async {
+  testWidgets('PlaceLoggerBottomSheet renders Edit Mode with pre-filled place data', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2.0;
 
@@ -160,11 +144,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      createSubject(
-        albumId: 'test-album-1',
-        albumTitle: 'Kyoto Autumn Journey',
-        placeToEdit: testPlace,
-      ),
+      createSubject(albumId: 'test-album-1', albumTitle: 'Kyoto Autumn Journey', placeToEdit: testPlace),
     );
     await tester.pumpAndSettle();
 
@@ -186,9 +166,9 @@ void main() {
     expect(find.text('Update Place in Kyoto Autumn Journey'), findsOneWidget);
   });
 
-  testWidgets(
-      'PlaceLoggerScreen saves place with photos and updates PlaceMediaFiles and TripAlbum.coverImagePath',
-      (WidgetTester tester) async {
+  testWidgets('PlaceLoggerScreen saves place with photos and updates PlaceMediaFiles and TripAlbum.coverImagePath', (
+    WidgetTester tester,
+  ) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2.0;
 
@@ -209,10 +189,7 @@ void main() {
       createSubject(
         albumId: 'album-photos-test',
         albumTitle: 'Hokkaido Winter Trip',
-        initialPhotos: [
-          'assets/images/place_one.jpeg',
-          'assets/images/place_two.jpeg',
-        ],
+        initialPhotos: ['assets/images/place_one.jpeg', 'assets/images/place_two.jpeg'],
       ),
     );
     await tester.pumpAndSettle();
@@ -224,6 +201,10 @@ void main() {
 
     // Verify photos attached counter
     expect(find.text('2 of 6 attached'), findsOneWidget);
+
+    // Enter place name
+    await tester.enterText(find.byType(TextFormField).first, 'Sapporo Snow Park');
+    await tester.pump();
 
     // Verify sticky save button is visible and tap it directly
     final saveButtonFinder = find.byKey(const Key('place_logger_save_button'));
@@ -252,9 +233,9 @@ void main() {
     expect(updatedAlbum?.totalPlacesCount, 1);
   });
 
-  testWidgets(
-      'PlaceLoggerScreen loads existing photos in edit mode and allows editing photos',
-      (WidgetTester tester) async {
+  testWidgets('PlaceLoggerScreen loads existing photos in edit mode and allows editing photos', (
+    WidgetTester tester,
+  ) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2.0;
 
@@ -316,11 +297,7 @@ void main() {
     final placeToEdit = (await db.tripPlaceDao.getPlacesForAlbum('album-edit-photos')).first;
 
     await tester.pumpWidget(
-      createSubject(
-        albumId: 'album-edit-photos',
-        albumTitle: 'Nara Exploration',
-        placeToEdit: placeToEdit,
-      ),
+      createSubject(albumId: 'album-edit-photos', albumTitle: 'Nara Exploration', placeToEdit: placeToEdit),
     );
     await tester.pumpAndSettle();
 

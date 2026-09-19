@@ -43,4 +43,19 @@ class AppRoutes {
   // --- Settings ---
   static const String settings = '/settings';
   static const String settingsName = 'settings';
+
+  static const String helpSupport = '/settings/help-support';
+  static const String helpSupportName = 'helpSupport';
+
+  static const String faq = '/settings/faq';
+  static const String faqName = 'faq';
+
+  static const String about = '/settings/about';
+  static const String aboutName = 'about';
+
+  static const String privacyPolicy = '/settings/privacy-policy';
+  static const String privacyPolicyName = 'privacyPolicy';
+
+  static const String termsConditions = '/settings/terms-conditions';
+  static const String termsConditionsName = 'termsConditions';
 }

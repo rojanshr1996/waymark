@@ -8,6 +8,7 @@ import 'package:waymark/core/database/app_database.dart';
 import 'package:waymark/core/gen/assets.gen.dart';
 import 'package:waymark/core/l10n/l10n_extension.dart';
 import 'package:waymark/core/presentation/widgets/waymark_buttons.dart';
+import 'package:waymark/core/presentation/widgets/waymark_shimmer.dart';
 import 'package:waymark/core/theme/waymark_colors.dart';
 import 'package:waymark/core/theme/waymark_typography.dart';
 import 'package:waymark/features/journeys/presentation/widgets/create_journey_bottom_sheet.dart';
@@ -21,6 +22,13 @@ class ActiveJourneyHeroCard extends StatelessWidget {
   final String? headerTitle;
   final bool isFlexible;
 
+  /// Live-computed distance override (e.g. road route from places).
+  /// Shown instead of [album.totalDistanceKm] when non-null.
+  final double? liveDistanceKm;
+
+  /// Whether route distance is currently being fetched asynchronously.
+  final bool isDistanceLoading;
+
   const ActiveJourneyHeroCard({
     super.key,
     required this.album,
@@ -29,6 +37,8 @@ class ActiveJourneyHeroCard extends StatelessWidget {
     this.showHeader = true,
     this.headerTitle,
     this.isFlexible = false,
+    this.liveDistanceKm,
+    this.isDistanceLoading = false,
   });
 
   @override
@@ -98,23 +108,35 @@ class ActiveJourneyHeroCard extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 2.h),
-                          RichText(
-                            text: TextSpan(
-                              text: album.totalDistanceKm.toStringAsFixed(1),
-                              style: context.textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: colors.textPrimary,
+                          if (isDistanceLoading)
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 4.h),
+                              child: WaymarkShimmerBox(
+                                width: 56.w,
+                                height: 18.h,
+                                borderRadius: BorderRadius.circular(4.r),
                               ),
-                              children: [
-                                TextSpan(
-                                  text: ' km',
-                                  style: context.textTheme.caption.copyWith(
-                                    color: colors.textSecondary,
+                            )
+                          else
+                            RichText(
+                              text: TextSpan(
+                                text: (liveDistanceKm ?? album.totalDistanceKm)
+                                    .toStringAsFixed(1),
+                                style: context.textTheme.headlineSmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: colors.textPrimary,
+                                    ),
+                                children: [
+                                  TextSpan(
+                                    text: ' km',
+                                    style: context.textTheme.caption.copyWith(
+                                      color: colors.textSecondary,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),

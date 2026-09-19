@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:waymark/core/constants/waymark_spacing.dart';
 import 'package:waymark/core/database/app_database.dart';
 import 'package:waymark/core/l10n/l10n_extension.dart';
@@ -13,6 +14,7 @@ import 'package:waymark/core/presentation/widgets/waymark_liquid_glass_app_bar.d
 import 'package:waymark/core/presentation/widgets/waymark_scroll_behavior.dart';
 import 'package:waymark/core/presentation/widgets/waymark_snackbar.dart';
 import 'package:waymark/core/router/route_names.dart';
+import 'package:waymark/core/services/location_search_service.dart';
 import 'package:waymark/core/theme/waymark_colors.dart';
 import 'package:waymark/core/theme/waymark_typography.dart';
 import 'package:waymark/features/journeys/presentation/widgets/active_journey_hero_card.dart';
@@ -39,6 +41,9 @@ class _AllJourneysDashboardScreenState
   final ValueNotifier<int> _currentExpeditionIndexNotifier = ValueNotifier<int>(
     0,
   );
+  final ValueNotifier<Set<String>> _loadingRouteAlbumIdsNotifier =
+      ValueNotifier<Set<String>>({});
+  final Map<String, String> _lastCheckedRoutesKey = {};
   late final PageController _expeditionsPageController;
 
   @override
@@ -51,6 +56,7 @@ class _AllJourneysDashboardScreenState
   void dispose() {
     _selectedFilterNotifier.dispose();
     _currentExpeditionIndexNotifier.dispose();
+    _loadingRouteAlbumIdsNotifier.dispose();
     _expeditionsPageController.dispose();
     super.dispose();
   }
@@ -70,10 +76,14 @@ class _AllJourneysDashboardScreenState
             final albums = albumsSnapshot.data ?? [];
 
             return StreamBuilder<List<TripPlace>>(
-              stream: db.tripPlaceDao.watchRecentPlaces(),
+              stream: db.tripPlaceDao.watchAllPlaces(),
               builder: (context, placesSnapshot) {
-                final places = placesSnapshot.data ?? [];
-                final placeIds = places.map((p) => p.id).toList();
+                final allPlaces = placesSnapshot.data ?? [];
+                final recentPlaces = allPlaces.take(10).toList();
+                final placeIds = allPlaces.map((p) => p.id).toList();
+
+                // Proactively compute & update road route distances if any album needs it
+                _checkAndFetchRoadDistances(albums, allPlaces);
 
                 return StreamBuilder<List<PlaceMediaFile>>(
                   stream: db.placeMediaDao.watchMediaForPlaces(placeIds),
@@ -96,17 +106,6 @@ class _AllJourneysDashboardScreenState
                         sectionName: context.l10n.navJourneys,
                         actions: [
                           IconButton(
-                            icon: const Icon(Icons.notifications_none_rounded),
-                            color: colors.onSurfaceVariant,
-                            onPressed: () {
-                              WaymarkSnackbar.showInfo(
-                                context,
-                                context.l10n.notificationsPrivateToast,
-                              );
-                            },
-                          ),
-                          // Settings Navigation Icon
-                          IconButton(
                             icon: const Icon(Icons.settings_outlined),
                             color: colors.onSurfaceVariant,
                             tooltip: context.l10n.settingsTitle,
@@ -124,7 +123,8 @@ class _AllJourneysDashboardScreenState
                             left: WaymarkSpacing.margin(context),
                             right: WaymarkSpacing.margin(context),
                             top: MediaQuery.paddingOf(context).top + 70.h,
-                            bottom: WaymarkSpacing.margin(context),
+                            bottom:
+                                MediaQuery.paddingOf(context).bottom + 100.h,
                           ),
                           child: albums.isEmpty
                               ? EmptyDeckView(
@@ -136,7 +136,8 @@ class _AllJourneysDashboardScreenState
                                   context: context,
                                   profile: profile,
                                   albums: albums,
-                                  places: places,
+                                  places: recentPlaces,
+                                  allPlaces: allPlaces,
                                   placeCoverMap: placeCoverMap,
                                 ),
                         ),
@@ -157,6 +158,7 @@ class _AllJourneysDashboardScreenState
     required UserProfile? profile,
     required List<TripAlbum> albums,
     required List<TripPlace> places,
+    required List<TripPlace> allPlaces,
     Map<String, String>? placeCoverMap,
   }) {
     final rawName = profile?.fullName.trim() ?? '';
@@ -173,6 +175,9 @@ class _AllJourneysDashboardScreenState
       0.0,
       (acc, a) => acc + a.totalDistanceKm,
     );
+
+    // Compute straight-line per-album distances from the loaded places list.
+    final albumDistances = _computeAlbumDistances(albums, allPlaces);
 
     // Active featured expedition (first ongoing or latest)
     final activeAlbum = ongoingAlbums.isNotEmpty ? ongoingAlbums.first : null;
@@ -378,18 +383,30 @@ class _AllJourneysDashboardScreenState
                       final album = displayedExpeditions[index];
                       return Padding(
                         padding: EdgeInsets.symmetric(horizontal: 2.w),
-                        child: ActiveJourneyHeroCard(
-                          album: album,
-                          showHeader: false,
-                          isFlexible: true,
-                          onContinue: () {
-                            context.push('${AppRoutes.journeys}/${album.id}');
+                        child: ValueListenableBuilder<Set<String>>(
+                          valueListenable: _loadingRouteAlbumIdsNotifier,
+                          builder: (context, loadingIds, _) {
+                            final isDistanceLoading = loadingIds.contains(
+                              album.id,
+                            );
+                            return ActiveJourneyHeroCard(
+                              album: album,
+                              showHeader: false,
+                              isFlexible: true,
+                              liveDistanceKm: albumDistances[album.id],
+                              isDistanceLoading: isDistanceLoading,
+                              onContinue: () {
+                                context.push(
+                                  '${AppRoutes.journeys}/${album.id}',
+                                );
+                              },
+                              onAddWaypoint: () => PlaceLoggerBottomSheet.show(
+                                context,
+                                albumId: album.id,
+                                albumTitle: album.title,
+                              ),
+                            );
                           },
-                          onAddWaypoint: () => PlaceLoggerBottomSheet.show(
-                            context,
-                            albumId: album.id,
-                            albumTitle: album.title,
-                          ),
                         ),
                       );
                     },
@@ -398,7 +415,7 @@ class _AllJourneysDashboardScreenState
 
                 // Dot Indicator
                 if (displayedExpeditions.length > 1) ...[
-                  SizedBox(height: 3.h),
+                  SizedBox(height: 12.h),
                   ValueListenableBuilder<int>(
                     valueListenable: _currentExpeditionIndexNotifier,
                     builder: (context, currentExpeditionIndex, _) {
@@ -484,6 +501,7 @@ class _AllJourneysDashboardScreenState
               ArchivedMemoirsSection(
                 albums: displayedAlbums,
                 title: listTitle,
+                albumDistances: albumDistances,
                 onAlbumTap: (album) {
                   context.push('${AppRoutes.journeys}/${album.id}');
                 },
@@ -517,6 +535,118 @@ class _AllJourneysDashboardScreenState
     );
   }
 
+  /// Proactively fetches road routes for albums whose total distance is 0 or needs updating.
+  void _checkAndFetchRoadDistances(
+    List<TripAlbum> albums,
+    List<TripPlace> allPlaces,
+  ) {
+    final grouped = <String, List<TripPlace>>{};
+    for (final place in allPlaces) {
+      grouped.putIfAbsent(place.albumId, () => []).add(place);
+    }
+
+    for (final album in albums) {
+      final albumPlaces = grouped[album.id] ?? [];
+      if (albumPlaces.length < 2) continue;
+
+      final key = albumPlaces
+          .map((p) => '${p.id}:${p.latitude},${p.longitude}')
+          .join(';');
+      if (key == _lastCheckedRoutesKey[album.id]) continue;
+      _lastCheckedRoutesKey[album.id] = key;
+
+      // If distance is not yet computed or places changed, fetch road route
+      final straightKm = _calculateStraightLineKm(albumPlaces);
+      final waypoints = albumPlaces
+          .map((p) => (latitude: p.latitude, longitude: p.longitude))
+          .toList();
+
+      // Only show shimmer if we don't already have a valid stored distance
+      if (album.totalDistanceKm <= 0.05) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _loadingRouteAlbumIdsNotifier.value = {
+              ..._loadingRouteAlbumIdsNotifier.value,
+              album.id,
+            };
+          }
+        });
+      }
+
+      LocationSearchService.instance
+          .fetchRoutePolyline(waypoints)
+          .then((result) {
+            if (!mounted) return;
+            final double resolvedKm;
+            if (result != null && result.points.isNotEmpty) {
+              resolvedKm = result.distanceKm;
+            } else {
+              resolvedKm = straightKm;
+            }
+
+            if ((album.totalDistanceKm - resolvedKm).abs() >= 0.01) {
+              AppDatabase.instance.tripAlbumDao.updateAlbum(
+                album.copyWith(totalDistanceKm: resolvedKm),
+              );
+            }
+
+            final updatedLoading = Set<String>.from(
+              _loadingRouteAlbumIdsNotifier.value,
+            )..remove(album.id);
+            _loadingRouteAlbumIdsNotifier.value = updatedLoading;
+          })
+          .catchError((_) {
+            if (mounted) {
+              final updatedLoading = Set<String>.from(
+                _loadingRouteAlbumIdsNotifier.value,
+              )..remove(album.id);
+              _loadingRouteAlbumIdsNotifier.value = updatedLoading;
+            }
+          });
+    }
+  }
+
+  double _calculateStraightLineKm(List<TripPlace> places) {
+    if (places.length < 2) return 0.0;
+    const distCalc = Distance();
+    double total = 0.0;
+    for (int i = 0; i < places.length - 1; i++) {
+      total += distCalc.as(
+        LengthUnit.Kilometer,
+        LatLng(places[i].latitude, places[i].longitude),
+        LatLng(places[i + 1].latitude, places[i + 1].longitude),
+      );
+    }
+    return total;
+  }
+
+  /// Computes straight-line total distance (km) for each album from the
+  /// provided [places] list, grouped by [TripPlace.albumId].
+  /// Falls back to [TripAlbum.totalDistanceKm] when the stored value > 0.
+  Map<String, double> _computeAlbumDistances(
+    List<TripAlbum> albums,
+    List<TripPlace> places,
+  ) {
+    // Group places by albumId
+    final grouped = <String, List<TripPlace>>{};
+    for (final place in places) {
+      grouped.putIfAbsent(place.albumId, () => []).add(place);
+    }
+
+    final result = <String, double>{};
+
+    for (final album in albums) {
+      // Prefer the stored DB value if it's already meaningful.
+      if (album.totalDistanceKm > 0.05) {
+        result[album.id] = album.totalDistanceKm;
+        continue;
+      }
+      final albumPlaces = grouped[album.id] ?? [];
+      result[album.id] = _calculateStraightLineKm(albumPlaces);
+    }
+    return result;
+  }
+
   void _showExportFieldJournalModal(
     BuildContext context,
     List<TripAlbum> albums,
@@ -537,7 +667,7 @@ class _AllJourneysDashboardScreenState
     );
     sb.writeln('Total Expeditions: ${albums.length}');
     sb.writeln('Total Distance Recorded: ${totalKm.toStringAsFixed(1)} km');
-    sb.writeln('Total Waypoints: ${places.length}\n');
+    sb.writeln('Total Places: ${places.length}\n');
 
     sb.writeln('--- JOURNEYS ---');
     for (final album in albums) {
@@ -556,7 +686,7 @@ class _AllJourneysDashboardScreenState
     }
 
     if (places.isNotEmpty) {
-      sb.writeln('--- RECENT DISCOVERIES & WAYPOINTS ---');
+      sb.writeln('--- RECENT DISCOVERIES & PLACES ---');
       for (final place in places) {
         final visitTime = DateFormat(
           'MMM d, yyyy HH:mm',
@@ -650,7 +780,7 @@ class _AllJourneysDashboardScreenState
                         ),
                         SizedBox(height: 2.h),
                         Text(
-                          '${albums.length} journeys • ${places.length} waypoints recorded',
+                          '${albums.length} journeys • ${places.length} places recorded',
                           style: modalContext.textTheme.caption.copyWith(
                             color: colors.textSecondary,
                           ),

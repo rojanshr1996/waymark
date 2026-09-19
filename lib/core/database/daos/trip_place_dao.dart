@@ -52,6 +52,19 @@ class TripPlaceDao extends DatabaseAccessor<AppDatabase>
         .watch();
   }
 
+  /// Watch all places across all albums, ordered by visitOrder asc
+  Stream<List<TripPlace>> watchAllPlaces() {
+    return (select(tripPlaces)..orderBy([
+          (p) => OrderingTerm(expression: p.visitOrder, mode: OrderingMode.asc),
+        ]))
+        .watch();
+  }
+
+  /// Get all places across all albums
+  Future<List<TripPlace>> getAllPlaces() {
+    return select(tripPlaces).get();
+  }
+
   /// Batch update the visit order of a list of places
   Future<void> updateVisitOrders(List<String> placeIds) async {
     await transaction(() async {
@@ -60,6 +73,11 @@ class TripPlaceDao extends DatabaseAccessor<AppDatabase>
             .write(TripPlacesCompanion(visitOrder: Value(i)));
       }
     });
+  }
+
+  /// Delete a single place by ID
+  Future<int> deletePlace(String id) {
+    return (delete(tripPlaces)..where((p) => p.id.equals(id))).go();
   }
 
   /// Delete all trip places

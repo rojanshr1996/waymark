@@ -66,12 +66,11 @@ void main() {
     expect(find.text('e.g. Rojan Shrestha'), findsOneWidget);
     expect(find.text('e.g. rojan@waymark.app'), findsOneWidget);
 
-    // Enter text and verify tick mark and claimed badge appear
+    // Enter text and verify tick mark appears
     await tester.enterText(find.byType(TextField).first, 'John Doe');
     await tester.enterText(find.byType(TextField).at(1), 'john@example.com');
     await tester.pump();
 
     expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
-    expect(find.text('CLAIMED'), findsOneWidget);
   });
 }

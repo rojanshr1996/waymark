@@ -1019,13 +1019,13 @@
   "@journeysDistanceLabel": {
     "description": "Distance stat label in active journey hero card"
   },
-  "journeysWaypointsLabel": "Waypoints",
+  "journeysWaypointsLabel": "Places",
   "@journeysWaypointsLabel": {
-    "description": "Waypoints stat label in active journey hero card"
+    "description": "Places stat label in active journey hero card"
   },
-  "journeysWaypointsLogged": "{count, plural, =1{1 waypoint} other{{count} waypoints}} logged",
+  "journeysWaypointsLogged": "{count, plural, =1{1 place} other{{count} places}} logged",
   "@journeysWaypointsLogged": {
-    "description": "Waypoints logged stat in active journey hero card",
+    "description": "Places logged stat in active journey hero card",
     "placeholders": {
       "count": {
         "type": "int",
