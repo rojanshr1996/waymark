@@ -30,7 +30,7 @@
     "placeholders": {
       "name": {
         "type": "String",
-        "example": "Rojan"
+        "example": "John"
       }
     }
   },
@@ -40,7 +40,7 @@
     "placeholders": {
       "name": {
         "type": "String",
-        "example": "Rojan"
+        "example": "John"
       }
     }
   },
@@ -90,7 +90,7 @@
   "@profileFullNameLabel": {
     "description": "Label for full name field on profile"
   },
-  "profileFullNamePlaceholder": "e.g. Rojan Shrestha",
+  "profileFullNamePlaceholder": "e.g. John Doe",
   "@profileFullNamePlaceholder": {
     "description": "Placeholder for full name field on profile"
   },
@@ -98,7 +98,7 @@
   "@profileHandleLabel": {
     "description": "Label for handle/email field on profile"
   },
-  "profileHandlePlaceholder": "e.g. rojan@waymark.app",
+  "profileHandlePlaceholder": "e.g. john.doe@waymark.app",
   "@profileHandlePlaceholder": {
     "description": "Placeholder for handle field on profile"
   },
@@ -444,9 +444,9 @@
   "@placeLoggerCategoryTag": {
     "description": "Label for category tag chips"
   },
-  "placeLoggerVisitedTime": "Visited Time",
+  "placeLoggerVisitedTime": "Date Visited",
   "@placeLoggerVisitedTime": {
-    "description": "Label for visited time card"
+    "description": "Label for date visited card"
   },
   "placeLoggerSkyAndTemp": "Sky & Temp",
   "@placeLoggerSkyAndTemp": {

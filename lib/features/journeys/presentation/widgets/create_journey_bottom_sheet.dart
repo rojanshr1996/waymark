@@ -91,6 +91,7 @@ class _CreateJourneyBottomSheetState extends State<CreateJourneyBottomSheet> {
   }
 
   Future<void> _pickCoverImage() async {
+    FocusScope.of(context).unfocus();
     try {
       final picker = ImagePicker();
       final XFile? file = await picker.pickImage(
@@ -110,6 +111,7 @@ class _CreateJourneyBottomSheetState extends State<CreateJourneyBottomSheet> {
   }
 
   Future<void> _pickDate({required bool isStartDate}) async {
+    FocusScope.of(context).unfocus();
     final picked = await showDatePicker(
       context: context,
       initialDate: isStartDate
@@ -133,6 +135,7 @@ class _CreateJourneyBottomSheetState extends State<CreateJourneyBottomSheet> {
   }
 
   Future<void> _saveJourney() async {
+    FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) return;
 
     _isCreatingNotifier.value = true;
@@ -209,709 +212,730 @@ class _CreateJourneyBottomSheetState extends State<CreateJourneyBottomSheet> {
     final safeBottom = MediaQuery.paddingOf(context).bottom;
     final dateFmt = DateFormat('MMM d, yyyy');
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: WaymarkSpacing.margin(context),
-        right: WaymarkSpacing.margin(context),
-        top: 12.h,
-        bottom: bottomInset + (safeBottom > 0 ? safeBottom : 20.h),
-      ),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Grabber Handle
-              Center(
-                child: Container(
-                  width: 44.w,
-                  height: 4.5.h,
-                  decoration: BoxDecoration(
-                    color: colors.borderDivider,
-                    borderRadius: BorderRadius.circular(
-                      WaymarkSpacing.radiusFull,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 12.h),
-
-              // Header Row with Badge & Close Button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8.w,
-                      vertical: 3.h,
-                    ),
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: WaymarkSpacing.margin(context),
+          right: WaymarkSpacing.margin(context),
+          top: 12.h,
+          bottom: bottomInset + (safeBottom > 0 ? safeBottom : 20.h),
+        ),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Grabber Handle
+                Center(
+                  child: Container(
+                    width: 44.w,
+                    height: 4.5.h,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFC89D3C).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(20.r),
-                      border: Border.all(
-                        color: const Color(0xFFC89D3C).withValues(alpha: 0.4),
-                        width: 0.8,
-                      ),
-                    ),
-                    child: Text(
-                      _isEditing ? 'EDIT EXPEDITION' : 'NEW EXPEDITION',
-                      style: context.textTheme.labelSmall?.copyWith(
-                        color: const Color(0xFFC89D3C),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 9.sp,
-                        letterSpacing: 0.6,
+                      color: colors.borderDivider,
+                      borderRadius: BorderRadius.circular(
+                        WaymarkSpacing.radiusFull,
                       ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    iconSize: 20.sp,
-                    color: colors.textSecondary,
-                    padding: EdgeInsets.zero,
-                    constraints: BoxConstraints.tight(Size(32.w, 32.w)),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 6.h),
-
-              // Title and Subtitle
-              Text(
-                _isEditing
-                    ? 'Edit Journey Album'
-                    : context.l10n.createJourneyTitle,
-                style: context.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: colors.textPrimary,
                 ),
-              ),
-              SizedBox(height: 3.h),
-              Text(
-                _isEditing
-                    ? 'Update expedition title, notes, cover and status'
-                    : context.l10n.createJourneySubtitle,
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: colors.textSecondary,
-                ),
-              ),
+                SizedBox(height: 12.h),
 
-              SizedBox(height: 16.h),
-
-              // Journey Status Segmented Toggle: Ongoing vs Completed
-              Text(
-                'Expedition Status',
-                style: context.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colors.textPrimary,
-                ),
-              ),
-              SizedBox(height: 6.h),
-              ValueListenableBuilder<String>(
-                valueListenable: _statusNotifier,
-                builder: (context, status, _) {
-                  return Container(
-                    padding: EdgeInsets.all(4.w),
-                    decoration: BoxDecoration(
-                      color: colors.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(
-                        color: colors.borderDivider.withValues(alpha: 0.8),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _buildStatusTab(
-                            context: context,
-                            label: 'Live Ongoing',
-                            icon: Icons.explore_rounded,
-                            activeColor: const Color(0xFF2E7D32),
-                            isSelected: status == 'ONGOING',
-                            onTap: () {
-                              _statusNotifier.value = 'ONGOING';
-                              _endDateNotifier.value = null;
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: _buildStatusTab(
-                            context: context,
-                            label: 'Completed',
-                            icon: Icons.flag_circle_rounded,
-                            activeColor: const Color(0xFFC89D3C),
-                            isSelected: status == 'COMPLETED',
-                            onTap: () {
-                              _statusNotifier.value = 'COMPLETED';
-                              _endDateNotifier.value ??=
-                                  _startDateNotifier.value;
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-
-              SizedBox(height: 14.h),
-
-              // Journey Title Input
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    context.l10n.createJourneyNameLabel,
-                    style: context.textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: colors.textPrimary,
-                    ),
-                  ),
-                  ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: _titleController,
-                    builder: (context, val, _) {
-                      if (val.text.isEmpty) return const SizedBox.shrink();
-                      return GestureDetector(
-                        onTap: () => _titleController.clear(),
-                        child: Text(
-                          'Clear',
-                          style: context.textTheme.labelSmall?.copyWith(
-                            color: colors.textSecondary,
-                            fontSize: 10.sp,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: 6.h),
-              TextFormField(
-                controller: _titleController,
-                validator: (val) => (val == null || val.trim().isEmpty)
-                    ? context.l10n.createJourneyTitleRequired
-                    : null,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: colors.textPrimary,
-                ),
-                decoration: InputDecoration(
-                  prefixIcon: Icon(
-                    Icons.bookmark_outline_rounded,
-                    color: colors.primary,
-                    size: 20.sp,
-                  ),
-                  hintText: context.l10n.createJourneyNameHint,
-                  hintStyle: context.textTheme.bodyMedium?.copyWith(
-                    color: colors.textSecondary.withValues(alpha: 0.7),
-                  ),
-                  filled: true,
-                  fillColor: colors.surfaceContainerLow,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 12.h,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      WaymarkSpacing.radiusMd,
-                    ),
-                    borderSide: BorderSide(color: colors.borderDivider),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      WaymarkSpacing.radiusMd,
-                    ),
-                    borderSide: BorderSide(
-                      color: colors.borderDivider.withValues(alpha: 0.8),
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      WaymarkSpacing.radiusMd,
-                    ),
-                    borderSide: BorderSide(color: colors.primary, width: 1.5),
-                  ),
-                ),
-              ),
-
-              // Quick Title Inspiration Chips
-              SizedBox(height: 6.h),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Row(
+                // Header Row with Badge & Close Button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.only(right: 6.w),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 3.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFC89D3C).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(
+                          color: const Color(0xFFC89D3C).withValues(alpha: 0.4),
+                          width: 0.8,
+                        ),
+                      ),
                       child: Text(
-                        'Quick ideas:',
-                        style: context.textTheme.caption.copyWith(
-                          fontSize: 10.sp,
-                          color: colors.textSecondary,
+                        _isEditing ? 'EDIT EXPEDITION' : 'NEW EXPEDITION',
+                        style: context.textTheme.labelSmall?.copyWith(
+                          color: const Color(0xFFC89D3C),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 9.sp,
+                          letterSpacing: 0.6,
                         ),
                       ),
                     ),
-                    ..._titleInspirations.map((idea) {
-                      return Padding(
-                        padding: EdgeInsets.only(right: 6.w),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12.r),
-                          onTap: () {
-                            _titleController.text = idea;
-                            _titleController.selection =
-                                TextSelection.fromPosition(
-                                  TextPosition(offset: idea.length),
-                                );
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8.w,
-                              vertical: 3.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colors.surfaceContainerHigh,
-                              borderRadius: BorderRadius.circular(12.r),
-                              border: Border.all(
-                                color: colors.borderDivider.withValues(
-                                  alpha: 0.6,
-                                ),
-                                width: 0.7,
-                              ),
-                            ),
-                            child: Text(
-                              idea,
-                              style: context.textTheme.labelSmall?.copyWith(
-                                fontSize: 10.sp,
-                                color: colors.textPrimary,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      iconSize: 20.sp,
+                      color: colors.textSecondary,
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints.tight(Size(32.w, 32.w)),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                   ],
                 ),
-              ),
 
-              SizedBox(height: 14.h),
+                SizedBox(height: 6.h),
 
-              // Cover Photo Option
-              ValueListenableBuilder<String?>(
-                valueListenable: _coverImagePathNotifier,
-                builder: (context, coverImagePath, _) {
-                  final hasValidCover =
-                      coverImagePath != null &&
-                      coverImagePath.isNotEmpty &&
-                      File(coverImagePath).existsSync();
+                // Title and Subtitle
+                Text(
+                  _isEditing
+                      ? 'Edit Journey Album'
+                      : context.l10n.createJourneyTitle,
+                  style: context.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: colors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: 3.h),
+                Text(
+                  _isEditing
+                      ? 'Update expedition title, notes, cover and status'
+                      : context.l10n.createJourneySubtitle,
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                ),
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Album Cover Photo',
-                        style: context.textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colors.textPrimary,
+                SizedBox(height: 16.h),
+
+                // Journey Status Segmented Toggle: Ongoing vs Completed
+                Text(
+                  'Expedition Status',
+                  style: context.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: 6.h),
+                ValueListenableBuilder<String>(
+                  valueListenable: _statusNotifier,
+                  builder: (context, status, _) {
+                    return Container(
+                      padding: EdgeInsets.all(4.w),
+                      decoration: BoxDecoration(
+                        color: colors.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                          color: colors.borderDivider.withValues(alpha: 0.8),
                         ),
                       ),
-                      SizedBox(height: 6.h),
-                      InkWell(
-                        borderRadius: BorderRadius.circular(14.r),
-                        onTap: _pickCoverImage,
-                        child: Container(
-                          height: 84.h,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: colors.surfaceContainerLow,
-                            borderRadius: BorderRadius.circular(14.r),
-                            border: Border.all(
-                              color: hasValidCover
-                                  ? const Color(0xFFC89D3C)
-                                  : colors.borderDivider.withValues(alpha: 0.8),
-                              width: hasValidCover ? 1.5 : 1.0,
-                            ),
-                          ),
-                          child: hasValidCover
-                              ? Stack(
-                                  children: [
-                                    Positioned.fill(
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                          13.r,
-                                        ),
-                                        child: Image.file(
-                                          File(coverImagePath),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 6.h,
-                                      right: 6.w,
-                                      child: GestureDetector(
-                                        onTap: () =>
-                                            _coverImagePathNotifier.value =
-                                                null,
-                                        child: Container(
-                                          padding: EdgeInsets.all(4.w),
-                                          decoration: const BoxDecoration(
-                                            color: Colors.black54,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Icon(
-                                            Icons.close_rounded,
-                                            size: 14.sp,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      bottom: 6.h,
-                                      left: 8.w,
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 8.w,
-                                          vertical: 3.h,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.64,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            8.r,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.photo_camera_rounded,
-                                              size: 12.sp,
-                                              color: Colors.white,
-                                            ),
-                                            SizedBox(width: 4.w),
-                                            Text(
-                                              'Change Cover',
-                                              style: context
-                                                  .textTheme
-                                                  .labelSmall
-                                                  ?.copyWith(
-                                                    color: Colors.white,
-                                                    fontSize: 9.5.sp,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : Center(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.add_photo_alternate_outlined,
-                                        size: 24.sp,
-                                        color: colors.primary,
-                                      ),
-                                      SizedBox(height: 4.h),
-                                      Text(
-                                        'Tap to choose a cover photo (optional)',
-                                        style: context.textTheme.bodySmall
-                                            ?.copyWith(
-                                              color: colors.textSecondary,
-                                              fontSize: 11.sp,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-
-              SizedBox(height: 14.h),
-
-              // Date pickers row
-              ListenableBuilder(
-                listenable: Listenable.merge([
-                  _startDateNotifier,
-                  _endDateNotifier,
-                ]),
-                builder: (context, _) {
-                  final startDate = _startDateNotifier.value;
-                  final endDate = _endDateNotifier.value;
-
-                  return Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          // Start Date Card
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  context.l10n.createJourneyStartDate,
-                                  style: context.textTheme.labelSmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: colors.textPrimary,
-                                  ),
-                                ),
-                                SizedBox(height: 4.h),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(
-                                    WaymarkSpacing.radiusMd,
-                                  ),
-                                  onTap: () => _pickDate(isStartDate: true),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 10.h,
-                                      horizontal: 10.w,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: colors.surfaceContainerLow,
-                                      borderRadius: BorderRadius.circular(
-                                        WaymarkSpacing.radiusMd,
-                                      ),
-                                      border: Border.all(
-                                        color: colors.borderDivider,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.calendar_today_rounded,
-                                          size: 15.sp,
-                                          color: colors.primary,
-                                        ),
-                                        SizedBox(width: 6.w),
-                                        Expanded(
-                                          child: Text(
-                                            dateFmt.format(startDate),
-                                            style: context.textTheme.caption
-                                                .copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: colors.textPrimary,
-                                                ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            child: _buildStatusTab(
+                              context: context,
+                              label: 'Live Ongoing',
+                              icon: Icons.explore_rounded,
+                              activeColor: const Color(0xFF2E7D32),
+                              isSelected: status == 'ONGOING',
+                              onTap: () {
+                                _statusNotifier.value = 'ONGOING';
+                                _endDateNotifier.value = null;
+                              },
                             ),
                           ),
-
-                          // Middle arrow indicator
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 6.w,
-                              vertical: 24.h,
-                            ),
-                            child: Icon(
-                              Icons.arrow_forward_rounded,
-                              size: 16.sp,
-                              color: colors.textSecondary,
-                            ),
-                          ),
-
-                          // End Date Card
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  context.l10n.createJourneyEndDate,
-                                  style: context.textTheme.labelSmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: colors.textPrimary,
-                                  ),
-                                ),
-                                SizedBox(height: 4.h),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(
-                                    WaymarkSpacing.radiusMd,
-                                  ),
-                                  onTap: () => _pickDate(isStartDate: false),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 10.h,
-                                      horizontal: 10.w,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: colors.surfaceContainerLow,
-                                      borderRadius: BorderRadius.circular(
-                                        WaymarkSpacing.radiusMd,
-                                      ),
-                                      border: Border.all(
-                                        color: endDate != null
-                                            ? colors.borderDivider
-                                            : colors.borderDivider.withValues(
-                                                alpha: 0.6,
-                                              ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.event_available_rounded,
-                                          size: 15.sp,
-                                          color: endDate != null
-                                              ? const Color(0xFFC89D3C)
-                                              : colors.textSecondary,
-                                        ),
-                                        SizedBox(width: 6.w),
-                                        Expanded(
-                                          child: Text(
-                                            endDate != null
-                                                ? dateFmt.format(endDate)
-                                                : 'Ongoing',
-                                            style: context.textTheme.caption
-                                                .copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: endDate != null
-                                                      ? colors.textPrimary
-                                                      : const Color(0xFF2E7D32),
-                                                ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        if (endDate != null)
-                                          GestureDetector(
-                                            onTap: () {
-                                              _endDateNotifier.value = null;
-                                              _statusNotifier.value = 'ONGOING';
-                                            },
-                                            child: Icon(
-                                              Icons.close_rounded,
-                                              size: 14.sp,
-                                              color: colors.textSecondary,
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            child: _buildStatusTab(
+                              context: context,
+                              label: 'Completed',
+                              icon: Icons.flag_circle_rounded,
+                              activeColor: const Color(0xFFC89D3C),
+                              isSelected: status == 'COMPLETED',
+                              onTap: () {
+                                _statusNotifier.value = 'COMPLETED';
+                                _endDateNotifier.value ??=
+                                    _startDateNotifier.value;
+                              },
                             ),
                           ),
                         ],
                       ),
+                    );
+                  },
+                ),
 
-                      // Duration Preview
-                      if (endDate != null) ...[
-                        SizedBox(height: 4.h),
-                        Align(
-                          alignment: Alignment.centerRight,
+                SizedBox(height: 14.h),
+
+                // Journey Title Input
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      context.l10n.createJourneyNameLabel,
+                      style: context.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colors.textPrimary,
+                      ),
+                    ),
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _titleController,
+                      builder: (context, val, _) {
+                        if (val.text.isEmpty) return const SizedBox.shrink();
+                        return GestureDetector(
+                          onTap: () {
+                            FocusScope.of(context).unfocus();
+                            _titleController.clear();
+                          },
                           child: Text(
-                            '${endDate.difference(startDate).inDays + 1} days expedition duration',
-                            style: context.textTheme.caption.copyWith(
-                              fontSize: 9.5.sp,
+                            'Clear',
+                            style: context.textTheme.labelSmall?.copyWith(
                               color: colors.textSecondary,
-                              fontStyle: FontStyle.italic,
+                              fontSize: 10.sp,
                             ),
                           ),
-                        ),
-                      ],
-                    ],
-                  );
-                },
-              ),
-
-              SizedBox(height: 14.h),
-
-              // Description input
-              Text(
-                context.l10n.createJourneyDescLabel,
-                style: context.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colors.textPrimary,
+                        );
+                      },
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(height: 6.h),
-              TextFormField(
-                controller: _descController,
-                maxLines: 2,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: colors.textPrimary,
-                ),
-                decoration: InputDecoration(
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 20.h),
-                    child: Icon(
-                      Icons.auto_stories_outlined,
+                SizedBox(height: 6.h),
+                TextFormField(
+                  controller: _titleController,
+                  validator: (val) => (val == null || val.trim().isEmpty)
+                      ? context.l10n.createJourneyTitleRequired
+                      : null,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: colors.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(
+                      Icons.bookmark_outline_rounded,
                       color: colors.primary,
                       size: 20.sp,
                     ),
-                  ),
-                  hintText: context.l10n.createJourneyDescHint,
-                  hintStyle: context.textTheme.bodyMedium?.copyWith(
-                    color: colors.textSecondary.withValues(alpha: 0.7),
-                  ),
-                  filled: true,
-                  fillColor: colors.surfaceContainerLow,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 10.h,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      WaymarkSpacing.radiusMd,
+                    hintText: context.l10n.createJourneyNameHint,
+                    hintStyle: context.textTheme.bodyMedium?.copyWith(
+                      color: colors.textSecondary.withValues(alpha: 0.7),
                     ),
-                    borderSide: BorderSide(color: colors.borderDivider),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      WaymarkSpacing.radiusMd,
+                    filled: true,
+                    fillColor: colors.surfaceContainerLow,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 12.h,
                     ),
-                    borderSide: BorderSide(
-                      color: colors.borderDivider.withValues(alpha: 0.8),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        WaymarkSpacing.radiusMd,
+                      ),
+                      borderSide: BorderSide(color: colors.borderDivider),
                     ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      WaymarkSpacing.radiusMd,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        WaymarkSpacing.radiusMd,
+                      ),
+                      borderSide: BorderSide(
+                        color: colors.borderDivider.withValues(alpha: 0.8),
+                      ),
                     ),
-                    borderSide: BorderSide(color: colors.primary, width: 1.5),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        WaymarkSpacing.radiusMd,
+                      ),
+                      borderSide: BorderSide(color: colors.primary, width: 1.5),
+                    ),
                   ),
                 ),
-              ),
 
-              SizedBox(height: 20.h),
+                // Quick Title Inspiration Chips
+                SizedBox(height: 6.h),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(right: 6.w),
+                        child: Text(
+                          'Quick ideas:',
+                          style: context.textTheme.caption.copyWith(
+                            fontSize: 10.sp,
+                            color: colors.textSecondary,
+                          ),
+                        ),
+                      ),
+                      ..._titleInspirations.map((idea) {
+                        return Padding(
+                          padding: EdgeInsets.only(right: 6.w),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12.r),
+                            onTap: () {
+                              FocusScope.of(context).unfocus();
+                              _titleController.text = idea;
+                              _titleController.selection =
+                                  TextSelection.fromPosition(
+                                    TextPosition(offset: idea.length),
+                                  );
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8.w,
+                                vertical: 3.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colors.surfaceContainerHigh,
+                                borderRadius: BorderRadius.circular(12.r),
+                                border: Border.all(
+                                  color: colors.borderDivider.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                  width: 0.7,
+                                ),
+                              ),
+                              child: Text(
+                                idea,
+                                style: context.textTheme.labelSmall?.copyWith(
+                                  fontSize: 10.sp,
+                                  color: colors.textPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                ),
 
-              // Submit CTA
-              ValueListenableBuilder<bool>(
-                valueListenable: _isCreatingNotifier,
-                builder: (context, isCreating, _) {
-                  return SizedBox(
-                    width: double.infinity,
-                    child: WaymarkPrimaryButton(
-                      label: _isEditing
-                          ? 'Save Changes'
-                          : context.l10n.createJourneyBtnCreate,
-                      icon: _isEditing
-                          ? Icons.check_rounded
-                          : Icons.explore_rounded,
-                      isLoading: isCreating,
-                      onPressed: isCreating ? null : _saveJourney,
+                SizedBox(height: 14.h),
+
+                // Cover Photo Option
+                ValueListenableBuilder<String?>(
+                  valueListenable: _coverImagePathNotifier,
+                  builder: (context, coverImagePath, _) {
+                    final hasValidCover =
+                        coverImagePath != null &&
+                        coverImagePath.isNotEmpty &&
+                        File(coverImagePath).existsSync();
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Album Cover Photo',
+                          style: context.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colors.textPrimary,
+                          ),
+                        ),
+                        SizedBox(height: 6.h),
+                        InkWell(
+                          borderRadius: BorderRadius.circular(14.r),
+                          onTap: _pickCoverImage,
+                          child: Container(
+                            height: 84.h,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: colors.surfaceContainerLow,
+                              borderRadius: BorderRadius.circular(14.r),
+                              border: Border.all(
+                                color: hasValidCover
+                                    ? const Color(0xFFC89D3C)
+                                    : colors.borderDivider.withValues(
+                                        alpha: 0.8,
+                                      ),
+                                width: hasValidCover ? 1.5 : 1.0,
+                              ),
+                            ),
+                            child: hasValidCover
+                                ? Stack(
+                                    children: [
+                                      Positioned.fill(
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            13.r,
+                                          ),
+                                          child: Image.file(
+                                            File(coverImagePath),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 6.h,
+                                        right: 6.w,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            FocusScope.of(context).unfocus();
+                                            _coverImagePathNotifier.value =
+                                                null;
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.all(4.w),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.black54,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(
+                                              Icons.close_rounded,
+                                              size: 14.sp,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 6.h,
+                                        left: 8.w,
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 8.w,
+                                            vertical: 3.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.64,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              8.r,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.photo_camera_rounded,
+                                                size: 12.sp,
+                                                color: Colors.white,
+                                              ),
+                                              SizedBox(width: 4.w),
+                                              Text(
+                                                'Change Cover',
+                                                style: context
+                                                    .textTheme
+                                                    .labelSmall
+                                                    ?.copyWith(
+                                                      color: Colors.white,
+                                                      fontSize: 9.5.sp,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.add_photo_alternate_outlined,
+                                          size: 24.sp,
+                                          color: colors.primary,
+                                        ),
+                                        SizedBox(height: 4.h),
+                                        Text(
+                                          'Tap to choose a cover photo (optional)',
+                                          style: context.textTheme.bodySmall
+                                              ?.copyWith(
+                                                color: colors.textSecondary,
+                                                fontSize: 11.sp,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+
+                SizedBox(height: 14.h),
+
+                // Date pickers row
+                ListenableBuilder(
+                  listenable: Listenable.merge([
+                    _startDateNotifier,
+                    _endDateNotifier,
+                  ]),
+                  builder: (context, _) {
+                    final startDate = _startDateNotifier.value;
+                    final endDate = _endDateNotifier.value;
+
+                    return Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Start Date Card
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    context.l10n.createJourneyStartDate,
+                                    style: context.textTheme.labelSmall
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: colors.textPrimary,
+                                        ),
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(
+                                      WaymarkSpacing.radiusMd,
+                                    ),
+                                    onTap: () => _pickDate(isStartDate: true),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 10.h,
+                                        horizontal: 10.w,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: colors.surfaceContainerLow,
+                                        borderRadius: BorderRadius.circular(
+                                          WaymarkSpacing.radiusMd,
+                                        ),
+                                        border: Border.all(
+                                          color: colors.borderDivider,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_today_rounded,
+                                            size: 15.sp,
+                                            color: colors.primary,
+                                          ),
+                                          SizedBox(width: 6.w),
+                                          Expanded(
+                                            child: Text(
+                                              dateFmt.format(startDate),
+                                              style: context.textTheme.caption
+                                                  .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: colors.textPrimary,
+                                                  ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Middle arrow indicator
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6.w,
+                                vertical: 24.h,
+                              ),
+                              child: Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 16.sp,
+                                color: colors.textSecondary,
+                              ),
+                            ),
+
+                            // End Date Card
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    context.l10n.createJourneyEndDate,
+                                    style: context.textTheme.labelSmall
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: colors.textPrimary,
+                                        ),
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(
+                                      WaymarkSpacing.radiusMd,
+                                    ),
+                                    onTap: () => _pickDate(isStartDate: false),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 10.h,
+                                        horizontal: 10.w,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: colors.surfaceContainerLow,
+                                        borderRadius: BorderRadius.circular(
+                                          WaymarkSpacing.radiusMd,
+                                        ),
+                                        border: Border.all(
+                                          color: endDate != null
+                                              ? colors.borderDivider
+                                              : colors.borderDivider.withValues(
+                                                  alpha: 0.6,
+                                                ),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.event_available_rounded,
+                                            size: 15.sp,
+                                            color: endDate != null
+                                                ? const Color(0xFFC89D3C)
+                                                : colors.textSecondary,
+                                          ),
+                                          SizedBox(width: 6.w),
+                                          Expanded(
+                                            child: Text(
+                                              endDate != null
+                                                  ? dateFmt.format(endDate)
+                                                  : 'Ongoing',
+                                              style: context.textTheme.caption
+                                                  .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: endDate != null
+                                                        ? colors.textPrimary
+                                                        : const Color(
+                                                            0xFF2E7D32,
+                                                          ),
+                                                  ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          if (endDate != null)
+                                            GestureDetector(
+                                              onTap: () {
+                                                FocusScope.of(
+                                                  context,
+                                                ).unfocus();
+                                                _endDateNotifier.value = null;
+                                                _statusNotifier.value =
+                                                    'ONGOING';
+                                              },
+                                              child: Icon(
+                                                Icons.close_rounded,
+                                                size: 14.sp,
+                                                color: colors.textSecondary,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Duration Preview
+                        if (endDate != null) ...[
+                          SizedBox(height: 4.h),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              '${endDate.difference(startDate).inDays + 1} days expedition duration',
+                              style: context.textTheme.caption.copyWith(
+                                fontSize: 9.5.sp,
+                                color: colors.textSecondary,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    );
+                  },
+                ),
+
+                SizedBox(height: 14.h),
+
+                // Description input
+                Text(
+                  context.l10n.createJourneyDescLabel,
+                  style: context.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: 6.h),
+                TextFormField(
+                  controller: _descController,
+                  maxLines: 2,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: colors.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.only(bottom: 20.h),
+                      child: Icon(
+                        Icons.auto_stories_outlined,
+                        color: colors.primary,
+                        size: 20.sp,
+                      ),
                     ),
-                  );
-                },
-              ),
-            ],
+                    hintText: context.l10n.createJourneyDescHint,
+                    hintStyle: context.textTheme.bodyMedium?.copyWith(
+                      color: colors.textSecondary.withValues(alpha: 0.7),
+                    ),
+                    filled: true,
+                    fillColor: colors.surfaceContainerLow,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 10.h,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        WaymarkSpacing.radiusMd,
+                      ),
+                      borderSide: BorderSide(color: colors.borderDivider),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        WaymarkSpacing.radiusMd,
+                      ),
+                      borderSide: BorderSide(
+                        color: colors.borderDivider.withValues(alpha: 0.8),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        WaymarkSpacing.radiusMd,
+                      ),
+                      borderSide: BorderSide(color: colors.primary, width: 1.5),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: 20.h),
+
+                // Submit CTA
+                ValueListenableBuilder<bool>(
+                  valueListenable: _isCreatingNotifier,
+                  builder: (context, isCreating, _) {
+                    return SizedBox(
+                      width: double.infinity,
+                      child: WaymarkPrimaryButton(
+                        label: _isEditing
+                            ? 'Save Changes'
+                            : context.l10n.createJourneyBtnCreate,
+                        icon: _isEditing
+                            ? Icons.check_rounded
+                            : Icons.explore_rounded,
+                        isLoading: isCreating,
+                        onPressed: isCreating ? null : _saveJourney,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -932,7 +956,10 @@ class _CreateJourneyBottomSheetState extends State<CreateJourneyBottomSheet> {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(8.r),
-        onTap: onTap,
+        onTap: () {
+          FocusScope.of(context).unfocus();
+          onTap();
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: EdgeInsets.symmetric(vertical: 8.h),

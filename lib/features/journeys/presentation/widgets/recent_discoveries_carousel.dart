@@ -107,7 +107,7 @@ class RecentDiscoveriesCarousel extends StatelessWidget {
 
   Widget _buildDiscoveryCard(BuildContext context, TripPlace place, int index) {
     final colors = context.colorScheme;
-    final timeFmt = DateFormat('MMM d • HH:mm').format(place.visitedAt);
+    final dateFmt = DateFormat('MMM d, yyyy').format(place.visitedAt);
     final tempStr = place.temperatureCelsius != null
         ? '${place.temperatureCelsius!.toInt()}°C'
         : null;
@@ -229,7 +229,7 @@ class RecentDiscoveriesCarousel extends StatelessWidget {
               ),
               SizedBox(height: 2.h),
               Text(
-                '$timeFmt • ${place.weatherCondition ?? context.l10n.weatherClear}',
+                '$dateFmt • ${place.weatherCondition ?? context.l10n.weatherClear}',
                 style: context.textTheme.caption.copyWith(
                   color: colors.textSecondary,
                   fontSize: 11.sp,

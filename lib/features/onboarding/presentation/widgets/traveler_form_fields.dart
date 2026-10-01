@@ -25,6 +25,17 @@ class TravelerFormFields extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colorScheme;
+    final hintColor = Color.lerp(
+      colors.textSecondary,
+      colors.textPrimary,
+      0.25,
+    )!;
+    final iconColor = Color.lerp(
+      colors.textSecondary,
+      colors.textPrimary,
+      0.35,
+    )!;
+
     return Container(
       padding: EdgeInsets.all(WaymarkSpacing.spaceMd),
       decoration: BoxDecoration(
@@ -64,11 +75,7 @@ class TravelerFormFields extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.badge_outlined,
-                      size: 20.sp,
-                      color: fieldColors.outline,
-                    ),
+                    Icon(Icons.badge_outlined, size: 20.sp, color: iconColor),
                     SizedBox(width: 8.w),
                     Expanded(
                       child: Padding(
@@ -81,8 +88,8 @@ class TravelerFormFields extends StatelessWidget {
                           ),
                           decoration: InputDecoration(
                             hintText: context.l10n.profileFullNamePlaceholder,
-                            hintStyle: context.textTheme.bodyMedium?.copyWith(
-                              color: fieldColors.outline,
+                            hintStyle: context.textTheme.bodyLarge?.copyWith(
+                              color: hintColor,
                             ),
                             border: InputBorder.none,
                             isDense: true,
@@ -135,7 +142,7 @@ class TravelerFormFields extends StatelessWidget {
                     Icon(
                       Icons.alternate_email_rounded,
                       size: 20.sp,
-                      color: fieldColors.outline,
+                      color: iconColor,
                     ),
                     SizedBox(width: 8.w),
                     Expanded(
@@ -150,8 +157,8 @@ class TravelerFormFields extends StatelessWidget {
                           ),
                           decoration: InputDecoration(
                             hintText: context.l10n.profileHandlePlaceholder,
-                            hintStyle: context.textTheme.bodyMedium?.copyWith(
-                              color: fieldColors.outline,
+                            hintStyle: context.textTheme.bodyLarge?.copyWith(
+                              color: hintColor,
                             ),
                             border: InputBorder.none,
                             isDense: true,
@@ -223,7 +230,7 @@ class TravelerFormFields extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: context.l10n.profileBioPlaceholder,
                 hintStyle: context.textTheme.bodyMedium?.copyWith(
-                  color: colors.outline,
+                  color: hintColor,
                   fontStyle: FontStyle.italic,
                 ),
 

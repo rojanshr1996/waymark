@@ -792,7 +792,7 @@ class _TravelerProfileScreenState extends State<TravelerProfileScreen> {
                           color: colors.textSecondary,
                         ),
                         Text(
-                          '${album.totalDistanceKm.toStringAsFixed(1)} km',
+                          '${album.totalDistanceKm.toStringAsFixed(2)} km',
                           style: context.textTheme.caption.copyWith(
                             color: colors.textSecondary,
                             fontSize: 11.sp,

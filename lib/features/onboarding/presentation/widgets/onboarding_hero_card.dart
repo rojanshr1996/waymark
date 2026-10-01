@@ -116,16 +116,16 @@ class OnboardingHeroCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(width: 8.w),
-                Text(
-                  context.l10n.onboardingHeroPlateNo,
-                  style: context.textTheme.caption.copyWith(
-                    fontSize: 9.sp,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                    color: colors.textSecondary.withValues(alpha: 0.75),
-                  ),
-                ),
+                // SizedBox(width: 8.w),
+                // Text(
+                //   context.l10n.onboardingHeroPlateNo,
+                //   style: context.textTheme.caption.copyWith(
+                //     fontSize: 9.sp,
+                //     fontWeight: FontWeight.w600,
+                //     letterSpacing: 0.5,
+                //     color: colors.textSecondary.withValues(alpha: 0.75),
+                //   ),
+                // ),
               ],
             ),
           ),

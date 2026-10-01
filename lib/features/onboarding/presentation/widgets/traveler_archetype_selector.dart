@@ -323,7 +323,7 @@ class TravelerArchetypeSelector extends StatelessWidget {
                       SizedBox(height: 2.h),
                       Text(
                         current.description,
-                        maxLines: 1,
+                        maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: context.textTheme.caption.copyWith(
                           color: colors.textSecondary,

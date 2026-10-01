@@ -274,7 +274,7 @@ class _AllJourneysDashboardScreenState
                   child: Text(
                     context.l10n.journeysMetricsSummary(
                       albums.length,
-                      totalKm.toStringAsFixed(1),
+                      totalKm.toStringAsFixed(2),
                     ),
                     style: context.textTheme.bodySmall?.copyWith(
                       color: colors.textSecondary,
@@ -400,11 +400,19 @@ class _AllJourneysDashboardScreenState
                                   '${AppRoutes.journeys}/${album.id}',
                                 );
                               },
-                              onAddWaypoint: () => PlaceLoggerBottomSheet.show(
-                                context,
-                                albumId: album.id,
-                                albumTitle: album.title,
-                              ),
+                              onAddWaypoint: () async {
+                                final newPlaceId =
+                                    await PlaceLoggerBottomSheet.show(
+                                      context,
+                                      albumId: album.id,
+                                      albumTitle: album.title,
+                                    );
+                                if (newPlaceId != null && context.mounted) {
+                                  context.push(
+                                    '${AppRoutes.journeys}/${album.id}?highlightPlaceId=$newPlaceId',
+                                  );
+                                }
+                              },
                             );
                           },
                         ),
@@ -666,7 +674,7 @@ class _AllJourneysDashboardScreenState
       'Date of Export: ${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now())}',
     );
     sb.writeln('Total Expeditions: ${albums.length}');
-    sb.writeln('Total Distance Recorded: ${totalKm.toStringAsFixed(1)} km');
+    sb.writeln('Total Distance Recorded: ${totalKm.toStringAsFixed(2)} km');
     sb.writeln('Total Places: ${places.length}\n');
 
     sb.writeln('--- JOURNEYS ---');
@@ -680,7 +688,7 @@ class _AllJourneysDashboardScreenState
         sb.writeln('  Description: ${album.description}');
       }
       sb.writeln(
-        '  Distance: ${album.totalDistanceKm.toStringAsFixed(1)} km | Stops: ${album.totalPlacesCount}',
+        '  Distance: ${album.totalDistanceKm.toStringAsFixed(2)} km | Stops: ${album.totalPlacesCount}',
       );
       sb.writeln('');
     }
@@ -688,11 +696,9 @@ class _AllJourneysDashboardScreenState
     if (places.isNotEmpty) {
       sb.writeln('--- RECENT DISCOVERIES & PLACES ---');
       for (final place in places) {
-        final visitTime = DateFormat(
-          'MMM d, yyyy HH:mm',
-        ).format(place.visitedAt);
+        final visitDate = DateFormat('MMM d, yyyy').format(place.visitedAt);
         sb.writeln('#${place.visitOrder} ${place.name} (${place.category})');
-        sb.writeln('  Visited: $visitTime');
+        sb.writeln('  Visited: $visitDate');
         if (place.locationAddress != null &&
             place.locationAddress!.isNotEmpty) {
           sb.writeln('  Location: ${place.locationAddress}');

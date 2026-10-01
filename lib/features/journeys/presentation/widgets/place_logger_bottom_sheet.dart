@@ -151,14 +151,14 @@ class PlaceLoggerScreen extends StatefulWidget {
   });
 
   /// Displays the Place Logger as a dedicated full-page screen.
-  static Future<void> show(
+  static Future<String?> show(
     BuildContext context, {
     required String albumId,
     String? albumTitle,
     TripPlace? placeToEdit,
     List<String>? initialPhotos,
   }) {
-    return Navigator.of(context, rootNavigator: true).push(
+    return Navigator.of(context, rootNavigator: true).push<String>(
       MaterialPageRoute(
         builder: (ctx) => PlaceLoggerScreen(
           albumId: albumId,
@@ -275,7 +275,9 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
           temperatureCelsius: p.temperatureCelsius ?? 19.0,
         ),
       );
-      _visitedAtNotifier = ValueNotifier<DateTime>(p.visitedAt);
+      _visitedAtNotifier = ValueNotifier<DateTime>(
+        DateTime(p.visitedAt.year, p.visitedAt.month, p.visitedAt.day),
+      );
       _notesController.text = p.notes ?? '';
 
       _loadExistingMedia(p.id);
@@ -293,7 +295,10 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
       _weatherStateNotifier = ValueNotifier<_WeatherState>(
         const _WeatherState(),
       );
-      _visitedAtNotifier = ValueNotifier<DateTime>(DateTime.now());
+      final now = DateTime.now();
+      _visitedAtNotifier = ValueNotifier<DateTime>(
+        DateTime(now.year, now.month, now.day),
+      );
 
       _initUserLocation();
       _fetchLiveWeather(_latitude, _longitude);
@@ -1108,7 +1113,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
     );
   }
 
-  Future<void> _pickDateTime() async {
+  Future<void> _pickDate() async {
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: _visitedAt,
@@ -1117,18 +1122,10 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
     );
     if (pickedDate == null || !mounted) return;
 
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(_visitedAt),
-    );
-    if (pickedTime == null || !mounted) return;
-
     _visitedAtNotifier.value = DateTime(
       pickedDate.year,
       pickedDate.month,
       pickedDate.day,
-      pickedTime.hour,
-      pickedTime.minute,
     );
   }
 
@@ -1142,6 +1139,11 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
       final name = _nameController.text.trim();
       final notes = _notesController.text.trim();
       final sensoryTags = 'rating:$_recommendationScale';
+      final visitDateOnly = DateTime(
+        _visitedAt.year,
+        _visitedAt.month,
+        _visitedAt.day,
+      );
 
       if (_isEditing) {
         final existing = widget.placeToEdit!;
@@ -1150,7 +1152,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
           notes: drift.Value(notes.isEmpty ? null : notes),
           latitude: _latitude,
           longitude: _longitude,
-          visitedAt: _visitedAt,
+          visitedAt: visitDateOnly,
           category: _category,
           weatherCondition: drift.Value(_weather),
           temperatureCelsius: drift.Value(_temperatureCelsius),
@@ -1188,7 +1190,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
                 width: const drift.Value(800),
                 height: const drift.Value(600),
                 isCoverPhoto: drift.Value(photo.isCover),
-                capturedAt: drift.Value(_visitedAt),
+                capturedAt: drift.Value(visitDateOnly),
               ),
             );
           } else {
@@ -1221,7 +1223,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
         unawaited(_updateAlbumDistance(db, widget.albumId));
 
         if (mounted) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(widget.placeToEdit?.id);
           WaymarkSnackbar.showSuccess(
             context,
             context.l10n.placeLoggerUpdatedToast,
@@ -1231,6 +1233,23 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
         final places = await db.tripPlaceDao.getPlacesForAlbum(widget.albumId);
         final placeId = const Uuid().v4();
 
+        // Sort existing places chronologically by visitedAt, then visitOrder
+        final sortedExisting = List<TripPlace>.from(places)
+          ..sort((a, b) {
+            final comp = a.visitedAt.compareTo(b.visitedAt);
+            if (comp != 0) return comp;
+            return a.visitOrder.compareTo(b.visitOrder);
+          });
+
+        // Determine chronological insertion position based on visited date
+        int insertIndex = sortedExisting.length;
+        for (int i = 0; i < sortedExisting.length; i++) {
+          if (sortedExisting[i].visitedAt.isAfter(visitDateOnly)) {
+            insertIndex = i;
+            break;
+          }
+        }
+
         await db.tripPlaceDao.insertPlace(
           TripPlacesCompanion(
             id: drift.Value(placeId),
@@ -1239,8 +1258,8 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
             notes: drift.Value(notes.isEmpty ? null : notes),
             latitude: drift.Value(_latitude),
             longitude: drift.Value(_longitude),
-            visitedAt: drift.Value(_visitedAt),
-            visitOrder: drift.Value(places.length),
+            visitedAt: drift.Value(visitDateOnly),
+            visitOrder: drift.Value(insertIndex),
             category: drift.Value(_category),
             weatherCondition: drift.Value(_weather),
             temperatureCelsius: drift.Value(_temperatureCelsius),
@@ -1249,6 +1268,19 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
             isGpsFromExif: drift.Value(_isGpsFromExif),
           ),
         );
+
+        // Re-index all places in album to maintain clean sequential visitOrder
+        final allPlaceIds = <String>[];
+        for (int i = 0; i < sortedExisting.length; i++) {
+          if (i == insertIndex) {
+            allPlaceIds.add(placeId);
+          }
+          allPlaceIds.add(sortedExisting[i].id);
+        }
+        if (insertIndex == sortedExisting.length) {
+          allPlaceIds.add(placeId);
+        }
+        await db.tripPlaceDao.updateVisitOrders(allPlaceIds);
 
         for (final photo in _photos) {
           await db.placeMediaDao.insertMedia(
@@ -1261,7 +1293,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
               width: const drift.Value(800),
               height: const drift.Value(600),
               isCoverPhoto: drift.Value(photo.isCover),
-              capturedAt: drift.Value(_visitedAt),
+              capturedAt: drift.Value(visitDateOnly),
             ),
           );
         }
@@ -1288,7 +1320,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
         unawaited(_updateAlbumDistance(db, widget.albumId));
 
         if (mounted) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(placeId);
           WaymarkSnackbar.showSuccess(
             context,
             context.l10n.placeLoggerSuccessToast,
@@ -2238,17 +2270,17 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
 
               SizedBox(height: 14.h),
 
-              // 5. Visited Time & Weather Cards (2-Column Grid)
+              // 5. Visited Date & Weather Cards (2-Column Grid)
               Row(
                 children: [
-                  // Visited Time Card
+                  // Visited Date Card
                   ValueListenableBuilder<DateTime>(
                     valueListenable: _visitedAtNotifier,
                     builder: (context, visitedAt, _) {
                       return Expanded(
                         child: InkWell(
                           borderRadius: BorderRadius.circular(14.r),
-                          onTap: _pickDateTime,
+                          onTap: _pickDate,
                           child: Container(
                             padding: EdgeInsets.all(12.w),
                             decoration: BoxDecoration(
@@ -2293,7 +2325,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
                                       SizedBox(height: 2.h),
                                       Text(
                                         DateFormat(
-                                          'MMM d • HH:mm',
+                                          'MMM d, yyyy',
                                         ).format(visitedAt),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,

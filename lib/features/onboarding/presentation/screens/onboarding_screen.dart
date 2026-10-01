@@ -24,6 +24,7 @@ import 'package:waymark/features/onboarding/presentation/widgets/onboarding_hero
 import 'package:waymark/features/onboarding/presentation/widgets/onboarding_step_header.dart';
 import 'package:waymark/features/onboarding/presentation/widgets/traveler_avatar_picker.dart';
 import 'package:waymark/features/onboarding/presentation/widgets/traveler_form_fields.dart';
+import 'package:waymark/core/services/backup_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -52,6 +53,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final ValueNotifier<bool> _autoExifGpsEnabledNotifier = ValueNotifier<bool>(
     true,
   );
+  final ValueNotifier<bool> _autoBackupEnabledNotifier = ValueNotifier<bool>(
+    true,
+  );
   final ValueNotifier<String?> _avatarPathNotifier = ValueNotifier<String?>(
     'avatar:explorer',
   );
@@ -77,6 +81,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _selectedArchetypeNotifier.dispose();
     _unitSystemNotifier.dispose();
     _autoExifGpsEnabledNotifier.dispose();
+    _autoBackupEnabledNotifier.dispose();
     _avatarPathNotifier.dispose();
     super.dispose();
   }
@@ -412,6 +417,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('hasCompletedOnboarding', true);
+
+      // Save auto backup preference
+      await BackupService.setAutoBackupEnabled(
+        _autoBackupEnabledNotifier.value,
+      );
 
       if (!mounted) return;
       context.go(AppRoutes.journeys);
@@ -762,16 +772,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   return ValueListenableBuilder<bool>(
                     valueListenable: _autoExifGpsEnabledNotifier,
                     builder: (context, autoExifGpsEnabled, _) {
-                      return DriftVaultSettingsCard(
-                        unitSystem: unitSystem,
-                        onUnitChanged: (unit) {
-                          _unitSystemNotifier.value = unit;
+                      return ValueListenableBuilder<bool>(
+                        valueListenable: _autoBackupEnabledNotifier,
+                        builder: (context, autoBackupEnabled, _) {
+                          return DriftVaultSettingsCard(
+                            unitSystem: unitSystem,
+                            onUnitChanged: (unit) {
+                              _unitSystemNotifier.value = unit;
+                            },
+                            autoExifGpsEnabled: autoExifGpsEnabled,
+                            onAutoExifChanged: (enabled) {
+                              _autoExifGpsEnabledNotifier.value = enabled;
+                            },
+                            autoBackupEnabled: autoBackupEnabled,
+                            onAutoBackupChanged: (enabled) {
+                              _autoBackupEnabledNotifier.value = enabled;
+                            },
+                            vaultPath: _vaultPath,
+                          );
                         },
-                        autoExifGpsEnabled: autoExifGpsEnabled,
-                        onAutoExifChanged: (enabled) {
-                          _autoExifGpsEnabledNotifier.value = enabled;
-                        },
-                        vaultPath: _vaultPath,
                       );
                     },
                   );

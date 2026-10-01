@@ -98,7 +98,11 @@ class AppRouter {
             name: AppRoutes.journeyDetailName,
             builder: (context, state) {
               final id = state.pathParameters['id'] ?? '';
-              return JourneyAlbumDetailScreen(journeyId: id);
+              final highlightId = state.uri.queryParameters['highlightPlaceId'];
+              return JourneyAlbumDetailScreen(
+                journeyId: id,
+                initialHighlightPlaceId: highlightId,
+              );
             },
           ),
         ],

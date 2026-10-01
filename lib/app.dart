@@ -27,6 +27,11 @@ class WaymarkApp extends StatelessWidget {
           theme: WaymarkTheme.lightTheme,
           scrollBehavior: const WaymarkNoOverscrollScrollBehavior(),
           routerConfig: AppRouter.router,
+          builder: (context, routerChild) {
+            return WaymarkNotificationListener(
+              child: routerChild ?? const SizedBox.shrink(),
+            );
+          },
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,

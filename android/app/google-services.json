@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "470529540260",
+    "project_id": "waymark-264f6",
+    "storage_bucket": "waymark-264f6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470529540260:android:074e35e788337102a36631",
+        "android_client_info": {
+          "package_name": "com.waymark.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCgBTAQXlgN5w_uBQPRBGiQFdN6jDgTqk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470529540260:android:d10b201d880a20caa36631",
+        "android_client_info": {
+          "package_name": "com.waymark.app.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCgBTAQXlgN5w_uBQPRBGiQFdN6jDgTqk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

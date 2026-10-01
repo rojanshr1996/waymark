@@ -196,7 +196,7 @@ class ArchivedMemoirsSection extends StatelessWidget {
                           color: colors.textSecondary,
                         ),
                         Text(
-                          '${(albumDistances?[album.id] ?? album.totalDistanceKm).toStringAsFixed(1)} km',
+                          '${(albumDistances?[album.id] ?? album.totalDistanceKm).toStringAsFixed(2)} km',
                           style: context.textTheme.caption.copyWith(
                             color: colors.textSecondary,
                             fontSize: 11.sp,

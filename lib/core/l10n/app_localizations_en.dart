@@ -73,13 +73,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileFullNameLabel => 'Full Name';
 
   @override
-  String get profileFullNamePlaceholder => 'e.g. Rojan Shrestha';
+  String get profileFullNamePlaceholder => 'e.g. John Doe';
 
   @override
   String get profileHandleLabel => 'Compass ID / Email';
 
   @override
-  String get profileHandlePlaceholder => 'e.g. rojan@waymark.app';
+  String get profileHandlePlaceholder => 'e.g. john.doe@waymark.app';
 
   @override
   String get profileHandleClaimed => 'CLAIMED';
@@ -362,7 +362,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get placeLoggerCategoryTag => 'Category Tag';
 
   @override
-  String get placeLoggerVisitedTime => 'Visited Time';
+  String get placeLoggerVisitedTime => 'Date Visited';
 
   @override
   String get placeLoggerSkyAndTemp => 'Sky & Temp';

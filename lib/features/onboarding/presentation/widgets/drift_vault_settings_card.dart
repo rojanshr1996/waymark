@@ -12,6 +12,8 @@ class DriftVaultSettingsCard extends StatelessWidget {
   final bool autoExifGpsEnabled;
   final ValueChanged<bool> onAutoExifChanged;
   final String vaultPath;
+  final bool autoBackupEnabled;
+  final ValueChanged<bool>? onAutoBackupChanged;
 
   const DriftVaultSettingsCard({
     super.key,
@@ -19,6 +21,8 @@ class DriftVaultSettingsCard extends StatelessWidget {
     required this.onUnitChanged,
     required this.autoExifGpsEnabled,
     required this.onAutoExifChanged,
+    this.autoBackupEnabled = true,
+    this.onAutoBackupChanged,
     this.vaultPath = '/sandbox/documents/vault_001.drift',
   });
 
@@ -373,6 +377,95 @@ class DriftVaultSettingsCard extends StatelessWidget {
               ),
             ],
           ),
+
+          if (onAutoBackupChanged != null) ...[
+            SizedBox(height: WaymarkSpacing.spaceMd),
+
+            // Automated Local Backup
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              'Automated Local Backup',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.textTheme.headlineSmall?.copyWith(
+                                color: colors.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 6.w),
+                          Icon(
+                            Icons.backup_rounded,
+                            size: 16.sp,
+                            color: colors.primary,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        'Automatically backs up your journey data to the Downloads folder every 2 days.',
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: colors.textSecondary,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                GestureDetector(
+                  onTap: () => onAutoBackupChanged!(!autoBackupEnabled),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 48.w,
+                    height: 28.h,
+                    padding: EdgeInsets.symmetric(horizontal: 2.w),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(
+                        WaymarkSpacing.radiusFull,
+                      ),
+                      color: autoBackupEnabled
+                          ? colors.primary
+                          : colors.surfaceContainerHigh,
+                    ),
+                    alignment: autoBackupEnabled
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: Container(
+                      width: 24.w,
+                      height: 24.w,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x1F000000),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        autoBackupEnabled ? Icons.check : Icons.close,
+                        size: 14.sp,
+                        color: autoBackupEnabled
+                            ? colors.primary
+                            : colors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

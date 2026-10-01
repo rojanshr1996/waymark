@@ -199,7 +199,7 @@ abstract class AppLocalizations {
   /// Placeholder for full name field on profile
   ///
   /// In en, this message translates to:
-  /// **'e.g. Rojan Shrestha'**
+  /// **'e.g. John Doe'**
   String get profileFullNamePlaceholder;
 
   /// Label for handle/email field on profile
@@ -211,7 +211,7 @@ abstract class AppLocalizations {
   /// Placeholder for handle field on profile
   ///
   /// In en, this message translates to:
-  /// **'e.g. rojan@waymark.app'**
+  /// **'e.g. john.doe@waymark.app'**
   String get profileHandlePlaceholder;
 
   /// Badge when handle/email is entered on profile
@@ -700,10 +700,10 @@ abstract class AppLocalizations {
   /// **'Category Tag'**
   String get placeLoggerCategoryTag;
 
-  /// Label for visited time card
+  /// Label for date visited card
   ///
   /// In en, this message translates to:
-  /// **'Visited Time'**
+  /// **'Date Visited'**
   String get placeLoggerVisitedTime;
 
   /// Label for sky and temperature card

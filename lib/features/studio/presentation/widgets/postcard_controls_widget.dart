@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:waymark/core/database/app_database.dart';
@@ -10,9 +12,11 @@ class PostcardControlsWidget extends StatelessWidget {
   final ValueNotifier<TripAlbum?> selectedAlbumNotifier;
   final ValueNotifier<PostcardAestheticStyle> selectedStyleNotifier;
   final ValueNotifier<PostcardRatio> selectedRatioNotifier;
+  final ValueNotifier<String?> selectedBgImageNotifier;
   final ValueNotifier<bool> showMapRouteNotifier;
-  final ValueNotifier<bool> showWeatherNotifier;
+  final ValueNotifier<bool> showFlightTrailNotifier;
   final ValueNotifier<bool> isQuadPhotoLayoutNotifier;
+  final int uploadedPhotosCount;
 
   const PostcardControlsWidget({
     super.key,
@@ -20,9 +24,11 @@ class PostcardControlsWidget extends StatelessWidget {
     required this.selectedAlbumNotifier,
     required this.selectedStyleNotifier,
     required this.selectedRatioNotifier,
+    required this.selectedBgImageNotifier,
     required this.showMapRouteNotifier,
-    required this.showWeatherNotifier,
+    required this.showFlightTrailNotifier,
     required this.isQuadPhotoLayoutNotifier,
+    this.uploadedPhotosCount = 4,
   });
 
   @override
@@ -40,11 +46,15 @@ class PostcardControlsWidget extends StatelessWidget {
         _buildStyleSelector(context),
         SizedBox(height: 16.h),
 
-        // 3. Export Canvas Ratio Selector
+        // 3. Postcard Background Image Selector (from assets/images)
+        _buildBackgroundImageSelector(context),
+        SizedBox(height: 16.h),
+
+        // 4. Export Canvas Ratio Selector
         _buildRatioSelector(context),
         SizedBox(height: 16.h),
 
-        // 4. Canvas Elements & Layers Toggles
+        // 5. Canvas Elements & Layers Toggles
         _buildLayersCard(context),
         SizedBox(height: 20.h),
       ],
@@ -211,6 +221,179 @@ class PostcardControlsWidget extends StatelessWidget {
               ),
             );
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBackgroundImageSelector(BuildContext context) {
+    final colors = context.colorScheme;
+
+    const backgroundImages = [
+      'assets/images/place_eight.jpeg',
+      'assets/images/place_eleven.jpeg',
+      'assets/images/place_one.jpeg',
+      'assets/images/place_two.jpeg',
+      'assets/images/place_three.jpeg',
+      'assets/images/place_four.jpeg',
+      'assets/images/place_five.jpeg',
+      'assets/images/place_six.jpeg',
+      'assets/images/place_seven.jpeg',
+      'assets/images/place_nine.jpeg',
+      'assets/images/place_ten.jpeg',
+      'assets/images/place_twelve.jpeg',
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.landscape_rounded,
+                  size: 16.sp,
+                  color: colors.primary,
+                ),
+                SizedBox(width: 6.w),
+                Text(
+                  'Postcard Background Scenery',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                    color: colors.onSurface,
+                  ),
+                ),
+              ],
+            ),
+            InkWell(
+              borderRadius: BorderRadius.circular(12.r),
+              onTap: () {
+                final random =
+                    backgroundImages[math.Random().nextInt(
+                      backgroundImages.length,
+                    )];
+                selectedBgImageNotifier.value = random;
+              },
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.shuffle_rounded,
+                      size: 13.sp,
+                      color: colors.primary,
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      'Random',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                        color: colors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 8.h),
+        SizedBox(
+          height: 60.h,
+          child: ValueListenableBuilder<String?>(
+            valueListenable: selectedBgImageNotifier,
+            builder: (context, currentBg, _) {
+              return ValueListenableBuilder<PostcardAestheticStyle>(
+                valueListenable: selectedStyleNotifier,
+                builder: (context, style, _) {
+                  final activeBg = currentBg ?? style.defaultBackgroundImage;
+
+                  return ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: backgroundImages.length,
+                    separatorBuilder: (_, _) => SizedBox(width: 8.w),
+                    itemBuilder: (context, index) {
+                      final path = backgroundImages[index];
+                      final isSelected = activeBg == path;
+
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(10.r),
+                        onTap: () {
+                          selectedBgImageNotifier.value = path;
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          width: 60.w,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.r),
+                            border: Border.all(
+                              color: isSelected
+                                  ? colors.primary
+                                  : colors.borderDivider,
+                              width: isSelected ? 2.5 : 1,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: colors.primary.withValues(
+                                        alpha: 0.25,
+                                      ),
+                                      blurRadius: 6.r,
+                                      offset: Offset(0, 2.h),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8.r),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Image.asset(path, fit: BoxFit.cover),
+                                if (isSelected)
+                                  Positioned(
+                                    top: 4.h,
+                                    right: 4.w,
+                                    child: Container(
+                                      padding: EdgeInsets.all(2.5.w),
+                                      decoration: BoxDecoration(
+                                        color: colors.primary,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.25,
+                                            ),
+                                            blurRadius: 3,
+                                            offset: const Offset(0, 1),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Icon(
+                                        Icons.check_rounded,
+                                        size: 11.sp,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
         ),
       ],
     );
@@ -409,7 +592,7 @@ class PostcardControlsWidget extends StatelessWidget {
                         duration: const Duration(milliseconds: 200),
                         padding: EdgeInsets.symmetric(
                           vertical: 8.h,
-                          horizontal: 8.w,
+                          horizontal: 4.w,
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
@@ -430,6 +613,7 @@ class PostcardControlsWidget extends StatelessWidget {
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               ratio.icon,
@@ -438,18 +622,22 @@ class PostcardControlsWidget extends StatelessWidget {
                                   ? Colors.white
                                   : colors.onSurface,
                             ),
-                            SizedBox(width: 5.w),
-                            Text(
-                              ratio.label,
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 11.sp,
-                                fontWeight: isSelected
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                                color: isSelected
-                                    ? Colors.white
-                                    : colors.onSurface,
+                            SizedBox(width: 4.w),
+                            Flexible(
+                              child: Text(
+                                ratio.label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 10.5.sp,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : colors.onSurface,
+                                ),
                               ),
                             ),
                           ],
@@ -504,24 +692,29 @@ class PostcardControlsWidget extends StatelessWidget {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.polyline_rounded,
-                        size: 18.sp,
-                        color: colors.secondary,
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        'Show Journey Route Polyline',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 13.sp,
-                          color: colors.onSurface,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.polyline_rounded,
+                          size: 18.sp,
+                          color: colors.secondary,
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 8.w),
+                        Expanded(
+                          child: Text(
+                            'Show Journey Route Polyline',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 13.sp,
+                              color: colors.onSurface,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  SizedBox(width: 8.w),
                   Switch.adaptive(
                     value: showRoute,
                     activeThumbColor: colors.primary,
@@ -533,70 +726,80 @@ class PostcardControlsWidget extends StatelessWidget {
           ),
           Divider(height: 12.h, color: colors.borderDivider),
 
-          // Weather & Ambient Data Toggle
-          ValueListenableBuilder<bool>(
-            valueListenable: showWeatherNotifier,
-            builder: (context, showWeather, _) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.wb_sunny_rounded,
-                        size: 18.sp,
-                        color: const Color(0xFFFFB703),
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        'Show Weather & Atmosphere',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 13.sp,
-                          color: colors.onSurface,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Switch.adaptive(
-                    value: showWeather,
-                    activeThumbColor: colors.primary,
-                    onChanged: (val) => showWeatherNotifier.value = val,
-                  ),
-                ],
-              );
-            },
-          ),
-          Divider(height: 12.h, color: colors.borderDivider),
+          // Flight Trail & Postmark Stamps Toggle
+          // ValueListenableBuilder<bool>(
+          //   valueListenable: showFlightTrailNotifier,
+          //   builder: (context, showFlight, _) {
+          //     return Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Row(
+          //           children: [
+          //             Icon(Icons.flight_takeoff_rounded, size: 18.sp, color: colors.primary),
+          //             SizedBox(width: 8.w),
+          //             Text(
+          //               'Show Flight Route & Stamp',
+          //               style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp, color: colors.onSurface),
+          //             ),
+          //           ],
+          //         ),
+          //         Switch.adaptive(
+          //           value: showFlight,
+          //           activeThumbColor: colors.primary,
+          //           onChanged: (val) => showFlightTrailNotifier.value = val,
+          //         ),
+          //       ],
+          //     );
+          //   },
+          // ),
+          // Divider(height: 12.h, color: colors.borderDivider),
 
-          // Photo Layout Toggle (Duo vs Quad)
+          // Photo Layout Toggle
           ValueListenableBuilder<bool>(
             valueListenable: isQuadPhotoLayoutNotifier,
             builder: (context, isQuad, _) {
+              final canToggleQuad = uploadedPhotosCount >= 4;
+              final layoutText = uploadedPhotosCount == 0
+                  ? 'No photos'
+                  : uploadedPhotosCount == 1
+                  ? '1 Photo'
+                  : uploadedPhotosCount == 2
+                  ? '2 Photos'
+                  : uploadedPhotosCount == 3
+                  ? '3 Photos'
+                  : (isQuad ? '4 Polaroids (Quad)' : '3 Taped Polaroids');
+
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.photo_library_rounded,
-                        size: 18.sp,
-                        color: colors.primary,
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        'Photo Layout',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 13.sp,
-                          color: colors.onSurface,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.photo_library_rounded,
+                          size: 18.sp,
+                          color: colors.primary,
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 8.w),
+                        Expanded(
+                          child: Text(
+                            'Polaroid Layout',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 13.sp,
+                              color: colors.onSurface,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  SizedBox(width: 8.w),
                   InkWell(
                     borderRadius: BorderRadius.circular(8.r),
-                    onTap: () => isQuadPhotoLayoutNotifier.value = !isQuad,
+                    onTap: canToggleQuad
+                        ? () => isQuadPhotoLayoutNotifier.value = !isQuad
+                        : null,
                     child: Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: 10.w,
@@ -608,12 +811,14 @@ class PostcardControlsWidget extends StatelessWidget {
                         border: Border.all(color: colors.borderDivider),
                       ),
                       child: Text(
-                        isQuad ? '4 Polaroids (Quad)' : '2 Polaroids (Duo)',
+                        layoutText,
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 11.5.sp,
                           fontWeight: FontWeight.w600,
-                          color: colors.primary,
+                          color: canToggleQuad
+                              ? colors.primary
+                              : colors.onSurfaceVariant,
                         ),
                       ),
                     ),

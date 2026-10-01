@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -26,8 +27,13 @@ enum _JourneyDetailTab { timeline, routeMap, wall }
 
 class JourneyAlbumDetailScreen extends StatefulWidget {
   final String journeyId;
+  final String? initialHighlightPlaceId;
 
-  const JourneyAlbumDetailScreen({super.key, required this.journeyId});
+  const JourneyAlbumDetailScreen({
+    super.key,
+    required this.journeyId,
+    this.initialHighlightPlaceId,
+  });
 
   @override
   State<JourneyAlbumDetailScreen> createState() =>
@@ -53,6 +59,9 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
   final ValueNotifier<bool> _isRouteLoadingNotifier = ValueNotifier<bool>(
     false,
   );
+  late final ValueNotifier<String?> _highlightPlaceIdNotifier;
+  final Map<String, GlobalKey> _itemKeys = {};
+  Set<String>? _knownPlaceIds;
   String? _lastRouteKey;
 
   late Stream<TripAlbum?> _albumStream;
@@ -61,7 +70,15 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
   @override
   void initState() {
     super.initState();
+    _highlightPlaceIdNotifier = ValueNotifier<String?>(
+      widget.initialHighlightPlaceId,
+    );
     _initStreams();
+    if (widget.initialHighlightPlaceId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _triggerNewPlaceAnimation(widget.initialHighlightPlaceId!);
+      });
+    }
   }
 
   @override
@@ -73,6 +90,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
     _roadRoutePointsNotifier.dispose();
     _roadDistanceKmNotifier.dispose();
     _isRouteLoadingNotifier.dispose();
+    _highlightPlaceIdNotifier.dispose();
     _mapController.dispose();
     super.dispose();
   }
@@ -84,8 +102,64 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
       _lastRouteKey = null;
       _roadRoutePointsNotifier.value = null;
       _roadDistanceKmNotifier.value = null;
+      _knownPlaceIds = null;
       _initStreams();
     }
+    if (widget.initialHighlightPlaceId != null &&
+        widget.initialHighlightPlaceId != oldWidget.initialHighlightPlaceId) {
+      _triggerNewPlaceAnimation(widget.initialHighlightPlaceId!);
+    }
+  }
+
+  void _triggerNewPlaceAnimation(String placeId) {
+    _highlightPlaceIdNotifier.value = placeId;
+    if (_activeTabNotifier.value != _JourneyDetailTab.timeline) {
+      _activeTabNotifier.value = _JourneyDetailTab.timeline;
+    }
+
+    void tryScroll(int attemptsLeft) {
+      if (!mounted) return;
+      final key = _itemKeys[placeId];
+      if (key?.currentContext != null) {
+        Scrollable.ensureVisible(
+          key!.currentContext!,
+          duration: const Duration(milliseconds: 650),
+          curve: Curves.easeInOutCubic,
+          alignment: 0.35,
+        );
+      } else if (attemptsLeft > 0) {
+        Future.delayed(
+          const Duration(milliseconds: 150),
+          () => tryScroll(attemptsLeft - 1),
+        );
+      }
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 250), () => tryScroll(5));
+    });
+
+    Future.delayed(const Duration(milliseconds: 4000), () {
+      if (mounted && _highlightPlaceIdNotifier.value == placeId) {
+        _highlightPlaceIdNotifier.value = null;
+      }
+    });
+  }
+
+  void _handlePlacesUpdate(List<TripPlace> places) {
+    final currentIds = places.map((p) => p.id).toSet();
+    if (_knownPlaceIds != null && _knownPlaceIds!.isNotEmpty) {
+      final diff = currentIds.difference(_knownPlaceIds!);
+      if (diff.isNotEmpty) {
+        final newlyAddedId = diff.first;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _triggerNewPlaceAnimation(newlyAddedId);
+          }
+        });
+      }
+    }
+    _knownPlaceIds = currentIds;
   }
 
   void _initStreams() {
@@ -166,22 +240,42 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
   Future<void> _movePlaceUp(List<TripPlace> places, int index) async {
     if (index <= 0) return;
     final updatedList = List<TripPlace>.from(places);
+    final current = updatedList[index];
+    final prev = updatedList[index - 1];
+
+    if (current.visitedAt.isBefore(prev.visitedAt)) {
+      await AppDatabase.instance.tripPlaceDao.updatePlace(
+        current.copyWith(visitedAt: prev.visitedAt),
+      );
+      updatedList[index] = current.copyWith(visitedAt: prev.visitedAt);
+    }
+
     final temp = updatedList[index];
     updatedList[index] = updatedList[index - 1];
     updatedList[index - 1] = temp;
     await AppDatabase.instance.tripPlaceDao.updateVisitOrders(
-      updatedList.map((p) => p.id).toList(),
+      updatedList.reversed.map((p) => p.id).toList(),
     );
   }
 
   Future<void> _movePlaceDown(List<TripPlace> places, int index) async {
     if (index >= places.length - 1) return;
     final updatedList = List<TripPlace>.from(places);
+    final current = updatedList[index];
+    final next = updatedList[index + 1];
+
+    if (current.visitedAt.isAfter(next.visitedAt)) {
+      await AppDatabase.instance.tripPlaceDao.updatePlace(
+        current.copyWith(visitedAt: next.visitedAt),
+      );
+      updatedList[index] = current.copyWith(visitedAt: next.visitedAt);
+    }
+
     final temp = updatedList[index];
     updatedList[index] = updatedList[index + 1];
     updatedList[index + 1] = temp;
     await AppDatabase.instance.tripPlaceDao.updateVisitOrders(
-      updatedList.map((p) => p.id).toList(),
+      updatedList.reversed.map((p) => p.id).toList(),
     );
   }
 
@@ -225,6 +319,8 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
           builder: (context, placesSnapshot) {
             final places = placesSnapshot.data ?? [];
             final placeIds = places.map((p) => p.id).toList();
+
+            _handlePlacesUpdate(places);
 
             // Trigger route polyline calculation when places load or reorder
             _checkAndFetchRoadRoute(places);
@@ -575,7 +671,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                     else
                       _buildStatColumn(
                         context,
-                        value: totalKm.toStringAsFixed(1),
+                        value: totalKm.toStringAsFixed(2),
                         unit: 'km',
                         label: 'Total Path',
                         valueColor: colors.primary,
@@ -872,6 +968,13 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
       );
     }
 
+    final timelinePlaces = List<TripPlace>.from(places)
+      ..sort((a, b) {
+        final dateComp = b.visitedAt.compareTo(a.visitedAt);
+        if (dateComp != 0) return dateComp;
+        return b.visitOrder.compareTo(a.visitOrder);
+      });
+
     return ValueListenableBuilder<bool>(
       valueListenable: _isReorderingNotifier,
       builder: (context, isReordering, _) {
@@ -887,30 +990,25 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                   Expanded(
                     child: Row(
                       children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.w,
-                            vertical: 3.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colors.secondary,
-                            borderRadius: BorderRadius.circular(
-                              WaymarkSpacing.radiusFull,
-                            ),
-                          ),
-                          child: Text(
-                            'Day 01',
-                            style: context.textTheme.labelSmall?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10.sp,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
+                        // Container(
+                        //   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                        //   decoration: BoxDecoration(
+                        //     color: colors.secondary,
+                        //     borderRadius: BorderRadius.circular(WaymarkSpacing.radiusFull),
+                        //   ),
+                        //   child: Text(
+                        //     'Day 01',
+                        //     style: context.textTheme.labelSmall?.copyWith(
+                        //       color: Colors.white,
+                        //       fontWeight: FontWeight.bold,
+                        //       fontSize: 10.sp,
+                        //     ),
+                        //   ),
+                        // ),
+                        // SizedBox(width: 8.w),
                         Expanded(
                           child: Text(
-                            'Arrival & Ancient Shrines',
+                            'Places visited',
                             style: context.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: colors.textPrimary,
@@ -1022,26 +1120,33 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                 ),
               ),
 
-            // Sequential Places with Dashed Line & Node Pins
+            // Sequential Places with Dashed Line & Node Pins (chronological order)
             ListView.builder(
-              key: ValueKey('timeline_list_${places.length}_$isReordering'),
+              key: ValueKey(
+                'timeline_list_${timelinePlaces.length}_$isReordering',
+              ),
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               padding: EdgeInsets.zero,
-              itemCount: places.length,
+              itemCount: timelinePlaces.length,
               itemBuilder: (context, index) {
-                final place = places[index];
+                final place = timelinePlaces[index];
                 final isFirst = index == 0;
-                final isLast = index == places.length - 1;
+                final isLast = index == timelinePlaces.length - 1;
                 final placeMedia = allMedia
                     .where((m) => m.placeId == place.id)
                     .toList();
+                final itemKey = _itemKeys.putIfAbsent(
+                  place.id,
+                  () => GlobalKey(),
+                );
 
                 return _buildTimelineNodeItem(
-                  key: ValueKey('timeline_node_${place.id}'),
+                  key: itemKey,
                   context: context,
                   album: album,
-                  places: places,
+                  allPlaces: places,
+                  places: timelinePlaces,
                   place: place,
                   index: index,
                   isFirst: isFirst,
@@ -1061,6 +1166,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
     Key? key,
     required BuildContext context,
     required TripAlbum album,
+    required List<TripPlace> allPlaces,
     required List<TripPlace> places,
     required TripPlace place,
     required int index,
@@ -1070,7 +1176,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
     required bool isReordering,
   }) {
     final colors = context.colorScheme;
-    final timeStr = DateFormat('hh:mm a').format(place.visitedAt);
+    final dateStr = DateFormat('MMM d, yyyy').format(place.visitedAt);
 
     Color pinColor = colors.primary;
     Widget pinIcon = Text(
@@ -1083,15 +1189,19 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
     );
 
     if (isFirst) {
-      pinColor = const Color(0xFF3B82F6); // route-start blue
+      pinColor = const Color(0xFF3B82F6); // route-start / latest stop blue
+      pinIcon = Icon(
+        Icons.location_on_rounded,
+        size: 12.sp,
+        color: Colors.white,
+      );
+    } else if (isLast) {
+      pinColor = const Color(0xFFF43F5E); // route-end / origin rose
       pinIcon = Icon(
         Icons.flight_land_rounded,
         size: 12.sp,
         color: Colors.white,
       );
-    } else if (isLast) {
-      pinColor = const Color(0xFFF43F5E); // route-end rose
-      pinIcon = Icon(Icons.flag_rounded, size: 12.sp, color: Colors.white);
     } else if (index % 2 == 1) {
       pinColor = colors.tertiaryContainer;
     }
@@ -1109,427 +1219,589 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
       }
     }
 
-    return Stack(
-      key: key,
-      children: [
-        // Dashed Line running vertically on left
-        if (!isLast)
-          Positioned(
-            left: 12.w,
-            top: 24.h,
-            bottom: 0,
-            child: _buildDashedVerticalLine(colors),
-          ),
+    return ValueListenableBuilder<String?>(
+      valueListenable: _highlightPlaceIdNotifier,
+      builder: (context, highlightId, _) {
+        final isNewlyAdded = highlightId == place.id;
 
-        // Node Pin Badge
-        Positioned(
-          left: 3.w,
-          top: 6.h,
-          child: Container(
-            width: 20.w,
-            height: 20.w,
-            decoration: BoxDecoration(
-              color: pinColor,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            alignment: Alignment.center,
-            child: pinIcon,
-          ),
-        ),
+        return Stack(
+          key: key,
+          clipBehavior: Clip.none,
+          children: [
+            // Dashed Line running vertically on left
+            if (!isLast)
+              Positioned(
+                left: 12.w,
+                top: 26.h,
+                bottom: -6.h,
+                child: _buildDashedVerticalLine(colors),
+              ),
 
-        // Milestone Content Container
-        Padding(
-          padding: EdgeInsets.only(left: 32.w, bottom: 20.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Milestone Card with smooth layout animation on reorder
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 280),
-                curve: Curves.easeInOutCubic,
-                decoration: BoxDecoration(
-                  color: colors.surfaceCard,
-                  borderRadius: BorderRadius.circular(14.r),
-                  border: Border.all(
-                    color: isReordering
-                        ? colors.primary.withValues(alpha: 0.45)
-                        : colors.borderDivider.withValues(alpha: 0.5),
-                    width: isReordering ? 1.5 : 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isReordering
-                          ? colors.primary.withValues(alpha: 0.12)
-                          : const Color(0x0F1F2421),
-                      blurRadius: isReordering ? 10 : 4,
-                      offset: const Offset(0, 2),
+            // Node Pin Badge
+            Positioned(
+              left: 3.w,
+              top: 6.h,
+              child: Stack(
+                alignment: Alignment.center,
+                clipBehavior: Clip.none,
+                children: [
+                  if (isNewlyAdded)
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.8, end: 1.6),
+                      duration: const Duration(milliseconds: 900),
+                      curve: Curves.easeInOut,
+                      builder: (context, pulseVal, child) {
+                        return Container(
+                          width: 20.w * pulseVal,
+                          height: 20.w * pulseVal,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: const Color(0xFFF59E0B).withValues(
+                              alpha: (1.6 - pulseVal).clamp(0.0, 0.45),
+                            ),
+                            border: Border.all(
+                              color: const Color(0xFFF59E0B).withValues(
+                                alpha: (1.6 - pulseVal).clamp(0.0, 0.85),
+                              ),
+                              width: 1.5,
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(14.r),
-                        onTap: () {
-                          PlaceLoggerBottomSheet.show(
-                            context,
-                            albumId: album.id,
-                            albumTitle: album.title,
-                            placeToEdit: place,
-                          );
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.all(12.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Card Header Row
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'Node P${index + 1} • $timeStr'
-                                          .toUpperCase(),
-                                      style: context.textTheme.caption.copyWith(
-                                        color: pinColor,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 10.sp,
-                                        letterSpacing: 0.5,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 8.w,
-                                          vertical: 2.h,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: colors.primary.withValues(
-                                            alpha: 0.08,
+                  Container(
+                    width: 20.w,
+                    height: 20.w,
+                    decoration: BoxDecoration(
+                      color: isNewlyAdded ? const Color(0xFFF59E0B) : pinColor,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              (isNewlyAdded
+                                      ? const Color(0xFFF59E0B)
+                                      : Colors.black)
+                                  .withValues(alpha: isNewlyAdded ? 0.5 : 0.15),
+                          blurRadius: isNewlyAdded ? 8 : 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: isNewlyAdded
+                        ? Icon(
+                            Icons.star_rounded,
+                            size: 13.sp,
+                            color: Colors.white,
+                          )
+                        : pinIcon,
+                  ),
+                ],
+              ),
+            ),
+
+            // Milestone Content Container
+            Padding(
+              padding: EdgeInsets.only(left: 30.w, bottom: isLast ? 8.h : 6.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Milestone Card with smooth layout animation on reorder & scale entrance on newly added
+                  TweenAnimationBuilder<double>(
+                    key: ValueKey('item_anim_${place.id}_$isNewlyAdded'),
+                    tween: Tween<double>(
+                      begin: isNewlyAdded ? 0.0 : 1.0,
+                      end: 1.0,
+                    ),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutBack,
+                    builder: (context, animVal, cardChild) {
+                      return Transform.scale(
+                        scale: 0.94 + 0.06 * animVal,
+                        alignment: Alignment.centerLeft,
+                        child: cardChild,
+                      );
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 320),
+                      curve: Curves.easeInOutCubic,
+                      decoration: BoxDecoration(
+                        color: isNewlyAdded
+                            ? colors.surfaceCard.withValues(alpha: 0.98)
+                            : colors.surfaceCard,
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                          color: isNewlyAdded
+                              ? const Color(0xFFF59E0B)
+                              : isReordering
+                              ? colors.primary.withValues(alpha: 0.45)
+                              : colors.borderDivider.withValues(alpha: 0.5),
+                          width: (isNewlyAdded || isReordering) ? 1.8 : 1.0,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isNewlyAdded
+                                ? const Color(0xFFF59E0B).withValues(alpha: 0.3)
+                                : isReordering
+                                ? colors.primary.withValues(alpha: 0.12)
+                                : const Color(0x0F1F2421),
+                            blurRadius: isNewlyAdded
+                                ? 14
+                                : (isReordering ? 10 : 4),
+                            spreadRadius: isNewlyAdded ? 1 : 0,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(12.r),
+                              onTap: () {
+                                PlaceLoggerBottomSheet.show(
+                                  context,
+                                  albumId: album.id,
+                                  albumTitle: album.title,
+                                  placeToEdit: place,
+                                );
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w,
+                                  vertical: 8.h,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Card Header Row
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'Node P${index + 1} • $dateStr'
+                                                .toUpperCase(),
+                                            style: context.textTheme.caption
+                                                .copyWith(
+                                                  color: pinColor,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 9.5.sp,
+                                                  letterSpacing: 0.4,
+                                                ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          borderRadius: BorderRadius.circular(
-                                            WaymarkSpacing.radiusFull,
-                                          ),
                                         ),
-                                        child: Text(
-                                          place.category.toUpperCase(),
-                                          style: context.textTheme.caption
-                                              .copyWith(
-                                                color: colors.primary,
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 9.sp,
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 6.w,
+                                                vertical: 1.5.h,
                                               ),
-                                        ),
-                                      ),
-                                      if (!isReordering) ...[
-                                        SizedBox(width: 4.w),
-                                        PopupMenuButton<String>(
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                          icon: Icon(
-                                            Icons.more_vert_rounded,
-                                            size: 18.sp,
-                                            color: colors.textSecondary
-                                                .withValues(alpha: 0.7),
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12.r,
+                                              decoration: BoxDecoration(
+                                                color: colors.primary
+                                                    .withValues(alpha: 0.08),
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      WaymarkSpacing.radiusFull,
+                                                    ),
+                                              ),
+                                              child: Text(
+                                                place.category.toUpperCase(),
+                                                style: context.textTheme.caption
+                                                    .copyWith(
+                                                      color: colors.primary,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontSize: 8.5.sp,
+                                                    ),
+                                              ),
                                             ),
-                                          ),
-                                          onSelected: (action) {
-                                            if (action == 'edit') {
-                                              PlaceLoggerBottomSheet.show(
-                                                context,
-                                                albumId: album.id,
-                                                albumTitle: album.title,
-                                                placeToEdit: place,
-                                              );
-                                            } else if (action == 'delete') {
-                                              _confirmDeletePlace(
-                                                context,
-                                                place,
-                                                album,
-                                                places,
-                                              );
-                                            }
-                                          },
-                                          itemBuilder: (ctx) => [
-                                            PopupMenuItem(
-                                              value: 'edit',
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.edit_outlined,
-                                                    size: 16.sp,
-                                                    color: colors.textPrimary,
-                                                  ),
-                                                  SizedBox(width: 8.w),
-                                                  Text(
-                                                    'Edit Place',
-                                                    style: ctx
-                                                        .textTheme
-                                                        .bodyMedium
-                                                        ?.copyWith(
+                                            if (isNewlyAdded) ...[
+                                              SizedBox(width: 4.w),
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 6.w,
+                                                  vertical: 1.5.h,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  gradient:
+                                                      const LinearGradient(
+                                                        colors: [
+                                                          Color(0xFFF59E0B),
+                                                          Color(0xFFD97706),
+                                                        ],
+                                                      ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        WaymarkSpacing
+                                                            .radiusFull,
+                                                      ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: const Color(
+                                                        0xFFF59E0B,
+                                                      ).withValues(alpha: 0.4),
+                                                      blurRadius: 4,
+                                                      offset: const Offset(
+                                                        0,
+                                                        1,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      Icons
+                                                          .auto_awesome_rounded,
+                                                      size: 8.5.sp,
+                                                      color: Colors.white,
+                                                    ),
+                                                    SizedBox(width: 2.w),
+                                                    Text(
+                                                      'NEW',
+                                                      style: context
+                                                          .textTheme
+                                                          .caption
+                                                          .copyWith(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                            fontSize: 8.sp,
+                                                            letterSpacing: 0.4,
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                            if (!isReordering) ...[
+                                              SizedBox(width: 4.w),
+                                              PopupMenuButton<String>(
+                                                padding: EdgeInsets.zero,
+                                                constraints:
+                                                    const BoxConstraints(),
+                                                icon: Icon(
+                                                  Icons.more_vert_rounded,
+                                                  size: 16.sp,
+                                                  color: colors.textSecondary
+                                                      .withValues(alpha: 0.7),
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        12.r,
+                                                      ),
+                                                ),
+                                                onSelected: (action) {
+                                                  if (action == 'edit') {
+                                                    PlaceLoggerBottomSheet.show(
+                                                      context,
+                                                      albumId: album.id,
+                                                      albumTitle: album.title,
+                                                      placeToEdit: place,
+                                                    );
+                                                  } else if (action ==
+                                                      'delete') {
+                                                    _confirmDeletePlace(
+                                                      context,
+                                                      place,
+                                                      album,
+                                                      allPlaces,
+                                                    );
+                                                  }
+                                                },
+                                                itemBuilder: (ctx) => [
+                                                  PopupMenuItem(
+                                                    value: 'edit',
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.edit_outlined,
+                                                          size: 16.sp,
                                                           color: colors
                                                               .textPrimary,
                                                         ),
+                                                        SizedBox(width: 8.w),
+                                                        Text(
+                                                          'Edit Place',
+                                                          style: ctx
+                                                              .textTheme
+                                                              .bodyMedium
+                                                              ?.copyWith(
+                                                                color: colors
+                                                                    .textPrimary,
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                            PopupMenuItem(
-                                              value: 'delete',
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons
-                                                        .delete_outline_rounded,
-                                                    size: 16.sp,
-                                                    color: Colors.redAccent,
-                                                  ),
-                                                  SizedBox(width: 8.w),
-                                                  Text(
-                                                    'Delete Place',
-                                                    style: ctx
-                                                        .textTheme
-                                                        .bodyMedium
-                                                        ?.copyWith(
+                                                  PopupMenuItem(
+                                                    value: 'delete',
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons
+                                                              .delete_outline_rounded,
+                                                          size: 16.sp,
                                                           color:
                                                               Colors.redAccent,
-                                                          fontWeight:
-                                                              FontWeight.w600,
                                                         ),
+                                                        SizedBox(width: 8.w),
+                                                        Text(
+                                                          'Delete Place',
+                                                          style: ctx
+                                                              .textTheme
+                                                              .bodyMedium
+                                                              ?.copyWith(
+                                                                color: Colors
+                                                                    .redAccent,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ],
                                               ),
-                                            ),
+                                            ],
                                           ],
                                         ),
                                       ],
-                                    ],
-                                  ),
-                                ],
-                              ),
-
-                              SizedBox(height: 4.h),
-
-                              // Place Name
-                              Text(
-                                place.name,
-                                style: context.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: colors.textPrimary,
-                                ),
-                              ),
-
-                              if (place.notes != null &&
-                                  place.notes!.isNotEmpty) ...[
-                                SizedBox(height: 4.h),
-                                Text(
-                                  place.notes!,
-                                  style: context.textTheme.bodySmall?.copyWith(
-                                    color: colors.textSecondary,
-                                    height: 1.35,
-                                  ),
-                                ),
-                              ],
-
-                              SizedBox(height: 8.h),
-
-                              // Context Badges Row (Weather, Route, Elev, Recommendation, Sensory)
-                              Wrap(
-                                spacing: 6.w,
-                                runSpacing: 4.h,
-                                children: [
-                                  if (place.weatherCondition != null)
-                                    _buildContextBadge(
-                                      context,
-                                      icon: Icons.wb_sunny_rounded,
-                                      label:
-                                          '${place.weatherCondition} ${place.temperatureCelsius?.toInt() ?? 20}°C',
-                                      iconColor: colors.tertiary,
                                     ),
-                                  _buildContextBadge(
-                                    context,
-                                    icon: Icons.hiking_rounded,
-                                    label:
-                                        '${(place.visitOrder + 1) * 2.4} km loop',
-                                    iconColor: colors.secondary,
-                                  ),
-                                  if (rating != null)
-                                    _buildContextBadge(
-                                      context,
-                                      icon: Icons.star_rounded,
-                                      label: '$rating/10 Rec',
-                                      iconColor: const Color(0xFFC89D3C),
-                                    ),
-                                  ...otherSensoryTags
-                                      .take(2)
-                                      .map(
-                                        (tag) => _buildContextBadge(
-                                          context,
-                                          icon: Icons.spa_rounded,
-                                          label: tag,
-                                          iconColor: colors.primary,
-                                        ),
-                                      ),
-                                ],
-                              ),
 
-                              // Polaroid Photos Preview Stack
-                              if (media.isNotEmpty) ...[
-                                SizedBox(height: 10.h),
-                                SizedBox(
-                                  height: 110.h,
-                                  child: ListView.separated(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: media.length > 3
-                                        ? 3
-                                        : media.length,
-                                    separatorBuilder: (_, _) =>
-                                        SizedBox(width: 8.w),
-                                    itemBuilder: (context, photoIdx) {
-                                      if (photoIdx == 2 && media.length > 3) {
-                                        return GestureDetector(
-                                          behavior: HitTestBehavior.opaque,
-                                          onTap: () {
-                                            // Expand 3rd photo (or first remaining photo)
-                                            _showPhotoLightbox(
-                                              context,
-                                              media[2],
-                                              place.name,
-                                            );
-                                          },
-                                          child: _buildMorePhotosTile(
-                                            context,
-                                            remaining: media.length - 2,
+                                    SizedBox(height: 2.h),
+
+                                    // Place Name
+                                    Text(
+                                      place.name,
+                                      style: context.textTheme.titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: colors.textPrimary,
+                                            fontSize: 13.5.sp,
                                           ),
-                                        );
-                                      }
-                                      final photo = media[photoIdx];
-                                      final isTilted = photoIdx % 2 == 0;
+                                    ),
 
-                                      return Transform.rotate(
-                                        angle: isTilted ? -0.02 : 0.02,
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          child: InkWell(
-                                            borderRadius: BorderRadius.circular(
-                                              6.r,
+                                    if (place.notes != null &&
+                                        place.notes!.isNotEmpty) ...[
+                                      SizedBox(height: 2.h),
+                                      Text(
+                                        place.notes!,
+                                        style: context.textTheme.bodySmall
+                                            ?.copyWith(
+                                              color: colors.textSecondary,
+                                              height: 1.3,
+                                              fontSize: 11.sp,
                                             ),
-                                            onTap: () {
-                                              // Expand the tapped photo in interactive lightbox viewer
-                                              _showPhotoLightbox(
+                                      ),
+                                    ],
+
+                                    SizedBox(height: 5.h),
+
+                                    // Context Badges Row (Weather, Route, Elev, Recommendation, Sensory)
+                                    Wrap(
+                                      spacing: 5.w,
+                                      runSpacing: 3.h,
+                                      children: [
+                                        if (place.weatherCondition != null)
+                                          _buildContextBadge(
+                                            context,
+                                            icon: Icons.wb_sunny_rounded,
+                                            label:
+                                                '${place.weatherCondition} ${place.temperatureCelsius?.toInt() ?? 20}°C',
+                                            iconColor: colors.tertiary,
+                                          ),
+                                        _buildContextBadge(
+                                          context,
+                                          icon: Icons.hiking_rounded,
+                                          label:
+                                              '${((place.visitOrder + 1) * 2.4).toStringAsFixed(2).replaceAll(RegExp(r"([0-9]*\.[0-9]*[1-9])0+$"), r"$1").replaceAll(RegExp(r"\.0+$"), "")} km loop',
+                                          iconColor: colors.secondary,
+                                        ),
+                                        if (rating != null)
+                                          _buildContextBadge(
+                                            context,
+                                            icon: Icons.star_rounded,
+                                            label: '$rating/10 Rec',
+                                            iconColor: const Color(0xFFC89D3C),
+                                          ),
+                                        ...otherSensoryTags
+                                            .take(2)
+                                            .map(
+                                              (tag) => _buildContextBadge(
                                                 context,
-                                                photo,
-                                                place.name,
-                                              );
-                                            },
-                                            child: Container(
-                                              width: 95.w,
-                                              padding: EdgeInsets.all(4.w),
-                                              decoration: BoxDecoration(
-                                                color: colors.surfaceCard,
-                                                borderRadius:
-                                                    BorderRadius.circular(6.r),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black
-                                                        .withValues(alpha: 0.1),
-                                                    blurRadius: 6,
-                                                    offset: const Offset(0, 2),
-                                                  ),
-                                                ],
+                                                icon: Icons.spa_rounded,
+                                                label: tag,
+                                                iconColor: colors.primary,
                                               ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.stretch,
-                                                children: [
-                                                  Expanded(
-                                                    child: ClipRRect(
+                                            ),
+                                      ],
+                                    ),
+
+                                    // Polaroid Photos Preview Stack
+                                    if (media.isNotEmpty) ...[
+                                      SizedBox(height: 6.h),
+                                      SizedBox(
+                                        height: 80.h,
+                                        child: ListView.separated(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: media.length > 3
+                                              ? 3
+                                              : media.length,
+                                          separatorBuilder: (_, _) =>
+                                              SizedBox(width: 6.w),
+                                          itemBuilder: (context, photoIdx) {
+                                            if (photoIdx == 2 &&
+                                                media.length > 3) {
+                                              return GestureDetector(
+                                                behavior:
+                                                    HitTestBehavior.opaque,
+                                                onTap: () {
+                                                  _showPhotoLightbox(
+                                                    context,
+                                                    media[2],
+                                                    place.name,
+                                                  );
+                                                },
+                                                child: _buildMorePhotosTile(
+                                                  context,
+                                                  remaining: media.length - 2,
+                                                ),
+                                              );
+                                            }
+                                            final photo = media[photoIdx];
+                                            final isTilted = photoIdx % 2 == 0;
+
+                                            return Transform.rotate(
+                                              angle: isTilted ? -0.015 : 0.015,
+                                              child: Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        6.r,
+                                                      ),
+                                                  onTap: () {
+                                                    _showPhotoLightbox(
+                                                      context,
+                                                      photo,
+                                                      place.name,
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    width: 74.w,
+                                                    padding: EdgeInsets.all(
+                                                      3.w,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: colors.surfaceCard,
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                            4.r,
+                                                            6.r,
                                                           ),
-                                                      child:
-                                                          _buildPhotoThumbnail(
-                                                            photo.localFilePath,
-                                                            colors,
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black
+                                                              .withValues(
+                                                                alpha: 0.08,
+                                                              ),
+                                                          blurRadius: 4,
+                                                          offset: const Offset(
+                                                            0,
+                                                            1.5,
                                                           ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .stretch,
+                                                      children: [
+                                                        Expanded(
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  4.r,
+                                                                ),
+                                                            child: _buildPhotoThumbnail(
+                                                              photo
+                                                                  .localFilePath,
+                                                              colors,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 2.h),
+                                                        Text(
+                                                          photo.isCoverPhoto
+                                                              ? 'Cover Shot'
+                                                              : 'Milestone View',
+                                                          style: context
+                                                              .textTheme
+                                                              .caption
+                                                              .copyWith(
+                                                                color: colors
+                                                                    .textSecondary,
+                                                                fontSize: 8.sp,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic,
+                                                              ),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                  SizedBox(height: 3.h),
-                                                  Text(
-                                                    photo.isCoverPhoto
-                                                        ? 'Cover Shot'
-                                                        : 'Milestone View',
-                                                    style: context
-                                                        .textTheme
-                                                        .caption
-                                                        .copyWith(
-                                                          color: colors
-                                                              .textSecondary,
-                                                          fontSize: 8.5.sp,
-                                                          fontStyle:
-                                                              FontStyle.italic,
-                                                        ),
-                                                    textAlign: TextAlign.center,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ],
+                                                ),
                                               ),
-                                            ),
-                                          ),
+                                            );
+                                          },
                                         ),
-                                      );
-                                    },
-                                  ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
-                              ],
-                            ],
+                              ),
+                            ),
                           ),
-                        ),
+                          // Dedicated Prominent Reordering Pill
+                          if (isReordering)
+                            _buildReorderControlPill(
+                              context: context,
+                              places: places,
+                              index: index,
+                            ),
+                        ],
                       ),
                     ),
-                    // Dedicated Prominent Reordering Pill
-                    if (isReordering)
-                      _buildReorderControlPill(
-                        context: context,
-                        places: places,
-                        index: index,
-                      ),
-                  ],
-                ),
-              ),
+                  ),
 
-              // Transit Connector Pill between Nodes
-              if (!isLast) ...[
-                SizedBox(height: 8.h),
-                _buildTransitConnectorPill(context, index: index),
-              ],
-            ],
-          ),
-        ),
-      ],
+                  // Transit Connector Pill between Nodes
+                  if (!isLast) ...[
+                    SizedBox(height: 5.h),
+                    _buildTransitConnectorPill(context, index: index),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1543,12 +1815,12 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
     final canMoveDown = index < places.length - 1;
 
     return Padding(
-      padding: EdgeInsets.only(right: 8.w, top: 10.h, bottom: 10.h),
+      padding: EdgeInsets.only(right: 6.w, top: 6.h, bottom: 6.h),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 6.h),
+        padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 4.h),
         decoration: BoxDecoration(
           color: colors.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(10.r),
           border: Border.all(color: colors.primary.withValues(alpha: 0.25)),
         ),
         child: Column(
@@ -1562,10 +1834,10 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                 customBorder: const CircleBorder(),
                 onTap: canMoveUp ? () => _movePlaceUp(places, index) : null,
                 child: Padding(
-                  padding: EdgeInsets.all(7.w),
+                  padding: EdgeInsets.all(5.w),
                   child: Icon(
                     Icons.keyboard_arrow_up_rounded,
-                    size: 22.sp,
+                    size: 18.sp,
                     color: canMoveUp
                         ? colors.primary
                         : colors.textSecondary.withValues(alpha: 0.25),
@@ -1574,9 +1846,9 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 4.h),
+              padding: EdgeInsets.symmetric(vertical: 2.h),
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.5.h),
                 decoration: BoxDecoration(
                   color: colors.primary,
                   borderRadius: BorderRadius.circular(
@@ -1588,7 +1860,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                   style: context.textTheme.labelSmall?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 10.sp,
+                    fontSize: 9.sp,
                   ),
                 ),
               ),
@@ -1601,10 +1873,10 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                 customBorder: const CircleBorder(),
                 onTap: canMoveDown ? () => _movePlaceDown(places, index) : null,
                 child: Padding(
-                  padding: EdgeInsets.all(7.w),
+                  padding: EdgeInsets.all(5.w),
                   child: Icon(
                     Icons.keyboard_arrow_down_rounded,
-                    size: 22.sp,
+                    size: 18.sp,
                     color: canMoveDown
                         ? colors.primary
                         : colors.textSecondary.withValues(alpha: 0.25),
@@ -1619,20 +1891,16 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
   }
 
   Widget _buildDashedVerticalLine(ColorScheme colors) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Column(
-          children: List.generate(
-            15,
-            (index) => Container(
-              width: 2,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 3),
-              color: colors.borderDivider,
-            ),
-          ),
-        );
-      },
+    return SizedBox(
+      width: 2.w,
+      child: CustomPaint(
+        painter: _DashedLinePainter(
+          color: colors.borderDivider.withValues(alpha: 0.8),
+          dashHeight: 4,
+          dashGap: 3,
+          strokeWidth: 2.w,
+        ),
+      ),
     );
   }
 
@@ -1644,7 +1912,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
   }) {
     final colors = context.colorScheme;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.5.h),
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
       decoration: BoxDecoration(
         color: colors.surfaceContainer,
         borderRadius: BorderRadius.circular(WaymarkSpacing.radiusFull),
@@ -1652,13 +1920,13 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 11.sp, color: iconColor),
+          Icon(icon, size: 10.sp, color: iconColor),
           SizedBox(width: 3.w),
           Text(
             label,
             style: context.textTheme.caption.copyWith(
               color: colors.textPrimary,
-              fontSize: 10.sp,
+              fontSize: 9.5.sp,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -1670,10 +1938,10 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
   Widget _buildMorePhotosTile(BuildContext context, {required int remaining}) {
     final colors = context.colorScheme;
     return Container(
-      width: 75.w,
+      width: 62.w,
       decoration: BoxDecoration(
         color: colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(8.r),
+        borderRadius: BorderRadius.circular(6.r),
         border: Border.all(color: colors.borderDivider),
       ),
       child: Column(
@@ -1681,16 +1949,16 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
         children: [
           Icon(
             Icons.add_photo_alternate_rounded,
-            size: 20.sp,
+            size: 16.sp,
             color: colors.textSecondary,
           ),
-          SizedBox(height: 4.h),
+          SizedBox(height: 2.h),
           Text(
             '+$remaining More',
             style: context.textTheme.caption.copyWith(
               fontWeight: FontWeight.bold,
               color: colors.textSecondary,
-              fontSize: 10.sp,
+              fontSize: 9.sp,
             ),
           ),
         ],
@@ -1712,7 +1980,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
     final item = connectors[index % connectors.length];
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.5.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.5.h),
       decoration: BoxDecoration(
         color: colors.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(WaymarkSpacing.radiusFull),
@@ -1727,15 +1995,15 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(item.$1, size: 13.sp, color: colors.primary),
-          SizedBox(width: 5.w),
+          Icon(item.$1, size: 11.sp, color: colors.primary),
+          SizedBox(width: 4.w),
           Flexible(
             child: Text(
               item.$2,
               style: context.textTheme.caption.copyWith(
-                color: colors.textPrimary,
-                fontWeight: FontWeight.w600,
-                fontSize: 10.sp,
+                color: colors.textSecondary,
+                fontSize: 9.5.sp,
+                fontWeight: FontWeight.w500,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -1830,7 +2098,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          '${places.length} Milestones${hasValidDistance ? " • ${totalKm.toStringAsFixed(1)} km traversed" : ""}',
+                          '${places.length} Milestones${hasValidDistance ? " • ${totalKm.toStringAsFixed(2)} km traversed" : ""}',
                           style: context.textTheme.caption.copyWith(
                             color: colors.textSecondary,
                           ),
@@ -2411,9 +2679,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                   final placeName =
                       placeNameMap[mediaItem.placeId] ?? 'Waypoint Stop';
                   final timeStr = mediaItem.capturedAt != null
-                      ? DateFormat(
-                          'MMM d • HH:mm',
-                        ).format(mediaItem.capturedAt!)
+                      ? DateFormat('MMM d, yyyy').format(mediaItem.capturedAt!)
                       : 'Expedition Photo';
                   final isTilted = index % 2 == 0;
 
@@ -2486,7 +2752,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
   ) {
     final colors = context.colorScheme;
     final timeStr = media.capturedAt != null
-        ? DateFormat('EEEE, MMM d, yyyy • hh:mm a').format(media.capturedAt!)
+        ? DateFormat('EEEE, MMM d, yyyy').format(media.capturedAt!)
         : 'Expedition Photo';
 
     showDialog(
@@ -2703,12 +2969,15 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                     fontSize: 13.sp,
                   ),
                 ),
-                onPressed: () {
-                  PlaceLoggerBottomSheet.show(
+                onPressed: () async {
+                  final newPlaceId = await PlaceLoggerBottomSheet.show(
                     context,
                     albumId: album.id,
                     albumTitle: album.title,
                   );
+                  if (newPlaceId != null && mounted) {
+                    _triggerNewPlaceAnimation(newPlaceId);
+                  }
                 },
               ),
             ),
@@ -2834,7 +3103,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
-                                  '${dateFmt.format(album.startDate)} • ${album.totalDistanceKm.toStringAsFixed(1)} km traversed',
+                                  '${dateFmt.format(album.startDate)} • ${album.totalDistanceKm.toStringAsFixed(2)} km traversed',
                                   style: ctx.textTheme.caption.copyWith(
                                     color: const Color(0xFF6C757D),
                                     fontSize: 10.sp,
@@ -3291,4 +3560,42 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
       }
     }
   }
+}
+
+class _DashedLinePainter extends CustomPainter {
+  final Color color;
+  final double dashHeight;
+  final double dashGap;
+  final double strokeWidth;
+
+  _DashedLinePainter({
+    required this.color,
+    this.dashHeight = 4.0,
+    this.dashGap = 3.0,
+    this.strokeWidth = 2.0,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    double startY = 0.0;
+    final x = size.width / 2;
+    while (startY < size.height) {
+      final endY = math.min(startY + dashHeight, size.height);
+      canvas.drawLine(Offset(x, startY), Offset(x, endY), paint);
+      startY += dashHeight + dashGap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedLinePainter oldDelegate) =>
+      oldDelegate.color != color ||
+      oldDelegate.dashHeight != dashHeight ||
+      oldDelegate.dashGap != dashGap ||
+      oldDelegate.strokeWidth != strokeWidth;
 }

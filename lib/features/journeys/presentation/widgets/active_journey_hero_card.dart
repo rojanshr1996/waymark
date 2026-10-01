@@ -12,7 +12,6 @@ import 'package:waymark/core/presentation/widgets/waymark_shimmer.dart';
 import 'package:waymark/core/theme/waymark_colors.dart';
 import 'package:waymark/core/theme/waymark_typography.dart';
 import 'package:waymark/features/journeys/presentation/widgets/create_journey_bottom_sheet.dart';
-import 'package:waymark/features/journeys/presentation/widgets/place_logger_bottom_sheet.dart';
 
 class ActiveJourneyHeroCard extends StatelessWidget {
   final TripAlbum album;
@@ -121,7 +120,7 @@ class ActiveJourneyHeroCard extends StatelessWidget {
                             RichText(
                               text: TextSpan(
                                 text: (liveDistanceKm ?? album.totalDistanceKm)
-                                    .toStringAsFixed(1),
+                                    .toStringAsFixed(2),
                                 style: context.textTheme.headlineSmall
                                     ?.copyWith(
                                       fontWeight: FontWeight.w700,
@@ -192,11 +191,7 @@ class ActiveJourneyHeroCard extends StatelessWidget {
                       WaymarkSpacing.radiusMd,
                     ),
                     child: InkWell(
-                      onTap: () => PlaceLoggerBottomSheet.show(
-                        context,
-                        albumId: album.id,
-                        albumTitle: album.title,
-                      ),
+                      onTap: onAddWaypoint,
                       borderRadius: BorderRadius.circular(
                         WaymarkSpacing.radiusMd,
                       ),

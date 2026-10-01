@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -38,10 +39,26 @@ class _PostcardStudioScreenState extends State<PostcardStudioScreen> {
   late final ValueNotifier<TripAlbum?> _selectedAlbumNotifier;
   late final ValueNotifier<PostcardAestheticStyle> _selectedStyleNotifier;
   late final ValueNotifier<PostcardRatio> _selectedRatioNotifier;
+  late final ValueNotifier<String?> _selectedBgImageNotifier;
   late final ValueNotifier<bool> _showMapRouteNotifier;
-  late final ValueNotifier<bool> _showWeatherNotifier;
+  late final ValueNotifier<bool> _showFlightTrailNotifier;
   late final ValueNotifier<bool> _isQuadPhotoLayoutNotifier;
   late final ValueNotifier<bool> _isExportingNotifier;
+
+  static const List<String> _scenicBackgroundImages = [
+    'assets/images/place_one.jpeg',
+    'assets/images/place_two.jpeg',
+    'assets/images/place_three.jpeg',
+    'assets/images/place_four.jpeg',
+    'assets/images/place_five.jpeg',
+    'assets/images/place_six.jpeg',
+    'assets/images/place_seven.jpeg',
+    'assets/images/place_eight.jpeg',
+    'assets/images/place_nine.jpeg',
+    'assets/images/place_ten.jpeg',
+    'assets/images/place_eleven.jpeg',
+    'assets/images/place_twelve.jpeg',
+  ];
 
   @override
   void initState() {
@@ -53,8 +70,13 @@ class _PostcardStudioScreenState extends State<PostcardStudioScreen> {
     _selectedRatioNotifier = ValueNotifier<PostcardRatio>(
       PostcardRatio.story916,
     );
+    final randomBg =
+        _scenicBackgroundImages[math.Random().nextInt(
+          _scenicBackgroundImages.length,
+        )];
+    _selectedBgImageNotifier = ValueNotifier<String?>(randomBg);
     _showMapRouteNotifier = ValueNotifier<bool>(true);
-    _showWeatherNotifier = ValueNotifier<bool>(true);
+    _showFlightTrailNotifier = ValueNotifier<bool>(true);
     _isQuadPhotoLayoutNotifier = ValueNotifier<bool>(false);
     _isExportingNotifier = ValueNotifier<bool>(false);
   }
@@ -64,8 +86,9 @@ class _PostcardStudioScreenState extends State<PostcardStudioScreen> {
     _selectedAlbumNotifier.dispose();
     _selectedStyleNotifier.dispose();
     _selectedRatioNotifier.dispose();
+    _selectedBgImageNotifier.dispose();
     _showMapRouteNotifier.dispose();
-    _showWeatherNotifier.dispose();
+    _showFlightTrailNotifier.dispose();
     _isQuadPhotoLayoutNotifier.dispose();
     _isExportingNotifier.dispose();
     super.dispose();
@@ -212,117 +235,153 @@ class _PostcardStudioScreenState extends State<PostcardStudioScreen> {
           }
 
           if (albums.isEmpty) {
-            return Center(
-              child: WaymarkAnimatedEntrance(
-                child: WaymarkArtisticEmptyState(
-                  badgeText: context.l10n.studioBadgeClosed,
-                  icon: Icons.camera_alt_rounded,
-                  title: context.l10n.studioNoMemoriesTitle,
-                  description: context.l10n.studioNoMemoriesDesc,
-                  buttonLabel: context.l10n.emptyExploreBtn,
-                  onButtonPressed: () => CreateJourneyBottomSheet.show(context),
-                ),
-              ),
-            );
+            return _buildEmptyState(context);
           }
 
-          // Maintain selected album
-          final activeAlbum = _selectedAlbumNotifier.value;
-          TripAlbum? requestedAlbum;
-          for (final album in albums) {
-            if (album.id == widget.initialAlbumId) {
-              requestedAlbum = album;
-              break;
-            }
-          }
-          if (activeAlbum == null ||
-              !albums.any((a) => a.id == activeAlbum.id)) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) {
-                _selectedAlbumNotifier.value = requestedAlbum ?? albums.first;
+          return StreamBuilder<List<TripPlace>>(
+            stream: db.tripPlaceDao.watchAllPlaces(),
+            builder: (context, allPlacesSnapshot) {
+              final allPlaces = allPlacesSnapshot.data ?? [];
+              if (allPlacesSnapshot.connectionState ==
+                  ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
               }
-            });
-          }
 
-          return ValueListenableBuilder<TripAlbum?>(
-            valueListenable: _selectedAlbumNotifier,
-            builder: (context, selectedAlbum, _) {
-              final album = selectedAlbum ?? albums.first;
+              // Only albums that have at least one place added can be used for postcards
+              final albumsWithPlaces = albums.where((album) {
+                return allPlaces.any((place) => place.albumId == album.id);
+              }).toList();
 
-              return StreamBuilder<List<TripPlace>>(
-                stream: db.tripPlaceDao.watchPlacesForAlbum(album.id),
-                builder: (context, placeSnapshot) {
-                  final places = placeSnapshot.data ?? [];
+              if (allPlaces.isEmpty || albumsWithPlaces.isEmpty) {
+                return _buildEmptyState(context);
+              }
 
-                  return StreamBuilder<List<PlaceMediaFile>>(
-                    stream: db.placeMediaDao.watchMediaForPlaces(
-                      places.map((p) => p.id).toList(),
-                    ),
-                    builder: (context, mediaSnapshot) {
-                      final mediaList = mediaSnapshot.data ?? [];
-                      final mediaMap = <String, List<PlaceMediaFile>>{};
-                      for (final m in mediaList) {
-                        mediaMap.putIfAbsent(m.placeId, () => []).add(m);
+              // Maintain selected album among albums with places
+              final activeAlbum = _selectedAlbumNotifier.value;
+              TripAlbum? requestedAlbum;
+              for (final album in albumsWithPlaces) {
+                if (album.id == widget.initialAlbumId) {
+                  requestedAlbum = album;
+                  break;
+                }
+              }
+              if (activeAlbum == null ||
+                  !albumsWithPlaces.any((a) => a.id == activeAlbum.id)) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    _selectedAlbumNotifier.value =
+                        requestedAlbum ?? albumsWithPlaces.first;
+                  }
+                });
+              }
+
+              return ValueListenableBuilder<TripAlbum?>(
+                valueListenable: _selectedAlbumNotifier,
+                builder: (context, selectedAlbum, _) {
+                  final album =
+                      (selectedAlbum != null &&
+                          albumsWithPlaces.any((a) => a.id == selectedAlbum.id))
+                      ? selectedAlbum
+                      : albumsWithPlaces.first;
+
+                  return StreamBuilder<List<TripPlace>>(
+                    stream: db.tripPlaceDao.watchPlacesForAlbum(album.id),
+                    builder: (context, placeSnapshot) {
+                      final places = placeSnapshot.data ?? [];
+                      if (places.isEmpty) {
+                        return _buildEmptyState(context);
                       }
 
-                      return ScrollConfiguration(
-                        behavior: const WaymarkNoOverscrollScrollBehavior(),
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(
-                            parent: AlwaysScrollableScrollPhysics(),
-                          ),
-                          padding: EdgeInsets.only(
-                            top: MediaQuery.paddingOf(context).top + 16.h,
-                            bottom: WaymarkSpacing.margin(context) + 16.h,
-                            left: WaymarkSpacing.margin(context),
-                            right: WaymarkSpacing.margin(context),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              // Studio Header Title & Quick Export Button
-                              _buildScreenHeader(context, album),
-                              SizedBox(height: 14.h),
+                      return StreamBuilder<List<PlaceMediaFile>>(
+                        stream: db.placeMediaDao.watchMediaForPlaces(
+                          places.map((p) => p.id).toList(),
+                        ),
+                        builder: (context, mediaSnapshot) {
+                          final mediaList = mediaSnapshot.data ?? [];
+                          final mediaMap = <String, List<PlaceMediaFile>>{};
+                          for (final m in mediaList) {
+                            mediaMap.putIfAbsent(m.placeId, () => []).add(m);
+                          }
 
-                              // Live Render Boundary Status Bar
-                              _buildLiveRenderStatusBar(context),
-                              SizedBox(height: 10.h),
+                          return ScrollConfiguration(
+                            behavior: const WaymarkNoOverscrollScrollBehavior(),
+                            child: SingleChildScrollView(
+                              physics: const BouncingScrollPhysics(
+                                parent: AlwaysScrollableScrollPhysics(),
+                              ),
+                              padding: EdgeInsets.only(
+                                top: MediaQuery.paddingOf(context).top + 16.h,
+                                bottom: WaymarkSpacing.margin(context) + 16.h,
+                                left: WaymarkSpacing.margin(context),
+                                right: WaymarkSpacing.margin(context),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Studio Header Title & Quick Export Button
+                                  _buildScreenHeader(context, album),
+                                  SizedBox(height: 14.h),
 
-                              // Live Postcard Canvas Viewport
-                              WaymarkAnimatedEntrance(
-                                child: ValueListenableBuilder<PostcardAestheticStyle>(
-                                  valueListenable: _selectedStyleNotifier,
-                                  builder: (context, style, _) {
-                                    return ValueListenableBuilder<
-                                      PostcardRatio
-                                    >(
-                                      valueListenable: _selectedRatioNotifier,
-                                      builder: (context, ratio, _) {
-                                        return ValueListenableBuilder<bool>(
+                                  // Live Render Boundary Status Bar
+                                  _buildLiveRenderStatusBar(context),
+                                  SizedBox(height: 10.h),
+
+                                  // Live Postcard Canvas Viewport
+                                  WaymarkAnimatedEntrance(
+                                    child: ValueListenableBuilder<PostcardAestheticStyle>(
+                                      valueListenable: _selectedStyleNotifier,
+                                      builder: (context, style, _) {
+                                        return ValueListenableBuilder<
+                                          PostcardRatio
+                                        >(
                                           valueListenable:
-                                              _showMapRouteNotifier,
-                                          builder: (context, showRoute, _) {
-                                            return ValueListenableBuilder<bool>(
+                                              _selectedRatioNotifier,
+                                          builder: (context, ratio, _) {
+                                            return ValueListenableBuilder<
+                                              String?
+                                            >(
                                               valueListenable:
-                                                  _showWeatherNotifier,
-                                              builder: (context, showWeather, _) {
+                                                  _selectedBgImageNotifier,
+                                              builder: (context, bgImage, _) {
                                                 return ValueListenableBuilder<
                                                   bool
                                                 >(
                                                   valueListenable:
-                                                      _isQuadPhotoLayoutNotifier,
-                                                  builder: (context, isQuad, _) {
-                                                    return PostcardCanvasWidget(
-                                                      repaintBoundaryKey:
-                                                          _repaintBoundaryKey,
-                                                      album: album,
-                                                      places: places,
-                                                      placeMediaMap: mediaMap,
-                                                      style: style,
-                                                      ratio: ratio,
-                                                      showMapRoute: showRoute,
-                                                      showWeather: showWeather,
-                                                      isQuadPhotoLayout: isQuad,
+                                                      _showMapRouteNotifier,
+                                                  builder: (context, showRoute, _) {
+                                                    return ValueListenableBuilder<
+                                                      bool
+                                                    >(
+                                                      valueListenable:
+                                                          _showFlightTrailNotifier,
+                                                      builder: (context, showFlight, _) {
+                                                        return ValueListenableBuilder<
+                                                          bool
+                                                        >(
+                                                          valueListenable:
+                                                              _isQuadPhotoLayoutNotifier,
+                                                          builder: (context, isQuad, _) {
+                                                            return PostcardCanvasWidget(
+                                                              repaintBoundaryKey:
+                                                                  _repaintBoundaryKey,
+                                                              album: album,
+                                                              places: places,
+                                                              placeMediaMap:
+                                                                  mediaMap,
+                                                              style: style,
+                                                              ratio: ratio,
+                                                              showMapRoute:
+                                                                  showRoute,
+                                                              isQuadPhotoLayout:
+                                                                  isQuad,
+                                                              customBackgroundImage:
+                                                                  bgImage,
+                                                              showFlightTrail:
+                                                                  showFlight,
+                                                            );
+                                                          },
+                                                        );
+                                                      },
                                                     );
                                                   },
                                                 );
@@ -331,29 +390,40 @@ class _PostcardStudioScreenState extends State<PostcardStudioScreen> {
                                           },
                                         );
                                       },
-                                    );
-                                  },
-                                ),
-                              ),
-                              SizedBox(height: 22.h),
+                                    ),
+                                  ),
+                                  SizedBox(height: 22.h),
 
-                              // Customization Controls & Actions
-                              WaymarkAnimatedEntrance(
-                                delay: const Duration(milliseconds: 100),
-                                child: PostcardControlsWidget(
-                                  albums: albums,
-                                  selectedAlbumNotifier: _selectedAlbumNotifier,
-                                  selectedStyleNotifier: _selectedStyleNotifier,
-                                  selectedRatioNotifier: _selectedRatioNotifier,
-                                  showMapRouteNotifier: _showMapRouteNotifier,
-                                  showWeatherNotifier: _showWeatherNotifier,
-                                  isQuadPhotoLayoutNotifier:
-                                      _isQuadPhotoLayoutNotifier,
-                                ),
+                                  // Customization Controls & Actions
+                                  WaymarkAnimatedEntrance(
+                                    delay: const Duration(milliseconds: 100),
+                                    child: PostcardControlsWidget(
+                                      albums: albumsWithPlaces,
+                                      selectedAlbumNotifier:
+                                          _selectedAlbumNotifier,
+                                      selectedStyleNotifier:
+                                          _selectedStyleNotifier,
+                                      selectedRatioNotifier:
+                                          _selectedRatioNotifier,
+                                      selectedBgImageNotifier:
+                                          _selectedBgImageNotifier,
+                                      showMapRouteNotifier:
+                                          _showMapRouteNotifier,
+                                      showFlightTrailNotifier:
+                                          _showFlightTrailNotifier,
+                                      isQuadPhotoLayoutNotifier:
+                                          _isQuadPhotoLayoutNotifier,
+                                      uploadedPhotosCount: _countUploadedPhotos(
+                                        places,
+                                        mediaMap,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
+                            ),
+                          );
+                        },
                       );
                     },
                   );
@@ -362,6 +432,40 @@ class _PostcardStudioScreenState extends State<PostcardStudioScreen> {
             },
           );
         },
+      ),
+    );
+  }
+
+  int _countUploadedPhotos(
+    List<TripPlace> places,
+    Map<String, List<PlaceMediaFile>> placeMediaMap,
+  ) {
+    final Set<String> validIds = {};
+    for (final place in places) {
+      final mediaList = placeMediaMap[place.id] ?? [];
+      for (final media in mediaList) {
+        final path = media.thumbnailPath.isNotEmpty
+            ? media.thumbnailPath
+            : media.localFilePath;
+        if (path.startsWith('assets/') || File(path).existsSync()) {
+          validIds.add(media.id);
+        }
+      }
+    }
+    return validIds.length;
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: WaymarkAnimatedEntrance(
+        child: WaymarkArtisticEmptyState(
+          badgeText: context.l10n.studioBadgeClosed,
+          icon: Icons.camera_alt_rounded,
+          title: context.l10n.studioNoMemoriesTitle,
+          description: context.l10n.studioNoMemoriesDesc,
+          buttonLabel: context.l10n.emptyExploreBtn,
+          onButtonPressed: () => CreateJourneyBottomSheet.show(context),
+        ),
       ),
     );
   }

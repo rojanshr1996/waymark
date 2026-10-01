@@ -180,6 +180,31 @@ enum PostcardAestheticStyle {
     }
   }
 
+  String get defaultBackgroundImage {
+    switch (this) {
+      case PostcardAestheticStyle.vintage:
+        return 'assets/images/place_eight.jpeg';
+      case PostcardAestheticStyle.minimal:
+        return 'assets/images/place_one.jpeg';
+      case PostcardAestheticStyle.goldenHour:
+        return 'assets/images/place_six.jpeg';
+      case PostcardAestheticStyle.nordicFrost:
+        return 'assets/images/place_eight.jpeg';
+      case PostcardAestheticStyle.midnightNoir:
+        return 'assets/images/place_seven.jpeg';
+      case PostcardAestheticStyle.cyberGlow:
+        return 'assets/images/place_seven.jpeg';
+      case PostcardAestheticStyle.botanicalPress:
+        return 'assets/images/place_three.jpeg';
+      case PostcardAestheticStyle.desertPostmark:
+        return 'assets/images/place_four.jpeg';
+      case PostcardAestheticStyle.monochromeFilm:
+        return 'assets/images/place_eight.jpeg';
+      case PostcardAestheticStyle.coastalInk:
+        return 'assets/images/place_ten.jpeg';
+    }
+  }
+
   bool get isDark {
     return this == PostcardAestheticStyle.midnightNoir ||
         this == PostcardAestheticStyle.cyberGlow;
@@ -214,14 +239,38 @@ enum PostcardRatio {
     }
   }
 
+  double get aspectRatio {
+    switch (this) {
+      case PostcardRatio.story916:
+        return 9 / 16;
+      case PostcardRatio.feed45:
+        return 4 / 5;
+      case PostcardRatio.square11:
+        return 1.0;
+    }
+  }
+
   double get targetWidthConstraint {
     switch (this) {
       case PostcardRatio.story916:
         return 340.0;
       case PostcardRatio.feed45:
-        return 320.0;
+        return 330.0;
       case PostcardRatio.square11:
-        return 300.0;
+        return 310.0;
+    }
+  }
+
+  double get baseWidth => 360.0;
+
+  double get baseHeight {
+    switch (this) {
+      case PostcardRatio.story916:
+        return 640.0;
+      case PostcardRatio.feed45:
+        return 450.0;
+      case PostcardRatio.square11:
+        return 360.0;
     }
   }
 }

@@ -63,8 +63,8 @@ void main() {
     expect(find.text('Initialize Local Vault'), findsOneWidget);
 
     // Verify generic hint and email placeholders
-    expect(find.text('e.g. Rojan Shrestha'), findsOneWidget);
-    expect(find.text('e.g. rojan@waymark.app'), findsOneWidget);
+    expect(find.text('e.g. John Doe'), findsOneWidget);
+    expect(find.text('e.g. john.doe@waymark.app'), findsOneWidget);
 
     // Enter text and verify tick mark appears
     await tester.enterText(find.byType(TextField).first, 'John Doe');

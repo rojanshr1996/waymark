@@ -123,11 +123,18 @@ class AllActiveExpeditionsScreen extends StatelessWidget {
                         showHeader: false,
                         onContinue: () =>
                             context.push('${AppRoutes.journeys}/${album.id}'),
-                        onAddWaypoint: () => PlaceLoggerBottomSheet.show(
-                          context,
-                          albumId: album.id,
-                          albumTitle: album.title,
-                        ),
+                        onAddWaypoint: () async {
+                          final newPlaceId = await PlaceLoggerBottomSheet.show(
+                            context,
+                            albumId: album.id,
+                            albumTitle: album.title,
+                          );
+                          if (newPlaceId != null && context.mounted) {
+                            context.push(
+                              '${AppRoutes.journeys}/${album.id}?highlightPlaceId=$newPlaceId',
+                            );
+                          }
+                        },
                       );
                     },
                   ),

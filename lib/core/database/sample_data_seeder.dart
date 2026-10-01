@@ -42,7 +42,7 @@ class SampleDataSeeder {
         ),
         latitude: const Value(34.9671),
         longitude: const Value(135.7727),
-        visitedAt: Value(DateTime(2026, 10, 18, 14, 20)),
+        visitedAt: Value(DateTime(2026, 10, 18)),
         visitOrder: const Value(1),
         weatherCondition: const Value('Sunny'),
         temperatureCelsius: const Value(21.0),
@@ -60,7 +60,7 @@ class SampleDataSeeder {
         ),
         latitude: const Value(34.6851),
         longitude: const Value(135.8430),
-        visitedAt: Value(DateTime(2026, 10, 17, 11, 45)),
+        visitedAt: Value(DateTime(2026, 10, 17)),
         visitOrder: const Value(2),
         weatherCondition: const Value('Light Rain'),
         temperatureCelsius: const Value(18.0),
@@ -78,7 +78,7 @@ class SampleDataSeeder {
         ),
         latitude: const Value(35.0170),
         longitude: const Value(135.6713),
-        visitedAt: Value(DateTime(2026, 10, 16, 7, 30)),
+        visitedAt: Value(DateTime(2026, 10, 16)),
         visitOrder: const Value(3),
         weatherCondition: const Value('Crisp'),
         temperatureCelsius: const Value(15.0),
@@ -97,7 +97,7 @@ class SampleDataSeeder {
         width: const Value(800),
         height: const Value(600),
         isCoverPhoto: const Value(true),
-        capturedAt: Value(DateTime(2026, 10, 18, 14, 20)),
+        capturedAt: Value(DateTime(2026, 10, 18)),
       ),
     );
     await db.placeMediaDao.insertMedia(
@@ -110,7 +110,7 @@ class SampleDataSeeder {
         width: const Value(800),
         height: const Value(600),
         isCoverPhoto: const Value(false),
-        capturedAt: Value(DateTime(2026, 10, 18, 14, 25)),
+        capturedAt: Value(DateTime(2026, 10, 18)),
       ),
     );
     await db.placeMediaDao.insertMedia(
@@ -123,7 +123,7 @@ class SampleDataSeeder {
         width: const Value(800),
         height: const Value(600),
         isCoverPhoto: const Value(true),
-        capturedAt: Value(DateTime(2026, 10, 17, 11, 45)),
+        capturedAt: Value(DateTime(2026, 10, 17)),
       ),
     );
     await db.placeMediaDao.insertMedia(
@@ -136,7 +136,7 @@ class SampleDataSeeder {
         width: const Value(800),
         height: const Value(600),
         isCoverPhoto: const Value(false),
-        capturedAt: Value(DateTime(2026, 10, 17, 11, 50)),
+        capturedAt: Value(DateTime(2026, 10, 17)),
       ),
     );
     await db.placeMediaDao.insertMedia(
@@ -149,7 +149,7 @@ class SampleDataSeeder {
         width: const Value(800),
         height: const Value(600),
         isCoverPhoto: const Value(true),
-        capturedAt: Value(DateTime(2026, 10, 16, 7, 30)),
+        capturedAt: Value(DateTime(2026, 10, 16)),
       ),
     );
     await db.placeMediaDao.insertMedia(
@@ -162,7 +162,7 @@ class SampleDataSeeder {
         width: const Value(800),
         height: const Value(600),
         isCoverPhoto: const Value(false),
-        capturedAt: Value(DateTime(2026, 10, 16, 7, 35)),
+        capturedAt: Value(DateTime(2026, 10, 16)),
       ),
     );
 
