@@ -149,11 +149,86 @@ class WaymarkLiquidGlassBottomNavBar extends StatelessWidget {
             ),
             child: SizedBox(
               height: contentHeight.h,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(effectiveItems.length, (index) {
-                  return _buildNavItem(context, index, effectiveItems[index]);
-                }),
+              child: Stack(
+                children: [
+                  // Smooth sliding selected tab design indicator
+                  Positioned.fill(
+                    child: AnimatedAlign(
+                      duration: const Duration(milliseconds: 280),
+                      curve: Curves.easeOutCubic,
+                      alignment: Alignment(
+                        effectiveItems.length <= 1
+                            ? 0.0
+                            : -1.0 +
+                                  (currentIndex.clamp(
+                                        0,
+                                        effectiveItems.length - 1,
+                                      ) *
+                                      2.0 /
+                                      (effectiveItems.length - 1)),
+                        0.0,
+                      ),
+                      child: FractionallySizedBox(
+                        widthFactor: 1.0 / effectiveItems.length,
+                        heightFactor: 1.0,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Soft liquid glass capsule highlight behind active tab
+                            Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 6.w,
+                                vertical: 4.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: (context.colorScheme.primary).withValues(
+                                  alpha: 0.08,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  WaymarkSpacing.radiusMd,
+                                ),
+                              ),
+                            ),
+                            // Bottom micro indicator pill
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                margin: EdgeInsets.only(bottom: 3.h),
+                                height: 3.h,
+                                width: 18.w,
+                                decoration: BoxDecoration(
+                                  color: context.colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(
+                                    WaymarkSpacing.radiusFull,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: context.colorScheme.primary
+                                          .withValues(alpha: 0.4),
+                                      blurRadius: 4.r,
+                                      offset: const Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Nav item touch targets
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: List.generate(effectiveItems.length, (index) {
+                      return _buildNavItem(
+                        context,
+                        index,
+                        effectiveItems[index],
+                      );
+                    }),
+                  ),
+                ],
               ),
             ),
           ),
@@ -218,20 +293,7 @@ class WaymarkLiquidGlassBottomNavBar extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                SizedBox(height: 2.h),
-                // Micro Active Pill Indicator
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  curve: Curves.easeOutQuad,
-                  height: 3.h,
-                  width: isSelected ? 16.w : 0,
-                  decoration: BoxDecoration(
-                    color: isSelected ? activeColor : Colors.transparent,
-                    borderRadius: BorderRadius.circular(
-                      WaymarkSpacing.radiusFull,
-                    ),
-                  ),
-                ),
+                SizedBox(height: 5.h),
               ],
             ),
           ),

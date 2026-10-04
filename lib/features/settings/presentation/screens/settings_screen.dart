@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -11,10 +10,8 @@ import 'package:waymark/core/database/app_database.dart';
 import 'package:waymark/core/l10n/l10n_extension.dart';
 import 'package:waymark/core/presentation/widgets/waymark_liquid_glass_app_bar.dart';
 import 'package:waymark/core/presentation/widgets/waymark_snackbar.dart';
-import 'package:waymark/core/presentation/widgets/waymark_status_pill.dart';
 import 'package:waymark/core/router/route_names.dart';
 import 'package:waymark/core/services/backup_service.dart';
-import 'package:waymark/core/services/notification_service.dart';
 import 'package:waymark/core/theme/waymark_colors.dart';
 import 'package:waymark/core/theme/waymark_typography.dart';
 import 'package:waymark/features/settings/presentation/widgets/wipe_vault_dialog.dart';
@@ -154,14 +151,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             SizedBox(height: 10.h),
             _buildBackupCard(context),
-            SizedBox(height: 24.h),
-            _buildSectionHeader(
-              context,
-              Icons.notifications_active_rounded,
-              'Push Notifications & Cloud Messaging',
-            ),
-            SizedBox(height: 10.h),
-            _buildNotificationCard(context),
           ],
         ),
       ),
@@ -264,7 +253,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 context,
                 Icons.update_rounded,
                 'Automated Backup',
-                'Backup journey data every 2 days',
+                'Backup journey data every time the app is opened',
                 Switch(
                   value: autoBackup,
                   onChanged: isProcessing
@@ -283,7 +272,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   context,
                   Icons.save_rounded,
                   'Create Manual Backup',
-                  'Save a backup now to the Downloads folder',
+                  'Save a .csv backup to Downloads/waymark folder',
                   TextButton(
                     onPressed: isProcessing ? null : _handleManualBackup,
                     child: const Text('Backup'),
@@ -308,201 +297,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildNotificationCard(BuildContext context) {
-    return _buildCard(
-      context,
-      child: ValueListenableBuilder<NotificationStatus>(
-        valueListenable: NotificationService.instance.statusNotifier,
-        builder: (context, status, _) {
-          final colors = context.colorScheme;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Status Bar Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 8.w,
-                        height: 8.w,
-                        decoration: BoxDecoration(
-                          color: status.hasPermission
-                              ? const Color(0xFF10B981)
-                              : colors.warning,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        status.hasPermission
-                            ? 'NOTIFICATIONS ACTIVE'
-                            : 'PERMISSION NEEDED',
-                        style: context.textTheme.caption.copyWith(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 10.sp,
-                          letterSpacing: 0.6,
-                          color: status.hasPermission
-                              ? const Color(0xFF10B981)
-                              : colors.warning,
-                        ),
-                      ),
-                    ],
-                  ),
-                  WaymarkStatusPill(
-                    label: status.isFcmAvailable ? 'FCM READY' : 'LOCAL PUSH',
-                    color: status.isFcmAvailable
-                        ? colors.primary
-                        : colors.secondary,
-                  ),
-                ],
-              ),
-              SizedBox(height: 6.h),
-              Text(
-                status.statusMessage,
-                style: context.textTheme.caption.copyWith(
-                  color: colors.textSecondary,
-                ),
-              ),
-              _buildDataDivider(context),
-
-              // Permissions Action Row
-              _buildActionRow(
-                context,
-                Icons.notifications_active_outlined,
-                'Push Notifications',
-                status.hasPermission
-                    ? 'Alerts active for backups & cloud updates'
-                    : 'Enable notification alerts on this device',
-                status.hasPermission
-                    ? Icon(
-                        Icons.check_circle_rounded,
-                        color: const Color(0xFF10B981),
-                        size: 22.sp,
-                      )
-                    : FilledButton.tonal(
-                        onPressed: () async {
-                          await NotificationService.instance
-                              .requestPermission();
-                        },
-                        child: const Text('Enable'),
-                      ),
-              ),
-              _buildDataDivider(context),
-
-              // Test Notification Action Row
-              _buildActionRow(
-                context,
-                Icons.send_to_mobile_rounded,
-                'Test Notification Alert',
-                'Trigger a local push notification alert',
-                OutlinedButton(
-                  onPressed: () async {
-                    await NotificationService.instance.showTestNotification();
-                    if (context.mounted) {
-                      WaymarkSnackbar.showInfo(
-                        context,
-                        'Test notification sent. Tap the alert to view popup.',
-                      );
-                    }
-                  },
-                  child: const Text('Send Test'),
-                ),
-              ),
-
-              // FCM Token Preview if available
-              if (status.fcmToken != null && status.fcmToken!.isNotEmpty) ...[
-                _buildDataDivider(context),
-                _buildActionRow(
-                  context,
-                  Icons.vpn_key_outlined,
-                  'FCM Device Token',
-                  '${status.fcmToken!.substring(0, 16)}...',
-                  IconButton(
-                    icon: Icon(Icons.copy_rounded, size: 20.sp),
-                    tooltip: 'Copy Token',
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: status.fcmToken!));
-                      WaymarkSnackbar.showSuccess(
-                        context,
-                        'FCM Registration Token copied to clipboard.',
-                      );
-                    },
-                  ),
-                ),
-              ],
-
-              // Last Received Notification preview
-              if (status.lastReceivedNotification != null) ...[
-                _buildDataDivider(context),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(12.w),
-                  decoration: BoxDecoration(
-                    color: colors.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(
-                      WaymarkSpacing.radiusMd,
-                    ),
-                    border: Border.all(color: colors.borderDivider, width: 0.8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'LAST RECEIVED NOTIFICATION',
-                            style: context.textTheme.caption.copyWith(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 9.5.sp,
-                              letterSpacing: 0.6,
-                              color: colors.secondary,
-                            ),
-                          ),
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                            onPressed: () {
-                              NotificationService.instance.inspectNotification(
-                                status.lastReceivedNotification!,
-                              );
-                            },
-                            child: const Text('Inspect Popup'),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        status.lastReceivedNotification!.title,
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      SizedBox(height: 2.h),
-                      Text(
-                        status.lastReceivedNotification!.body,
-                        style: context.textTheme.caption.copyWith(
-                          color: colors.textSecondary,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          );
-        },
-      ),
-    );
-  }
-
   Future<void> _handleManualBackup() async {
     _isProcessingNotifier.value = true;
     try {
@@ -513,7 +307,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           builder: (ctx) => AlertDialog(
             backgroundColor: ctx.colorScheme.surfaceCard,
             title: const Text('Backup Successful'),
-            content: Text('Backup saved to:\n$path'),
+            content: Text(
+              'Journal backup saved as CSV:\n$path\n\nApp Signature: ${BackupService.appSignature}',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
@@ -525,7 +321,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        WaymarkSnackbar.showError(context, e.toString());
+        final message = e.toString().replaceFirst('Exception: ', '');
+        WaymarkSnackbar.showError(context, message);
       }
     } finally {
       if (mounted) {
@@ -599,6 +396,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       itemBuilder: (context, index) {
                         final file = backups[index];
                         final fileName = p.basename(file.path);
+                        final isCsv = fileName.endsWith('.csv');
                         final size = (file.lengthSync() / 1024).toStringAsFixed(
                           1,
                         );
@@ -607,6 +405,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         final formattedDate = DateFormat(
                           'MMM dd, yyyy • hh:mm a',
                         ).format(backupTimestamp);
+                        final sig = BackupService.getBackupSignature(file);
+                        final isMatch = BackupService.isSignatureMatch(file);
 
                         return ListTile(
                           contentPadding: EdgeInsets.symmetric(
@@ -617,23 +417,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             width: 40.w,
                             height: 40.w,
                             decoration: BoxDecoration(
-                              color: colors.primary.withValues(alpha: 0.1),
+                              color: isMatch
+                                  ? colors.primary.withValues(alpha: 0.1)
+                                  : colors.warning.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10.r),
                             ),
                             child: Icon(
-                              Icons.history_rounded,
-                              color: colors.primary,
+                              isCsv
+                                  ? Icons.table_chart_rounded
+                                  : Icons.storage_rounded,
+                              color: isMatch ? colors.primary : colors.warning,
                               size: 22.sp,
                             ),
                           ),
-                          title: Text(
-                            formattedDate,
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
+                          title: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  formattedDate,
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              if (sig != null)
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 6.w,
+                                    vertical: 2.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isMatch
+                                        ? colors.primary.withValues(alpha: 0.12)
+                                        : colors.warning.withValues(
+                                            alpha: 0.12,
+                                          ),
+                                    borderRadius: BorderRadius.circular(4.r),
+                                  ),
+                                  child: Text(
+                                    isMatch
+                                        ? 'Sig $sig'
+                                        : 'Sig $sig (Mismatch)',
+                                    style: context.textTheme.caption.copyWith(
+                                      color: isMatch
+                                          ? colors.primary
+                                          : colors.warning,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                           subtitle: Text(
-                            '$fileName • $size KB',
+                            '$fileName • $size KB • ${isCsv ? 'CSV' : 'SQLite'}',
                             style: context.textTheme.caption.copyWith(
                               color: colors.textSecondary,
                             ),
@@ -695,6 +532,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     RestoreValidationResult validation,
   ) async {
     final colors = context.colorScheme;
+    final isSigMismatch = !validation.isSignatureMatch;
     final latestActiveDate = validation.activeSummary.latestTimestamp != null
         ? DateFormat(
             'MMM dd, yyyy • hh:mm a',
@@ -721,10 +559,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: colors.error.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.block_rounded, color: colors.error, size: 26.sp),
+            child: Icon(
+              isSigMismatch ? Icons.fingerprint_rounded : Icons.block_rounded,
+              color: colors.error,
+              size: 26.sp,
+            ),
           ),
           title: Text(
-            'Restore Blocked: Newer Data Detected',
+            isSigMismatch
+                ? 'Restore Blocked: Signature Mismatch'
+                : 'Restore Blocked: Newer Data Detected',
             textAlign: TextAlign.center,
             style: dialogCtx.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
@@ -736,7 +580,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Your current journal contains records modified on $latestActiveDate, which is newer than this backup snapshot taken on $backupDate.',
+                validation.blockReason ??
+                    'Your current journal contains records modified on $latestActiveDate, which is newer than this backup snapshot taken on $backupDate.',
                 style: dialogCtx.textTheme.bodyMedium?.copyWith(
                   color: colors.textSecondary,
                   height: 1.4,
@@ -764,7 +609,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SizedBox(width: 8.w),
                     Expanded(
                       child: Text(
-                        'To prevent accidental loss of recent memories, Waymark blocks overwriting newer records. Backup restore is intended for recovering data onto a clean reinstall or reset device.',
+                        isSigMismatch
+                            ? 'App signature verification prevents importing data from incompatible builds or different app signing certificates.'
+                            : 'To prevent accidental loss of recent memories, Waymark blocks overwriting newer records. Backup restore is intended for recovering data onto a clean reinstall or reset device.',
                         style: dialogCtx.textTheme.caption.copyWith(
                           color: colors.error,
                           fontWeight: FontWeight.w600,
@@ -852,6 +699,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   children: [
                     _buildDialogInfoRow(dialogCtx, 'Snapshot Date', backupDate),
+                    SizedBox(height: 4.h),
+                    _buildDialogInfoRow(
+                      dialogCtx,
+                      'App Signature',
+                      '${validation.backupSignature ?? BackupService.appSignature} (Matches App)',
+                    ),
+                    SizedBox(height: 4.h),
+                    _buildDialogInfoRow(
+                      dialogCtx,
+                      'Backup Format',
+                      validation.backupSignature != null
+                          ? 'CSV Data File'
+                          : 'Journal Snapshot',
+                    ),
                     SizedBox(height: 4.h),
                     _buildDialogInfoRow(
                       dialogCtx,

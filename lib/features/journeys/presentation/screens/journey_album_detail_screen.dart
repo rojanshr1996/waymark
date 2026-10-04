@@ -43,6 +43,7 @@ class JourneyAlbumDetailScreen extends StatefulWidget {
 class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
   final ValueNotifier<_JourneyDetailTab> _activeTabNotifier =
       ValueNotifier<_JourneyDetailTab>(_JourneyDetailTab.timeline);
+  int _previousTabIndex = 0;
   final MapController _mapController = MapController();
   final ValueNotifier<int> _selectedWaypointIndexNotifier = ValueNotifier<int>(
     0,
@@ -859,7 +860,10 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          _activeTabNotifier.value = tab;
+          if (_activeTabNotifier.value != tab) {
+            _previousTabIndex = _activeTabNotifier.value.index;
+            _activeTabNotifier.value = tab;
+          }
         },
         child: Container(
           color: Colors.transparent,
@@ -869,14 +873,10 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: Icon(
-                  icon,
-                  key: ValueKey('${tab.name}_$isSelected'),
-                  size: 15.sp,
-                  color: isSelected ? colors.primary : colors.textSecondary,
-                ),
+              Icon(
+                icon,
+                size: 15.sp,
+                color: isSelected ? colors.primary : colors.textSecondary,
               ),
               SizedBox(width: 5.w),
               Flexible(
@@ -925,23 +925,34 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
       _JourneyDetailTab.wall => _buildWallTab(context, album, places, allMedia),
     };
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 260),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      transitionBuilder: (child, animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0.03, 0),
-              end: Offset.zero,
-            ).animate(animation),
+    return ClipRect(
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        transitionBuilder: (child, animation) {
+          final isIncoming = child.key == ValueKey(activeTab);
+          final isMovingForward = _previousTabIndex <= activeTab.index;
+          final inOffset = isMovingForward
+              ? const Offset(1.0, 0.0)
+              : const Offset(-1.0, 0.0);
+          final outOffset = isMovingForward
+              ? const Offset(-1.0, 0.0)
+              : const Offset(1.0, 0.0);
+
+          final offsetTween = isIncoming
+              ? Tween<Offset>(begin: inOffset, end: Offset.zero)
+              : Tween<Offset>(begin: outOffset, end: Offset.zero);
+
+          return SlideTransition(
+            position: offsetTween.animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+            ),
             child: child,
-          ),
-        );
-      },
-      child: KeyedSubtree(key: ValueKey(activeTab), child: tabWidget),
+          );
+        },
+        child: KeyedSubtree(key: ValueKey(activeTab), child: tabWidget),
+      ),
     );
   }
 

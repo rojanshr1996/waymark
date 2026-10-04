@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -439,6 +440,429 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
+  Future<void> _handleRestoreBackup() async {
+    _isSavingNotifier.value = true;
+    try {
+      final backups = await BackupService.getAvailableBackups();
+      if (!mounted) return;
+
+      if (backups.isEmpty) {
+        WaymarkSnackbar.showInfo(
+          context,
+          'No backup files found in Downloads folder.',
+        );
+        return;
+      }
+
+      await showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: context.colorScheme.surface,
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        ),
+        builder: (ctx) {
+          final colors = ctx.colorScheme;
+          return SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40.w,
+                      height: 4.h,
+                      decoration: BoxDecoration(
+                        color: colors.borderDivider,
+                        borderRadius: BorderRadius.circular(2.r),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 14.h),
+                  Text(
+                    'Select Backup to Restore',
+                    style: ctx.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    'Restoring replaces current database records and initializes your private journal.',
+                    style: ctx.textTheme.caption.copyWith(
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  Flexible(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: backups.length,
+                      separatorBuilder: (context, index) =>
+                          Divider(height: 1, color: colors.borderDivider),
+                      itemBuilder: (context, index) {
+                        final file = backups[index];
+                        final fileName = p.basename(file.path);
+                        final isCsv = fileName.endsWith('.csv');
+                        final size = (file.lengthSync() / 1024).toStringAsFixed(
+                          1,
+                        );
+                        final backupTimestamp =
+                            BackupService.getBackupTimestamp(file);
+                        final formattedDate = DateFormat(
+                          'MMM dd, yyyy • hh:mm a',
+                        ).format(backupTimestamp);
+                        final sig = BackupService.getBackupSignature(file);
+                        final isMatch = BackupService.isSignatureMatch(file);
+
+                        return ListTile(
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 4.w,
+                            vertical: 4.h,
+                          ),
+                          leading: Container(
+                            width: 40.w,
+                            height: 40.w,
+                            decoration: BoxDecoration(
+                              color: isMatch
+                                  ? colors.primary.withValues(alpha: 0.1)
+                                  : colors.warning.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            child: Icon(
+                              isCsv
+                                  ? Icons.table_chart_rounded
+                                  : Icons.storage_rounded,
+                              color: isMatch ? colors.primary : colors.warning,
+                              size: 22.sp,
+                            ),
+                          ),
+                          title: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  formattedDate,
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              if (sig != null)
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 6.w,
+                                    vertical: 2.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isMatch
+                                        ? colors.primary.withValues(alpha: 0.12)
+                                        : colors.warning.withValues(
+                                            alpha: 0.12,
+                                          ),
+                                    borderRadius: BorderRadius.circular(4.r),
+                                  ),
+                                  child: Text(
+                                    isMatch
+                                        ? 'Sig $sig'
+                                        : 'Sig $sig (Mismatch)',
+                                    style: context.textTheme.caption.copyWith(
+                                      color: isMatch
+                                          ? colors.primary
+                                          : colors.warning,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          subtitle: Text(
+                            '$fileName • $size KB • ${isCsv ? 'CSV' : 'SQLite'}',
+                            style: context.textTheme.caption.copyWith(
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                          trailing: Icon(
+                            Icons.chevron_right_rounded,
+                            color: colors.textSecondary,
+                          ),
+                          onTap: () async {
+                            Navigator.pop(ctx);
+                            await _processBackupSelection(file);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      if (mounted) WaymarkSnackbar.showError(context, e.toString());
+    } finally {
+      if (mounted) {
+        _isSavingNotifier.value = false;
+      }
+    }
+  }
+
+  Future<void> _processBackupSelection(File backupFile) async {
+    _isSavingNotifier.value = true;
+    try {
+      final validation = await BackupService.validateRestoreSafety(backupFile);
+      if (!mounted) return;
+
+      if (!validation.isSafeToRestore) {
+        await _showRestoreBlockedDialog(validation);
+        return;
+      }
+
+      final shouldRestore = await _showRestoreConfirmationDialog(validation);
+      if (shouldRestore == true && mounted) {
+        await _performRestore(backupFile);
+      }
+    } catch (e) {
+      if (mounted) WaymarkSnackbar.showError(context, 'Validation error: $e');
+    } finally {
+      if (mounted) {
+        _isSavingNotifier.value = false;
+      }
+    }
+  }
+
+  Future<void> _showRestoreBlockedDialog(
+    RestoreValidationResult validation,
+  ) async {
+    final colors = context.colorScheme;
+    final isSigMismatch = !validation.isSignatureMatch;
+    return showDialog<void>(
+      context: context,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          backgroundColor: colors.surfaceCard,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.r),
+            side: BorderSide(color: colors.borderDivider),
+          ),
+          icon: Container(
+            width: 48.w,
+            height: 48.w,
+            decoration: BoxDecoration(
+              color: colors.error.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isSigMismatch ? Icons.fingerprint_rounded : Icons.block_rounded,
+              color: colors.error,
+              size: 26.sp,
+            ),
+          ),
+          title: Text(
+            isSigMismatch
+                ? 'Restore Blocked: Signature Mismatch'
+                : 'Restore Blocked: Incompatible Backup',
+            textAlign: TextAlign.center,
+            style: dialogCtx.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              fontSize: 18.sp,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isSigMismatch
+                    ? 'This backup has app signature "${validation.backupSignature}", but your installed app is signature "${BackupService.appSignature}". Restoring across different app signatures is blocked to prevent data corruption.'
+                    : (validation.blockReason ??
+                          'This backup cannot be safely restored.'),
+                style: dialogCtx.textTheme.bodyMedium?.copyWith(
+                  color: colors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<bool?> _showRestoreConfirmationDialog(
+    RestoreValidationResult validation,
+  ) async {
+    final colors = context.colorScheme;
+    final backupDate = DateFormat(
+      'MMM dd, yyyy • hh:mm a',
+    ).format(validation.backupTimestamp);
+
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          backgroundColor: colors.surfaceCard,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.r),
+            side: BorderSide(color: colors.borderDivider),
+          ),
+          icon: Container(
+            width: 48.w,
+            height: 48.w,
+            decoration: BoxDecoration(
+              color: colors.warning.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.warning_amber_rounded,
+              color: colors.warning,
+              size: 26.sp,
+            ),
+          ),
+          title: Text(
+            'Confirm Journal Restore',
+            textAlign: TextAlign.center,
+            style: dialogCtx.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              fontSize: 18.sp,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Are you sure you want to restore this journal snapshot?',
+                style: dialogCtx.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 10.h),
+              Container(
+                padding: EdgeInsets.all(10.w),
+                decoration: BoxDecoration(
+                  color: colors.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(WaymarkSpacing.radiusSm),
+                  border: Border.all(color: colors.borderDivider, width: 0.8),
+                ),
+                child: Column(
+                  children: [
+                    _buildDialogInfoRow(dialogCtx, 'Snapshot Date', backupDate),
+                    SizedBox(height: 4.h),
+                    _buildDialogInfoRow(
+                      dialogCtx,
+                      'App Signature',
+                      '${validation.backupSignature ?? BackupService.appSignature} (Matches App)',
+                    ),
+                    SizedBox(height: 4.h),
+                    _buildDialogInfoRow(
+                      dialogCtx,
+                      'Backup Format',
+                      validation.backupSignature != null
+                          ? 'CSV Data File'
+                          : 'Journal Snapshot',
+                    ),
+                    SizedBox(height: 4.h),
+                    _buildDialogInfoRow(
+                      dialogCtx,
+                      'Target Vault',
+                      'Active Database',
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 12.h),
+              Text(
+                '⚠️ Restoring will overwrite any local records with the contents of this backup file and complete setup. This action cannot be undone.',
+                style: dialogCtx.textTheme.caption.copyWith(
+                  color: colors.warning,
+                  fontWeight: FontWeight.w600,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: colors.warning,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.of(dialogCtx).pop(true),
+              child: const Text('Confirm Restore'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDialogInfoRow(BuildContext context, String label, String value) {
+    final colors = context.colorScheme;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: context.textTheme.caption.copyWith(
+            color: colors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        Text(
+          value,
+          style: context.textTheme.caption.copyWith(
+            color: colors.textPrimary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _performRestore(File backupFile) async {
+    _isSavingNotifier.value = true;
+    try {
+      await BackupService.restoreBackup(backupFile);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('hasCompletedOnboarding', true);
+
+      // Save auto backup preference
+      await BackupService.setAutoBackupEnabled(
+        _autoBackupEnabledNotifier.value,
+      );
+
+      if (!mounted) return;
+      WaymarkSnackbar.showSuccess(
+        context,
+        'Journal restored successfully! Welcome back.',
+      );
+      context.go(AppRoutes.journeys);
+    } catch (e) {
+      if (mounted) {
+        WaymarkSnackbar.showError(context, 'Restore failed: $e');
+      }
+    } finally {
+      if (mounted) {
+        _isSavingNotifier.value = false;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colorScheme;
@@ -621,12 +1045,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 // Secondary Restore Link
                 Center(
                   child: InkWell(
-                    onTap: () {
-                      WaymarkSnackbar.showInfo(
-                        context,
-                        context.l10n.onboardingRestoreBackupSnackbar,
-                      );
-                    },
+                    onTap: _handleRestoreBackup,
                     borderRadius: BorderRadius.circular(
                       WaymarkSpacing.radiusFull,
                     ),

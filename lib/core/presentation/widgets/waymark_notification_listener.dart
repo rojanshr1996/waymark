@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:waymark/core/router/app_router.dart';
+import 'package:waymark/core/services/backup_service.dart';
 import 'package:waymark/core/services/notification_service.dart';
 import 'waymark_notification_popup_dialog.dart';
 
@@ -18,12 +19,19 @@ class WaymarkNotificationListener extends StatefulWidget {
 class _WaymarkNotificationListenerState
     extends State<WaymarkNotificationListener> {
   bool _isDialogShowing = false;
+  late final AppLifecycleListener _lifecycleListener;
 
   @override
   void initState() {
     super.initState();
     NotificationService.instance.tappedNotificationNotifier.addListener(
       _onTappedNotificationChanged,
+    );
+
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () {
+        BackupService.checkAndRunAutoBackup();
+      },
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -33,6 +41,7 @@ class _WaymarkNotificationListenerState
 
   @override
   void dispose() {
+    _lifecycleListener.dispose();
     NotificationService.instance.tappedNotificationNotifier.removeListener(
       _onTappedNotificationChanged,
     );

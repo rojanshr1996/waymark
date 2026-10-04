@@ -329,34 +329,66 @@ class _CreateJourneyBottomSheetState extends State<CreateJourneyBottomSheet> {
                           color: colors.borderDivider.withValues(alpha: 0.8),
                         ),
                       ),
-                      child: Row(
+                      child: Stack(
                         children: [
-                          Expanded(
-                            child: _buildStatusTab(
-                              context: context,
-                              label: 'Live Ongoing',
-                              icon: Icons.explore_rounded,
-                              activeColor: const Color(0xFF2E7D32),
-                              isSelected: status == 'ONGOING',
-                              onTap: () {
-                                _statusNotifier.value = 'ONGOING';
-                                _endDateNotifier.value = null;
-                              },
+                          Positioned.fill(
+                            child: AnimatedAlign(
+                              duration: const Duration(milliseconds: 250),
+                              curve: Curves.easeInOutCubic,
+                              alignment: status == 'ONGOING'
+                                  ? Alignment.centerLeft
+                                  : Alignment.centerRight,
+                              child: FractionallySizedBox(
+                                widthFactor: 0.5,
+                                heightFactor: 1.0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: colors.surfaceCard,
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.08,
+                                        ),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                          Expanded(
-                            child: _buildStatusTab(
-                              context: context,
-                              label: 'Completed',
-                              icon: Icons.flag_circle_rounded,
-                              activeColor: const Color(0xFFC89D3C),
-                              isSelected: status == 'COMPLETED',
-                              onTap: () {
-                                _statusNotifier.value = 'COMPLETED';
-                                _endDateNotifier.value ??=
-                                    _startDateNotifier.value;
-                              },
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildStatusTab(
+                                  context: context,
+                                  label: 'Live Ongoing',
+                                  icon: Icons.explore_rounded,
+                                  activeColor: const Color(0xFF2E7D32),
+                                  isSelected: status == 'ONGOING',
+                                  onTap: () {
+                                    _statusNotifier.value = 'ONGOING';
+                                    _endDateNotifier.value = null;
+                                  },
+                                ),
+                              ),
+                              Expanded(
+                                child: _buildStatusTab(
+                                  context: context,
+                                  label: 'Completed',
+                                  icon: Icons.flag_circle_rounded,
+                                  activeColor: const Color(0xFFC89D3C),
+                                  isSelected: status == 'COMPLETED',
+                                  onTap: () {
+                                    _statusNotifier.value = 'COMPLETED';
+                                    _endDateNotifier.value ??=
+                                        _startDateNotifier.value;
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -960,22 +992,9 @@ class _CreateJourneyBottomSheetState extends State<CreateJourneyBottomSheet> {
           FocusScope.of(context).unfocus();
           onTap();
         },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+        child: Container(
+          color: Colors.transparent,
           padding: EdgeInsets.symmetric(vertical: 8.h),
-          decoration: BoxDecoration(
-            color: isSelected ? colors.surfaceCard : Colors.transparent,
-            borderRadius: BorderRadius.circular(8.r),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.08),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
-                    ),
-                  ]
-                : null,
-          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -985,13 +1004,19 @@ class _CreateJourneyBottomSheetState extends State<CreateJourneyBottomSheet> {
                 color: isSelected ? activeColor : colors.textSecondary,
               ),
               SizedBox(width: 5.w),
-              Text(
-                label,
-                style: context.textTheme.labelSmall?.copyWith(
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                  color: isSelected ? colors.textPrimary : colors.textSecondary,
-                  fontSize: 11.sp,
-                ),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 200),
+                style: (context.textTheme.labelSmall ?? const TextStyle())
+                    .copyWith(
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.w600,
+                      color: isSelected
+                          ? colors.textPrimary
+                          : colors.textSecondary,
+                      fontSize: 11.sp,
+                    ),
+                child: Text(label),
               ),
             ],
           ),

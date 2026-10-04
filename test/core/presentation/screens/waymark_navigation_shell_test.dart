@@ -54,49 +54,33 @@ void main() {
     await tester.pumpWidget(buildSubject(initialIndex: 0));
     await tester.pumpAndSettle();
 
-    // Verify IndexedStack is present and has 4 child screens
-    final indexedStackFinder = find.byType(IndexedStack);
-    expect(indexedStackFinder, findsOneWidget);
-    final IndexedStack indexedStack = tester.widget(indexedStackFinder);
-    expect(indexedStack.index, equals(0));
-    expect(indexedStack.children.length, equals(4));
+    // Verify PageView is present
+    final pageViewFinder = find.byType(PageView);
+    expect(pageViewFinder, findsOneWidget);
+    final PageView pageView = tester.widget(pageViewFinder);
+    expect(pageView.controller?.initialPage, equals(0));
 
-    // Initially Journeys is onstage, others exist in IndexedStack
+    // Initially Journeys is onstage
     expect(find.byType(AllJourneysDashboardScreen), findsOneWidget);
-    expect(find.byType(ExploreMapViewScreen, skipOffstage: false), findsOneWidget);
-    expect(find.byType(PostcardStudioScreen, skipOffstage: false), findsOneWidget);
-    expect(find.byType(TravelerProfileScreen, skipOffstage: false), findsOneWidget);
 
     // Switch to Explore tab (index 1)
     await tester.tap(find.text('Explore'));
     await tester.pumpAndSettle();
-
-    final IndexedStack exploreStack = tester.widget(indexedStackFinder);
-    expect(exploreStack.index, equals(1));
     expect(find.byType(ExploreMapViewScreen), findsOneWidget);
 
     // Switch to Studio tab (index 2)
     await tester.tap(find.text('Studio'));
     await tester.pumpAndSettle();
-
-    final IndexedStack studioStack = tester.widget(indexedStackFinder);
-    expect(studioStack.index, equals(2));
     expect(find.byType(PostcardStudioScreen), findsOneWidget);
 
     // Switch to Profile tab (index 3)
     await tester.tap(find.text('Profile'));
     await tester.pumpAndSettle();
-
-    final IndexedStack profileStack = tester.widget(indexedStackFinder);
-    expect(profileStack.index, equals(3));
     expect(find.byType(TravelerProfileScreen), findsOneWidget);
 
     // Switch back to Journeys (index 0)
     await tester.tap(find.text('Journeys'));
     await tester.pumpAndSettle();
-
-    final IndexedStack journeysStack = tester.widget(indexedStackFinder);
-    expect(journeysStack.index, equals(0));
     expect(find.byType(AllJourneysDashboardScreen), findsOneWidget);
 
     // Clean up

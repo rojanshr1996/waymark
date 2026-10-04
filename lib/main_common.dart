@@ -10,7 +10,7 @@ Future<void> mainCommon(AppFlavorConfig config) async {
   // Initialize notification & cloud messaging services
   await NotificationService.instance.initialize();
 
-  // Attempt auto-backup (runs every 2 days if enabled)
+  // Attempt auto-backup every time the app is opened (if database has data)
   BackupService.checkAndRunAutoBackup();
 
   if (config.enableLogging) {

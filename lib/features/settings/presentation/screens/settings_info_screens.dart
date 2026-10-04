@@ -459,13 +459,15 @@ Future<void> _launchSupportEmail(BuildContext context, String? handle) async {
   );
   try {
     final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!opened && context.mounted)
+    if (!opened && context.mounted) {
       WaymarkSnackbar.showError(
         context,
         'No email app is available on this device.',
       );
+    }
   } catch (_) {
-    if (context.mounted)
+    if (context.mounted) {
       WaymarkSnackbar.showError(context, 'Could not open your email app.');
+    }
   }
 }

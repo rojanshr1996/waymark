@@ -40,6 +40,7 @@ class WaymarkNavigationShell extends StatefulWidget {
 
 class _WaymarkNavigationShellState extends State<WaymarkNavigationShell> {
   late final ValueNotifier<int> _currentIndexNotifier;
+  late final PageController _pageController;
   DateTime? _lastBackPressTime;
 
   static const List<Widget> _screens = [
@@ -53,11 +54,13 @@ class _WaymarkNavigationShellState extends State<WaymarkNavigationShell> {
   void initState() {
     super.initState();
     _currentIndexNotifier = ValueNotifier<int>(widget.initialIndex);
+    _pageController = PageController(initialPage: widget.initialIndex);
   }
 
   @override
   void dispose() {
     _currentIndexNotifier.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -66,12 +69,23 @@ class _WaymarkNavigationShellState extends State<WaymarkNavigationShell> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialIndex != widget.initialIndex) {
       _currentIndexNotifier.value = widget.initialIndex;
+      if (_pageController.hasClients &&
+          _pageController.page?.round() != widget.initialIndex) {
+        _pageController.jumpToPage(widget.initialIndex);
+      }
     }
   }
 
   void _onTap(int index) {
     if (_currentIndexNotifier.value != index) {
       _currentIndexNotifier.value = index;
+      if (_pageController.hasClients) {
+        _pageController.animateToPage(
+          index,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOutCubic,
+        );
+      }
     }
   }
 
@@ -114,7 +128,13 @@ class _WaymarkNavigationShellState extends State<WaymarkNavigationShell> {
             switchToTab: _onTap,
             child: Scaffold(
               extendBody: false,
-              body: IndexedStack(index: currentIndex, children: _screens),
+              body: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: _screens
+                    .map((screen) => _KeepAliveTabScope(child: screen))
+                    .toList(),
+              ),
               bottomNavigationBar: WaymarkLiquidGlassBottomNavBar(
                 currentIndex: currentIndex,
                 onTap: _onTap,
@@ -124,5 +144,25 @@ class _WaymarkNavigationShellState extends State<WaymarkNavigationShell> {
         );
       },
     );
+  }
+}
+
+class _KeepAliveTabScope extends StatefulWidget {
+  final Widget child;
+  const _KeepAliveTabScope({required this.child});
+
+  @override
+  State<_KeepAliveTabScope> createState() => _KeepAliveTabScopeState();
+}
+
+class _KeepAliveTabScopeState extends State<_KeepAliveTabScope>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
   }
 }
