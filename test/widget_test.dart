@@ -36,7 +36,7 @@ void main() {
 
     AppFlavorConfig.initialize(
       flavor: Flavor.dev,
-      appTitle: 'Waymark Dev',
+      appTitle: 'Wanderline Dev',
       enableLogging: false,
     );
 

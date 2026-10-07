@@ -668,7 +668,7 @@ class _AllJourneysDashboardScreenState
 
     final sb = StringBuffer();
     sb.writeln('====================================');
-    sb.writeln('     WAYMARK EXPEDITION FIELD JOURNAL');
+    sb.writeln('     WANDERLINE EXPEDITION FIELD JOURNAL');
     sb.writeln('====================================\n');
     sb.writeln(
       'Date of Export: ${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now())}',

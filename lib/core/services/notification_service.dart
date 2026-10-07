@@ -36,7 +36,7 @@ class ReceivedNotification {
       id:
           json['id'] as String? ??
           DateTime.now().millisecondsSinceEpoch.toString(),
-      title: json['title'] as String? ?? 'Waymark Notification',
+      title: json['title'] as String? ?? 'Wanderline Notification',
       body: json['body'] as String? ?? '',
       payload: json['payload'] as String?,
       timestamp: json['timestamp'] != null
@@ -116,8 +116,8 @@ class NotificationService {
   NotificationService._();
   static final NotificationService instance = NotificationService._();
 
-  static const String channelId = 'waymark_general';
-  static const String channelName = 'Waymark Journal';
+  static const String channelId = 'wanderline_general';
+  static const String channelName = 'Wanderline Journal';
   static const String channelDescription =
       'Notifications for backup completion and journey updates';
 
@@ -331,7 +331,7 @@ class NotificationService {
   }) async {
     final fileName = backupPath.split(Platform.pathSeparator).last;
     final sizeKb = (fileSizeBytes / 1024).toStringAsFixed(1);
-    final title = 'Waymark Backup Completed';
+    final title = 'Wanderline Backup Completed';
     final body = 'Journal snapshot saved to Downloads: $fileName ($sizeKb KB)';
 
     final payloadMap = {
@@ -392,7 +392,7 @@ class NotificationService {
 
   /// Send a test notification to verify the push flow and tap popup
   Future<void> showTestNotification() async {
-    final title = 'Waymark Notification Test';
+    final title = 'Wanderline Notification Test';
     final body =
         'Push notification flow active. Tap to inspect notification details.';
 
@@ -400,7 +400,7 @@ class NotificationService {
       'id': 'test_${DateTime.now().millisecondsSinceEpoch}',
       'title': title,
       'body': body,
-      'payload': 'Test sample payload from Waymark settings',
+      'payload': 'Test sample payload from Wanderline settings',
       'timestamp': DateTime.now().toIso8601String(),
       'type': NotificationType.test.name,
       'data': {
@@ -462,7 +462,7 @@ class NotificationService {
     // Fallback if payload isn't json
     final fallback = ReceivedNotification(
       id: 'local_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Waymark Notification',
+      title: 'Wanderline Notification',
       body: payload ?? 'Notification tapped',
       payload: payload,
       timestamp: DateTime.now(),
@@ -474,7 +474,7 @@ class NotificationService {
   /// Handle foreground FCM message
   void _handleForegroundFcmMessage(RemoteMessage message) {
     final notification = message.notification;
-    final title = notification?.title ?? 'Waymark Cloud Message';
+    final title = notification?.title ?? 'Wanderline Cloud Message';
     final body = notification?.body ?? 'New expedition update received.';
 
     final payloadMap = {
@@ -526,7 +526,7 @@ class NotificationService {
     final notification = message.notification;
     final rec = ReceivedNotification(
       id: message.messageId ?? 'fcm_${DateTime.now().millisecondsSinceEpoch}',
-      title: notification?.title ?? 'Waymark Cloud Message',
+      title: notification?.title ?? 'Wanderline Cloud Message',
       body: notification?.body ?? 'Notification opened.',
       payload: message.data.isNotEmpty ? jsonEncode(message.data) : null,
       timestamp: DateTime.now(),

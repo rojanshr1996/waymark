@@ -4,7 +4,7 @@ import 'package:waymark/main_common.dart';
 void main() {
   AppFlavorConfig.initialize(
     flavor: Flavor.dev,
-    appTitle: 'Waymark Dev',
+    appTitle: 'Wanderline Dev',
     enableLogging: true,
   );
 

@@ -22,7 +22,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        manifestPlaceholders["appName"] = "Waymark"
+        manifestPlaceholders["appName"] = "Wanderline"
         multiDexEnabled = true
     }
 
@@ -32,21 +32,21 @@ android {
         create("dev") {
             dimension = "default"
             applicationIdSuffix = ".dev"
-            manifestPlaceholders["appName"] = "Waymark Dev"
+            manifestPlaceholders["appName"] = "Wanderline Dev"
         }
         create("qa") {
             dimension = "default"
             applicationIdSuffix = ".qa"
-            manifestPlaceholders["appName"] = "Waymark QA"
+            manifestPlaceholders["appName"] = "Wanderline QA"
         }
         create("uat") {
             dimension = "default"
             applicationIdSuffix = ".uat"
-            manifestPlaceholders["appName"] = "Waymark UAT"
+            manifestPlaceholders["appName"] = "Wanderline UAT"
         }
         create("production") {
             dimension = "default"
-            manifestPlaceholders["appName"] = "Waymark"
+            manifestPlaceholders["appName"] = "Wanderline"
         }
     }
 

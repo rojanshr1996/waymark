@@ -329,7 +329,7 @@ class _WipeVaultDialogState extends State<WipeVaultDialog>
               SizedBox(width: 8.w),
               Expanded(
                 child: Text(
-                  'Waymark is 100% offline. Erased records cannot be recovered from any cloud.',
+                  'Wanderline is 100% offline. Erased records cannot be recovered from any cloud.',
                   style: context.textTheme.caption.copyWith(
                     color: colors.error,
                     fontWeight: FontWeight.w600,

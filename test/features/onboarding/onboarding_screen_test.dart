@@ -88,7 +88,7 @@ void main() {
     // Verify Step 1: Welcome & Philosophy elements exist
     expect(find.byType(WaymarkLiquidGlassAppBar), findsOneWidget);
     expect(find.byType(WaymarkLiquidGlass), findsAtLeastNWidgets(2));
-    expect(find.text('WAYMARK ARCHIVE'), findsOneWidget);
+    expect(find.text('WANDERLINE ARCHIVE'), findsOneWidget);
     expect(find.text('Interactive Route Maps'), findsOneWidget);
     expect(find.text('Artistic Postcards'), findsOneWidget);
     expect(find.text('Private Local Vault'), findsOneWidget);
@@ -110,7 +110,7 @@ void main() {
 
     // Verify generic hint and email placeholders
     expect(find.text('e.g. John Doe'), findsOneWidget);
-    expect(find.text('e.g. john.doe@waymark.app'), findsOneWidget);
+    expect(find.text('e.g. john.doe@wanderline.app'), findsOneWidget);
 
     // Enter text and verify tick mark appears
     await tester.enterText(find.byType(TextField).first, 'John Doe');

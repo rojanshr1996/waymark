@@ -16,7 +16,7 @@ class HelpSupportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return _InfoPage(
       title: 'Help & Support',
-      subtitle: 'Get answers and contact the WayMark team',
+      subtitle: 'Get answers and contact the Wanderline team',
       icon: Icons.support_agent_rounded,
       child: StreamBuilder<UserProfile?>(
         stream: AppDatabase.instance.userProfileDao.watchProfile(),
@@ -28,7 +28,7 @@ class HelpSupportScreen extends StatelessWidget {
                 icon: Icons.email_outlined,
                 title: 'Email support',
                 body:
-                    'Send a message to the WayMark team. Your saved profile handle is included so we know who to reply to.',
+                    'Send a message to the Wanderline team. Your saved profile handle is included so we know who to reply to.',
                 action: FilledButton.icon(
                   onPressed: () => _launchSupportEmail(context, handle),
                   icon: const Icon(Icons.mail_outline_rounded),
@@ -64,7 +64,7 @@ class FaqScreen extends StatelessWidget {
     (
       question: 'Where is my journey data stored?',
       answer:
-          'WayMark stores journeys, places, and profile data locally on this device. Your memoirs remain available when you are offline.',
+          'Wanderline stores journeys, places, and profile data locally on this device. Your memoirs remain available when you are offline.',
     ),
     (
       question: 'How do I create a postcard?',
@@ -84,7 +84,7 @@ class FaqScreen extends StatelessWidget {
     (
       question: 'Why is a route distance still loading?',
       answer:
-          'WayMark is resolving the path between your places. A straight-line distance is used as a fallback when a road route is unavailable.',
+          'Wanderline is resolving the path between your places. A straight-line distance is used as a fallback when a road route is unavailable.',
     ),
   ];
 
@@ -92,7 +92,7 @@ class FaqScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return _InfoPage(
       title: 'Frequently Asked Questions',
-      subtitle: 'Quick answers about using WayMark',
+      subtitle: 'Quick answers about using Wanderline',
       icon: Icons.help_outline_rounded,
       child: _InfoCard(
         icon: Icons.question_answer_outlined,
@@ -141,16 +141,16 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _InfoPage(
-      title: 'About WayMark',
+      title: 'About Wanderline',
       subtitle: 'Memoir & Living Atlas',
       leading: Assets.images.waymarkLogoTransparent.image(fit: BoxFit.contain),
       child: Column(
         children: [
           _InfoCard(
             icon: Icons.explore_rounded,
-            title: 'WayMark',
+            title: 'Wanderline',
             body:
-                'WayMark is a personal travel memoir and living atlas for capturing the places, routes, photographs, and small details that make a journey memorable. Organize each trip as a visual story, revisit the sequence of places you explored, and transform your memories into beautiful postcards. The experience is designed to feel calm, tactile, and useful while keeping your journey records available on your device, even when you are offline.',
+                'Wanderline is a personal travel memoir and living atlas for capturing the places, routes, photographs, and small details that make a journey memorable. Organize each trip as a visual story, revisit the sequence of places you explored, and transform your memories into beautiful postcards. The experience is designed to feel calm, tactile, and useful while keeping your journey records available on your device, even when you are offline.',
             trailing: Text(
               'v1.0.0',
               style: context.textTheme.labelMedium?.copyWith(
@@ -193,33 +193,47 @@ class AboutScreen extends StatelessWidget {
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
 
+  static const String onlineUrl =
+      'https://doc-hosting.flycricket.io/wanderline-privacy-policy/c3835d93-6347-4dca-a1c2-2ae6de266378/privacy';
+
   @override
   Widget build(BuildContext context) {
     return _InfoPage(
       title: 'Privacy Policy',
-      subtitle: 'How WayMark handles your information',
+      subtitle: 'How Wanderline handles your information',
       icon: Icons.privacy_tip_outlined,
       child: Column(
-        children: const [
+        children: [
           _InfoCard(
+            icon: Icons.open_in_new_rounded,
+            title: 'Official Privacy Policy',
+            body:
+                'Read the full, official Wanderline privacy policy hosted online.',
+            action: FilledButton.icon(
+              onPressed: () => _launchWebUrl(context, onlineUrl),
+              icon: const Icon(Icons.open_in_new_rounded, size: 18),
+              label: const Text('Open Online Policy'),
+            ),
+          ),
+          const _InfoCard(
             icon: Icons.lock_outline_rounded,
             title: 'Your journey data stays local',
             body:
-                'Journeys, places, notes, and media references are stored on your device. WayMark does not upload your memoir data to a cloud service.',
+                'Journeys, places, notes, and media references are stored on your device. Wanderline does not upload your memoir data to a cloud service.',
           ),
-          _InfoCard(
+          const _InfoCard(
             icon: Icons.person_outline_rounded,
             title: 'Profile information',
             body:
                 'Your profile details are used only to personalize the local app experience and to identify you when you voluntarily contact support.',
           ),
-          _InfoCard(
+          const _InfoCard(
             icon: Icons.share_outlined,
             title: 'You choose what leaves the device',
             body:
-                'Sharing a postcard or opening an email app is an action you start. WayMark does not send content without your interaction.',
+                'Sharing a postcard or opening an email app is an action you start. Wanderline does not send content without your interaction.',
           ),
-          _InfoCard(
+          const _InfoCard(
             icon: Icons.delete_outline_rounded,
             title: 'Deletion',
             body:
@@ -234,37 +248,51 @@ class PrivacyPolicyScreen extends StatelessWidget {
 class TermsConditionsScreen extends StatelessWidget {
   const TermsConditionsScreen({super.key});
 
+  static const String onlineUrl =
+      'https://doc-hosting.flycricket.io/wanderline-terms-of-use/d9f6fdae-773c-44e7-8fb2-b11e9b22aacd/terms';
+
   @override
   Widget build(BuildContext context) {
     return _InfoPage(
       title: 'Terms & Conditions',
-      subtitle: 'Terms for using WayMark',
+      subtitle: 'Terms for using Wanderline',
       icon: Icons.gavel_outlined,
       child: Column(
-        children: const [
+        children: [
           _InfoCard(
+            icon: Icons.open_in_new_rounded,
+            title: 'Official Terms of Use',
+            body:
+                'Read the full, official Wanderline terms and conditions hosted online.',
+            action: FilledButton.icon(
+              onPressed: () => _launchWebUrl(context, onlineUrl),
+              icon: const Icon(Icons.open_in_new_rounded, size: 18),
+              label: const Text('Open Online Terms'),
+            ),
+          ),
+          const _InfoCard(
             icon: Icons.check_circle_outline_rounded,
             title: 'Use of the app',
             body:
-                'WayMark is a personal travel journaling and postcard creation tool. Use it responsibly and keep your device protected.',
+                'Wanderline is a personal travel journaling and postcard creation tool. Use it responsibly and keep your device protected.',
           ),
-          _InfoCard(
+          const _InfoCard(
             icon: Icons.backup_outlined,
             title: 'Your responsibility',
             body:
                 'You are responsible for your device, your local data, and any backups or exports you choose to create.',
           ),
-          _InfoCard(
+          const _InfoCard(
             icon: Icons.map_outlined,
             title: 'Routes and distances',
             body:
                 'Route lines, distances, and map details are provided for journaling and visualization. They may be approximate and should not be treated as navigation instructions.',
           ),
-          _InfoCard(
+          const _InfoCard(
             icon: Icons.update_rounded,
             title: 'Updates',
             body:
-                'WayMark may change features or these terms as the app evolves. Continued use after an update means you accept the revised terms.',
+                'Wanderline may change features or these terms as the app evolves. Continued use after an update means you accept the revised terms.',
           ),
         ],
       ),
@@ -450,11 +478,11 @@ class _FeatureRow extends StatelessWidget {
 Future<void> _launchSupportEmail(BuildContext context, String? handle) async {
   final uri = Uri(
     scheme: 'mailto',
-    path: 'support@waymark.app',
+    path: 'support@wanderline.app',
     queryParameters: {
-      'subject': 'WayMark Help & Support',
+      'subject': 'Wanderline Help & Support',
       'body':
-          'Hello WayMark support,\n\nPlease describe your question or issue here.\n\nMy WayMark handle: ${handle?.trim().isNotEmpty == true ? handle!.trim() : 'Not set'}',
+          'Hello Wanderline support,\n\nPlease describe your question or issue here.\n\nMy Wanderline handle: ${handle?.trim().isNotEmpty == true ? handle!.trim() : 'Not set'}',
     },
   );
   try {
@@ -468,6 +496,23 @@ Future<void> _launchSupportEmail(BuildContext context, String? handle) async {
   } catch (_) {
     if (context.mounted) {
       WaymarkSnackbar.showError(context, 'Could not open your email app.');
+    }
+  }
+}
+
+Future<void> _launchWebUrl(BuildContext context, String urlString) async {
+  final uri = Uri.parse(urlString);
+  try {
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && context.mounted) {
+      WaymarkSnackbar.showError(
+        context,
+        'Could not open the webpage in a browser.',
+      );
+    }
+  } catch (_) {
+    if (context.mounted) {
+      WaymarkSnackbar.showError(context, 'Could not launch the webpage.');
     }
   }
 }

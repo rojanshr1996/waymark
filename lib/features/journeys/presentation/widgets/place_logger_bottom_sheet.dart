@@ -2031,7 +2031,8 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
                                   TileLayer(
                                     urlTemplate:
                                         'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                    userAgentPackageName: 'app.waymark.journal',
+                                    userAgentPackageName:
+                                        'app.wanderline.journal',
                                   ),
                                   MarkerLayer(
                                     markers: [

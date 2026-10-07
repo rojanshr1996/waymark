@@ -339,7 +339,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                   extendBodyBehindAppBar: true,
                   appBar: WaymarkLiquidGlassAppBar(
                     title: 'Journey Detail',
-                    subtitle: 'WayMark Journal',
+                    subtitle: 'Wanderline Journal',
                     actions: [
                       // IconButton(
                       //   icon: const Icon(Icons.share_outlined),
@@ -2141,7 +2141,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                           TileLayer(
                             urlTemplate:
                                 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                            userAgentPackageName: 'app.waymark.journal',
+                            userAgentPackageName: 'app.wanderline.journal',
                           ),
                           if (polylinePoints.length > 1)
                             PolylineLayer(
@@ -3151,7 +3151,7 @@ class _JourneyAlbumDetailScreenState extends State<JourneyAlbumDetailScreen> {
                       ),
                       SizedBox(height: 8.h),
                       Text(
-                        'Captured with analog telemetry and tactile preservation in WayMark Journal.',
+                        'Captured with analog telemetry and tactile preservation in Wanderline Journal.',
                         style: ctx.textTheme.caption.copyWith(
                           fontStyle: FontStyle.italic,
                           color: const Color(0xFF6C757D),

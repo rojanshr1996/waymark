@@ -111,7 +111,7 @@ class _PostcardStudioScreenState extends State<PostcardStudioScreen> {
       final albumName =
           _selectedAlbumNotifier.value?.title.replaceAll(' ', '_') ?? 'memoir';
       final fileName =
-          'waymark_postcard_${albumName}_${DateTime.now().millisecondsSinceEpoch}.png';
+          'wanderline_postcard_${albumName}_${DateTime.now().millisecondsSinceEpoch}.png';
       final file = File('${tempDir.path}/$fileName');
       await file.writeAsBytes(pngBytes);
 
@@ -133,7 +133,7 @@ class _PostcardStudioScreenState extends State<PostcardStudioScreen> {
       if (file != null) {
         final hasAccess = await Gal.hasAccess();
         if (!hasAccess && !await Gal.requestAccess()) return;
-        await Gal.putImage(file.path, album: 'Waymark');
+        await Gal.putImage(file.path, album: 'Wanderline');
         if (mounted) await _showPostcardPreview(file);
       } else {
         if (mounted) {
@@ -198,8 +198,8 @@ class _PostcardStudioScreenState extends State<PostcardStudioScreen> {
         await Share.shareXFiles(
           [XFile(file.path)],
           text:
-              'Check out my $albumTitle travel postcard captured with WayMark!',
-          subject: 'WayMark Travel Memoir',
+              'Check out my $albumTitle travel postcard captured with Wanderline!',
+          subject: 'Wanderline Travel Memoir',
         );
       } else {
         if (mounted) {

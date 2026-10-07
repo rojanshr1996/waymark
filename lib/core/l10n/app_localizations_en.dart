@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'WayMark';
+  String get appName => 'Wanderline';
 
   @override
   String get navJourneys => 'Journeys';
@@ -79,7 +79,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileHandleLabel => 'Compass ID / Email';
 
   @override
-  String get profileHandlePlaceholder => 'e.g. john.doe@waymark.app';
+  String get profileHandlePlaceholder => 'e.g. john.doe@wanderline.app';
 
   @override
   String get profileHandleClaimed => 'CLAIMED';
@@ -100,7 +100,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emptyDeckBtnStart => 'Start Your First Journey';
 
   @override
-  String get emptyDeckHowItWorksTitle => 'How WayMark Works';
+  String get emptyDeckHowItWorksTitle => 'How Wanderline Works';
 
   @override
   String get emptyDeckHowItWorksSubtitle => 'Your offline field journal';
@@ -123,7 +123,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emptyDeckStep2Desc =>
-      'Waymark connects your photo stops with dynamic polyline routes rendered from your GPS breadcrumbs, creating a vivid visual trail of your path.';
+      'Wanderline connects your photo stops with dynamic polyline routes rendered from your GPS breadcrumbs, creating a vivid visual trail of your path.';
 
   @override
   String get emptyDeckStep3Title => 'Tactile Postcards';
@@ -296,7 +296,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Database wiped clean. Starting fresh.';
 
   @override
-  String get settingsAboutSection => 'About WayMark';
+  String get settingsAboutSection => 'About Wanderline';
 
   @override
   String get settingsStorageClearedToast =>
@@ -460,7 +460,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsBtnWipeVault => 'Wipe Vault';
 
   @override
-  String get settingsAppDescription => 'WayMark: Memoir & Living Atlas';
+  String get settingsAppDescription => 'Wanderline: Memoir & Living Atlas';
 
   @override
   String get settingsAppVersion => 'v1.0.0';
@@ -830,7 +830,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Private SQLite Vault • 100% Offline • Zero Data Tracking';
 
   @override
-  String get onboardingHeroTitle => 'WayMark';
+  String get onboardingHeroTitle => 'Wanderline';
 
   @override
   String get onboardingHeroTitleItalic => 'Expeditions';
@@ -964,14 +964,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePrivateBadge => '100% Private';
 
   @override
-  String get onboardingHeroArchive => 'WAYMARK ARCHIVE';
+  String get onboardingHeroArchive => 'WANDERLINE ARCHIVE';
 
   @override
   String get onboardingHeroPlateNo => 'PLATE NO. 12';
 
   @override
   String get onboardingRestoreBackupSnackbar =>
-      'Select your encrypted .waymark archive file to restore local trips and journal snapshots.';
+      'Select your encrypted .wanderline archive file to restore local trips and journal snapshots.';
 
   @override
   String onboardingVaultInitError(String error) {

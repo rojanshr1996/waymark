@@ -25,4 +25,4 @@ plugins {
 }
 
 include(":app")
-rootProject.name = "waymark"
+rootProject.name = "wanderline"

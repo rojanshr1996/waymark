@@ -734,7 +734,7 @@ class PostcardCanvasWidget extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'WayMark',
+                  'Wanderline',
                   style: GoogleFonts.outfit(
                     fontSize: brandSize,
                     fontWeight: FontWeight.w800,
@@ -1028,7 +1028,7 @@ class PostcardCanvasWidget extends StatelessWidget {
                         height: logoSize,
                         fit: BoxFit.contain,
                         errorBuilder: (_, _, _) => Text(
-                          'WM',
+                          'WL',
                           style: GoogleFonts.outfit(
                             fontSize: memoirTitleSize,
                             fontWeight: FontWeight.w800,
@@ -1045,7 +1045,7 @@ class PostcardCanvasWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'WayMark Travel Memoir',
+                          'Wanderline Travel Memoir',
                           style: GoogleFonts.inter(
                             fontSize: memoirTitleSize,
                             fontWeight: FontWeight.w800,

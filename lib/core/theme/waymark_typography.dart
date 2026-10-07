@@ -128,7 +128,7 @@ extension WaymarkTextThemeExtension on TextTheme {
     color: Colors.white,
   );
 
-  /// Brand signature cursive style for the app name "WayMark" across all screens.
+  /// Brand signature cursive style for the app name "Wanderline" across all screens.
   /// Uses Caveat with FontWeight.w700, matching the signature font from splash screen.
   TextStyle get brandTitle => GoogleFonts.caveat(
     fontSize: 21.sp,

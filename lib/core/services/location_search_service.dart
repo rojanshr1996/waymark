@@ -35,7 +35,8 @@ class LocationSearchService {
               connectTimeout: const Duration(seconds: 5),
               receiveTimeout: const Duration(seconds: 5),
               headers: {
-                'User-Agent': 'WaymarkApp/1.0.0 (contact: support@waymark.app)',
+                'User-Agent':
+                    'WanderlineApp/1.0.0 (contact: support@wanderline.app)',
                 'Accept': 'application/json',
               },
             ),

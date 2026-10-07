@@ -634,7 +634,8 @@ class _ExploreMapViewScreenState extends State<ExploreMapViewScreen>
                                   TileLayer(
                                     urlTemplate:
                                         'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                    userAgentPackageName: 'app.waymark.journal',
+                                    userAgentPackageName:
+                                        'app.wanderline.journal',
                                   ),
                                   MarkerLayer(
                                     markers: filteredPlaces.map((place) {

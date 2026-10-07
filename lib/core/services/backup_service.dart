@@ -54,13 +54,13 @@ class RestoreValidationResult {
 /// directory (iOS).
 ///
 /// Filenames follow the convention:
-///   `<app_name>_<app_signature>.csv` (e.g. `waymark_1.csv`)
+///   `<app_name>_<app_signature>.csv` (e.g. `wanderline_1.csv`)
 /// where the integer denotes the app signature.
 class BackupService {
-  static const String appName = 'waymark';
+  static const String appName = 'wanderline';
 
   /// The integer value denoting the app signature and schema compatibility.
-  /// Used in file naming (e.g., waymark_1.csv) and internal CSV header metadata.
+  /// Used in file naming (e.g., wanderline_1.csv) and internal CSV header metadata.
   static const int appSignature = 1;
 
   static const String _autoBackupEnabledKey = 'auto_backup_enabled';
@@ -197,7 +197,7 @@ class BackupService {
   /// E.g. `waymark_1.csv` -> 1, `waymark_1_20261004_120000.csv` -> 1.
   static int? getBackupSignature(File backupFile) {
     final fileName = p.basename(backupFile.path);
-    final match = RegExp('^${appName}_(\\d+)').firstMatch(fileName);
+    final match = RegExp('^(?:${appName}|waymark)_(\\d+)').firstMatch(fileName);
     if (match != null) {
       return int.tryParse(match.group(1)!);
     }
@@ -205,7 +205,9 @@ class BackupService {
     if (fileName.endsWith('.csv')) {
       try {
         final firstLine = backupFile.readAsLinesSync().firstOrNull;
-        if (firstLine != null && firstLine.startsWith('# WAYMARK_BACKUP')) {
+        if (firstLine != null &&
+            (firstLine.startsWith('# WANDERLINE_BACKUP') ||
+                firstLine.startsWith('# WAYMARK_BACKUP'))) {
           final sigMatch = RegExp(r'app_signature=(\d+)').firstMatch(firstLine);
           if (sigMatch != null) {
             return int.tryParse(sigMatch.group(1)!);
@@ -229,7 +231,7 @@ class BackupService {
   static DateTime getBackupTimestamp(File backupFile) {
     final fileName = p.basename(backupFile.path);
 
-    // Pattern 1: waymark_1_yyyyMMdd_HHmmss.csv
+    // Pattern 1: <app_name>_1_yyyyMMdd_HHmmss.csv or waymark_1_yyyyMMdd_HHmmss.csv
     final csvTimestampMatch = RegExp(
       r'_(\d{8}_\d{6})\.csv$',
     ).firstMatch(fileName);
@@ -239,9 +241,9 @@ class BackupService {
       } catch (_) {}
     }
 
-    // Pattern 2: legacy waymark_backup_yyyyMMdd_HHmmss.sqlite
+    // Pattern 2: legacy sqlite backup
     final sqliteMatch = RegExp(
-      r'waymark_backup_(\d{8}_\d{6})\.sqlite',
+      r'(?:wanderline|waymark)_backup_(\d{8}_\d{6})\.sqlite',
     ).firstMatch(fileName);
     if (sqliteMatch != null) {
       try {
@@ -253,7 +255,9 @@ class BackupService {
     if (fileName.endsWith('.csv')) {
       try {
         final firstLine = backupFile.readAsLinesSync().firstOrNull;
-        if (firstLine != null && firstLine.startsWith('# WAYMARK_BACKUP')) {
+        if (firstLine != null &&
+            (firstLine.startsWith('# WANDERLINE_BACKUP') ||
+                firstLine.startsWith('# WAYMARK_BACKUP'))) {
           final tsMatch = RegExp(r'timestamp=([^\s,]+)').firstMatch(firstLine);
           if (tsMatch != null) {
             final parsed = DateTime.tryParse(tsMatch.group(1)!);
@@ -323,7 +327,7 @@ class BackupService {
     // 1. Header Metadata
     final nowIso = DateTime.now().toIso8601String();
     buffer.writeln(
-      '# WAYMARK_BACKUP,app_name=$appName,app_signature=$appSignature,timestamp=$nowIso',
+      '# WANDERLINE_BACKUP,app_name=$appName,app_signature=$appSignature,timestamp=$nowIso',
     );
 
     // 2. User Profile
@@ -689,8 +693,11 @@ class BackupService {
         for (final entity in dir.listSync()) {
           if (entity is File) {
             final name = p.basename(entity.path);
-            if ((name.startsWith('${appName}_') && name.endsWith('.csv')) ||
-                (name.startsWith('waymark_backup_') &&
+            if (((name.startsWith('${appName}_') ||
+                        name.startsWith('waymark_')) &&
+                    name.endsWith('.csv')) ||
+                ((name.startsWith('wanderline_backup_') ||
+                        name.startsWith('waymark_backup_')) &&
                     name.endsWith('.sqlite'))) {
               files.add(entity);
             }
@@ -701,10 +708,16 @@ class BackupService {
       }
     }
 
-    // 1. Scan primary waymark directory
+    // 1. Scan primary wanderline directory
     scanDir(targetDir);
 
-    // 2. Scan parent download directory for backward compatibility
+    // 2. Scan legacy waymark directory if present
+    final legacyDir = Directory(p.join(targetDir.parent.path, 'waymark'));
+    if (legacyDir.existsSync() && legacyDir.path != targetDir.path) {
+      scanDir(legacyDir);
+    }
+
+    // 3. Scan parent download directory for backward compatibility
     if (targetDir.parent.existsSync() &&
         targetDir.parent.path != targetDir.path) {
       scanDir(targetDir.parent);
@@ -754,7 +767,8 @@ class BackupService {
     for (final row in rows) {
       if (row.isEmpty) continue;
       final firstCell = row.first.trim();
-      if (firstCell.startsWith('# WAYMARK_BACKUP')) {
+      if (firstCell.startsWith('# WANDERLINE_BACKUP') ||
+          firstCell.startsWith('# WAYMARK_BACKUP')) {
         continue;
       }
       if (firstCell.startsWith('# TABLE:')) {

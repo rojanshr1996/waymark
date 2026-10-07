@@ -4,7 +4,7 @@ import 'package:waymark/main_common.dart';
 void main() {
   AppFlavorConfig.initialize(
     flavor: Flavor.production,
-    appTitle: 'Waymark',
+    appTitle: 'Wanderline',
     enableLogging: false,
   );
 

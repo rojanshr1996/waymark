@@ -20,13 +20,13 @@ class WaymarkLiquidGlassAppBar extends StatelessWidget
   /// Optional custom title widget.
   final Widget? titleWidget;
 
-  /// Optional subtitle (e.g. "WayMark Journal" or "Drift Synced").
+  /// Optional subtitle (e.g. "Wanderline Journal" or "Drift Synced").
   final String? subtitle;
 
   /// Optional custom subtitle widget.
   final Widget? subtitleWidget;
 
-  /// Optional section label to form "WayMark • [sectionName]" when using brand style.
+  /// Optional section label to form "Wanderline • [sectionName]" when using brand style.
   final String? sectionName;
 
   /// Whether to display the signature editorial Brand Masthead with the

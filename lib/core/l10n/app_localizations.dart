@@ -97,7 +97,7 @@ abstract class AppLocalizations {
   /// The name of the application
   ///
   /// In en, this message translates to:
-  /// **'WayMark'**
+  /// **'Wanderline'**
   String get appName;
 
   /// Bottom nav label for journeys
@@ -211,7 +211,7 @@ abstract class AppLocalizations {
   /// Placeholder for handle field on profile
   ///
   /// In en, this message translates to:
-  /// **'e.g. john.doe@waymark.app'**
+  /// **'e.g. john.doe@wanderline.app'**
   String get profileHandlePlaceholder;
 
   /// Badge when handle/email is entered on profile
@@ -253,7 +253,7 @@ abstract class AppLocalizations {
   /// Title in how-it-works card on empty deck
   ///
   /// In en, this message translates to:
-  /// **'How WayMark Works'**
+  /// **'How Wanderline Works'**
   String get emptyDeckHowItWorksTitle;
 
   /// Subtitle in how-it-works card on empty deck
@@ -295,7 +295,7 @@ abstract class AppLocalizations {
   /// Step 2 description in guide
   ///
   /// In en, this message translates to:
-  /// **'Waymark connects your photo stops with dynamic polyline routes rendered from your GPS breadcrumbs, creating a vivid visual trail of your path.'**
+  /// **'Wanderline connects your photo stops with dynamic polyline routes rendered from your GPS breadcrumbs, creating a vivid visual trail of your path.'**
   String get emptyDeckStep2Desc;
 
   /// Step 3 title in guide
@@ -577,7 +577,7 @@ abstract class AppLocalizations {
   /// Header for about section in settings
   ///
   /// In en, this message translates to:
-  /// **'About WayMark'**
+  /// **'About Wanderline'**
   String get settingsAboutSection;
 
   /// Toast message when all journeys are cleared
@@ -877,7 +877,7 @@ abstract class AppLocalizations {
   /// App description in settings
   ///
   /// In en, this message translates to:
-  /// **'WayMark: Memoir & Living Atlas'**
+  /// **'Wanderline: Memoir & Living Atlas'**
   String get settingsAppDescription;
 
   /// App version in settings
@@ -1489,7 +1489,7 @@ abstract class AppLocalizations {
   /// Hero title on onboarding screen
   ///
   /// In en, this message translates to:
-  /// **'WayMark'**
+  /// **'Wanderline'**
   String get onboardingHeroTitle;
 
   /// Hero italic subtitle on onboarding screen
@@ -1723,7 +1723,7 @@ abstract class AppLocalizations {
   /// Archive label on onboarding hero card
   ///
   /// In en, this message translates to:
-  /// **'WAYMARK ARCHIVE'**
+  /// **'WANDERLINE ARCHIVE'**
   String get onboardingHeroArchive;
 
   /// Plate number label on onboarding hero card
@@ -1735,7 +1735,7 @@ abstract class AppLocalizations {
   /// Snackbar info text for restore backup on onboarding
   ///
   /// In en, this message translates to:
-  /// **'Select your encrypted .waymark archive file to restore local trips and journal snapshots.'**
+  /// **'Select your encrypted .wanderline archive file to restore local trips and journal snapshots.'**
   String get onboardingRestoreBackupSnackbar;
 
   /// Error message when initializing vault fails

@@ -12,6 +12,7 @@ import 'package:waymark/core/presentation/widgets/waymark_liquid_glass_app_bar.d
 import 'package:waymark/core/presentation/widgets/waymark_snackbar.dart';
 import 'package:waymark/core/router/route_names.dart';
 import 'package:waymark/core/services/backup_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:waymark/core/theme/waymark_colors.dart';
 import 'package:waymark/core/theme/waymark_typography.dart';
 import 'package:waymark/features/settings/presentation/widgets/wipe_vault_dialog.dart';
@@ -24,10 +25,32 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  static const String _termsUrl =
+      'https://doc-hosting.flycricket.io/wanderline-terms-of-use/d9f6fdae-773c-44e7-8fb2-b11e9b22aacd/terms';
+  static const String _privacyPolicyUrl =
+      'https://doc-hosting.flycricket.io/wanderline-privacy-policy/c3835d93-6347-4dca-a1c2-2ae6de266378/privacy';
+
   final ValueNotifier<bool> _isProcessingNotifier = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _autoBackupEnabledNotifier = ValueNotifier<bool>(
     true,
   );
+
+  Future<void> _launchWebUrl(String urlString) async {
+    final uri = Uri.parse(urlString);
+    try {
+      final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!opened && mounted) {
+        WaymarkSnackbar.showError(
+          context,
+          'Could not open the webpage in a browser.',
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        WaymarkSnackbar.showError(context, 'Could not launch the webpage.');
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -131,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSectionHeader(
               context,
               Icons.tune_rounded,
-              'WayMark Settings',
+              'Wanderline Settings',
             ),
             SizedBox(height: 10.h),
             _buildMenuCard(context),
@@ -167,23 +190,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Icons.support_agent_rounded,
             'Help & Support',
             'Contact support and get troubleshooting guidance',
-            AppRoutes.helpSupport,
+            route: AppRoutes.helpSupport,
           ),
           _buildDivider(context),
           _buildMenuTile(
             context,
             Icons.help_outline_rounded,
             'Frequently Asked Questions',
-            'Quick answers about using WayMark',
-            AppRoutes.faq,
+            'Quick answers about using Wanderline',
+            route: AppRoutes.faq,
           ),
           _buildDivider(context),
           _buildMenuTile(
             context,
             Icons.info_outline_rounded,
-            'About WayMark',
+            'About Wanderline',
             'Learn about the app and its purpose',
-            AppRoutes.about,
+            route: AppRoutes.about,
           ),
           _buildDivider(context),
           _buildMenuTile(
@@ -191,15 +214,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Icons.privacy_tip_outlined,
             'Privacy Policy',
             'How your journey information is handled',
-            AppRoutes.privacyPolicy,
+            trailingIcon: Icons.open_in_new_rounded,
+            onTap: () => _launchWebUrl(_privacyPolicyUrl),
           ),
           _buildDivider(context),
           _buildMenuTile(
             context,
             Icons.gavel_outlined,
             'Terms & Conditions',
-            'Terms for using WayMark',
-            AppRoutes.termsConditions,
+            'Terms for using Wanderline',
+            trailingIcon: Icons.open_in_new_rounded,
+            onTap: () => _launchWebUrl(_termsUrl),
           ),
         ],
       ),
@@ -808,9 +833,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     BuildContext context,
     IconData icon,
     String title,
-    String subtitle,
-    String route,
-  ) {
+    String subtitle, {
+    String? route,
+    VoidCallback? onTap,
+    IconData trailingIcon = Icons.chevron_right_rounded,
+  }) {
     final colors = context.colorScheme;
     return Material(
       color: Colors.transparent,
@@ -838,10 +865,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
         trailing: Icon(
-          Icons.chevron_right_rounded,
+          trailingIcon,
           color: colors.textSecondary,
+          size: trailingIcon == Icons.open_in_new_rounded ? 18.sp : 24.sp,
         ),
-        onTap: () => context.push(route),
+        onTap: onTap ?? (route != null ? () => context.push(route) : null),
       ),
     );
   }

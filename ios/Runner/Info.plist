@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>waymark</string>
+	<string>wanderline</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -31,11 +31,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>WayMark needs your location to accurately drop pins on your journey map.</string>
+	<string>Wanderline needs your location to accurately drop pins on your journey map.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>WayMark needs access to your gallery to attach memories and extract EXIF location data.</string>
+	<string>Wanderline needs access to your gallery to attach memories and extract EXIF location data.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>WayMark needs access to your camera to capture moments.</string>
+	<string>Wanderline needs access to your camera to capture moments.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

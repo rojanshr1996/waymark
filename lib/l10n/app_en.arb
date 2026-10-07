@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appName": "WayMark",
+  "appName": "Wanderline",
   "@appName": {
     "description": "The name of the application"
   },
@@ -98,7 +98,7 @@
   "@profileHandleLabel": {
     "description": "Label for handle/email field on profile"
   },
-  "profileHandlePlaceholder": "e.g. john.doe@waymark.app",
+  "profileHandlePlaceholder": "e.g. john.doe@wanderline.app",
   "@profileHandlePlaceholder": {
     "description": "Placeholder for handle field on profile"
   },
@@ -126,7 +126,7 @@
   "@emptyDeckBtnStart": {
     "description": "Button label in empty deck view"
   },
-  "emptyDeckHowItWorksTitle": "How WayMark Works",
+  "emptyDeckHowItWorksTitle": "How Wanderline Works",
   "@emptyDeckHowItWorksTitle": {
     "description": "Title in how-it-works card on empty deck"
   },
@@ -154,7 +154,7 @@
   "@emptyDeckStep2Badge": {
     "description": "Step 2 badge in guide"
   },
-  "emptyDeckStep2Desc": "Waymark connects your photo stops with dynamic polyline routes rendered from your GPS breadcrumbs, creating a vivid visual trail of your path.",
+  "emptyDeckStep2Desc": "Wanderline connects your photo stops with dynamic polyline routes rendered from your GPS breadcrumbs, creating a vivid visual trail of your path.",
   "@emptyDeckStep2Desc": {
     "description": "Step 2 description in guide"
   },
@@ -360,7 +360,7 @@
   "@settingsClearDatabaseSuccess": {
     "description": "Toast message when database is wiped clean"
   },
-  "settingsAboutSection": "About WayMark",
+  "settingsAboutSection": "About Wanderline",
   "@settingsAboutSection": {
     "description": "Header for about section in settings"
   },
@@ -575,7 +575,7 @@
   "@settingsBtnWipeVault": {
     "description": "Wipe vault button in settings"
   },
-  "settingsAppDescription": "WayMark: Memoir & Living Atlas",
+  "settingsAppDescription": "Wanderline: Memoir & Living Atlas",
   "@settingsAppDescription": {
     "description": "App description in settings"
   },
@@ -1057,7 +1057,7 @@
   "@emptyDeckSecurityFooter": {
     "description": "Security footer on empty deck view"
   },
-  "onboardingHeroTitle": "WayMark",
+  "onboardingHeroTitle": "Wanderline",
   "@onboardingHeroTitle": {
     "description": "Hero title on onboarding screen"
   },
@@ -1219,7 +1219,7 @@
   "@profilePrivateBadge": {
     "description": "Badge indicating 100% private storage"
   },
-  "onboardingHeroArchive": "WAYMARK ARCHIVE",
+  "onboardingHeroArchive": "WANDERLINE ARCHIVE",
   "@onboardingHeroArchive": {
     "description": "Archive label on onboarding hero card"
   },
@@ -1227,7 +1227,7 @@
   "@onboardingHeroPlateNo": {
     "description": "Plate number label on onboarding hero card"
   },
-  "onboardingRestoreBackupSnackbar": "Select your encrypted .waymark archive file to restore local trips and journal snapshots.",
+  "onboardingRestoreBackupSnackbar": "Select your encrypted .wanderline archive file to restore local trips and journal snapshots.",
   "@onboardingRestoreBackupSnackbar": {
     "description": "Snackbar info text for restore backup on onboarding"
   },
