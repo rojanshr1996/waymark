@@ -3,12 +3,16 @@ import 'package:waymark/app.dart';
 import 'package:waymark/core/config/flavor_config.dart';
 import 'package:waymark/core/services/backup_service.dart';
 import 'package:waymark/core/services/notification_service.dart';
+import 'package:waymark/core/services/remote_config_service.dart';
 
 Future<void> mainCommon(AppFlavorConfig config) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize notification & cloud messaging services
   await NotificationService.instance.initialize();
+
+  // Initialize Firebase Remote Config service
+  await RemoteConfigService.instance.initialize();
 
   // Attempt auto-backup every time the app is opened (if database has data)
   BackupService.checkAndRunAutoBackup();

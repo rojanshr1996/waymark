@@ -770,14 +770,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filterFavorites => 'Favorites';
 
   @override
-  String get journeysExportFieldJournalTitle => 'Export Field Journal';
+  String get journeysExportFieldJournalTitle =>
+      'Expedition Field Journal Dossier';
 
   @override
   String get journeysExportFieldJournalDesc =>
-      'Generate an archival PDF dossier of your journeys with high-res photos and route logs.';
+      'Export a full plain-text log of all your journeys, coordinates, weather, and field notes for sharing or offline archive.';
 
   @override
-  String get journeysBtnPreview => 'Preview';
+  String get journeysBtnPreview => 'View Dossier';
 
   @override
   String get journeysActiveExpedition => 'Active Expedition';
@@ -1000,7 +1001,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get journeysExportFieldJournalPreparing =>
-      'Field Journal PDF compiler is preparing your printable layout...';
+      'Preparing your expedition field journal dossier...';
 
   @override
   String get journeysExpeditionStatusBadge => 'EXPEDITION STATUS';

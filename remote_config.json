@@ -1,0 +1,112 @@
+{
+  "parameters": {
+    "min_required_version": {
+      "defaultValue": {
+        "value": "1.0.0"
+      },
+      "description": "Minimum required app version. Any client running an older version will be prompted with a non-skippable force update."
+    },
+    "latest_recommended_version": {
+      "defaultValue": {
+        "value": "1.0.0"
+      },
+      "description": "Latest recommended app version. Clients running older versions will see the update screen with a skip button."
+    },
+    "force_update_title": {
+      "defaultValue": {
+        "value": "Critical Update Required"
+      },
+      "description": "Headline displayed on the mandatory force update screen."
+    },
+    "force_update_message": {
+      "defaultValue": {
+        "value": "A vital new version of Wanderline is required to continue documenting your journeys with full offline stability and security. Please update to proceed."
+      },
+      "description": "Detailed explanation message displayed on the force update screen."
+    },
+    "recommended_update_title": {
+      "defaultValue": {
+        "value": "New Expedition Features Available"
+      },
+      "description": "Headline displayed on the recommended update screen."
+    },
+    "recommended_update_message": {
+      "defaultValue": {
+        "value": "A new version of Wanderline is ready for you with enhanced field journal features, smoother mapping, and memory optimizations."
+      },
+      "description": "Detailed description displayed on the recommended update screen."
+    },
+    "update_release_notes": {
+      "defaultValue": {
+        "value": "• Offline vault speed & integrity improvements\n• Enhanced route waypoint trail drawing\n• High-resolution postcard photo exports\n• Refined battery and background sync consumption"
+      },
+      "description": "Newline-separated bullet points or feature highlights shown on the update screen."
+    },
+    "update_store_url_android": {
+      "defaultValue": {
+        "value": "https://play.google.com/store/apps/details?id=com.wanderline.app"
+      },
+      "description": "Google Play Store destination URL for Android devices."
+    },
+    "update_store_url_ios": {
+      "defaultValue": {
+        "value": "https://apps.apple.com/app/wanderline-expedition-journal/id6449000000"
+      },
+      "description": "Apple App Store destination URL for iOS / iPadOS / macOS devices."
+    },
+    "allow_recommended_skip": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Whether users are allowed to skip recommended updates and proceed into the app."
+    },
+    "is_maintenance_mode": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "Global maintenance switch. When true, blocks normal app usage and redirects all clients to the maintenance screen."
+    },
+    "maintenance_title": {
+      "defaultValue": {
+        "value": "Under Scheduled Maintenance"
+      },
+      "description": "Title displayed on the maintenance screen."
+    },
+    "maintenance_message": {
+      "defaultValue": {
+        "value": "We are currently polishing the expedition trail to keep your field journals secure and dependable. Please check back shortly."
+      },
+      "description": "Descriptive message displayed on the maintenance screen."
+    },
+    "maintenance_start_time": {
+      "defaultValue": {
+        "value": ""
+      },
+      "description": "Timestamp or human-readable start time of the maintenance window (e.g. '10:00 UTC')."
+    },
+    "maintenance_end_time": {
+      "defaultValue": {
+        "value": ""
+      },
+      "description": "Estimated completion time of maintenance (e.g. '12:00 UTC')."
+    },
+    "maintenance_support_email": {
+      "defaultValue": {
+        "value": "support@wanderline.app"
+      },
+      "description": "Support email recipient address displayed on the maintenance screen."
+    },
+    "maintenance_status_url": {
+      "defaultValue": {
+        "value": "https://status.wanderline.app"
+      },
+      "description": "URL to public service status page."
+    },
+    "maintenance_bypass_key": {
+      "defaultValue": {
+        "value": "wanderline-crew-2026"
+      },
+      "description": "Secret emergency authorization passphrase allowing developers and QA to bypass maintenance mode."
+    }
+  }
+}

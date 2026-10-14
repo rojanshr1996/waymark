@@ -1393,19 +1393,19 @@ abstract class AppLocalizations {
   /// Title in export field journal banner
   ///
   /// In en, this message translates to:
-  /// **'Export Field Journal'**
+  /// **'Expedition Field Journal Dossier'**
   String get journeysExportFieldJournalTitle;
 
   /// Description in export field journal banner
   ///
   /// In en, this message translates to:
-  /// **'Generate an archival PDF dossier of your journeys with high-res photos and route logs.'**
+  /// **'Export a full plain-text log of all your journeys, coordinates, weather, and field notes for sharing or offline archive.'**
   String get journeysExportFieldJournalDesc;
 
-  /// Button to preview journal in export banner
+  /// Button to view journal in export banner
   ///
   /// In en, this message translates to:
-  /// **'Preview'**
+  /// **'View Dossier'**
   String get journeysBtnPreview;
 
   /// Badge in active journey hero card
@@ -1783,7 +1783,7 @@ abstract class AppLocalizations {
   /// Snackbar text when preparing field journal export
   ///
   /// In en, this message translates to:
-  /// **'Field Journal PDF compiler is preparing your printable layout...'**
+  /// **'Preparing your expedition field journal dossier...'**
   String get journeysExportFieldJournalPreparing;
 
   /// Badge for expedition status on journeys dashboard

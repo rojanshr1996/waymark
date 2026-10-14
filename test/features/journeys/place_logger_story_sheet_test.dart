@@ -3,19 +3,59 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:waymark/core/database/app_database.dart';
 import 'package:waymark/core/l10n/app_localizations.dart';
+import 'package:waymark/core/presentation/widgets/waymark_shimmer.dart';
 import 'package:waymark/core/theme/waymark_typography.dart';
 import 'package:waymark/features/journeys/presentation/widgets/place_logger_bottom_sheet.dart';
 
+class FakeGeolocatorPlatform extends GeolocatorPlatform {
+  bool locationServiceEnabled = false;
+  Duration delay = Duration.zero;
+
+  @override
+  Future<bool> isLocationServiceEnabled() async {
+    if (delay > Duration.zero) {
+      await Future<void>.delayed(delay);
+    }
+    return locationServiceEnabled;
+  }
+
+  @override
+  Future<LocationPermission> checkPermission() async => LocationPermission.denied;
+
+  @override
+  Future<LocationPermission> requestPermission() async => LocationPermission.denied;
+
+  @override
+  Future<Position> getCurrentPosition({LocationSettings? locationSettings}) async {
+    return Position(
+      longitude: 135.7727,
+      latitude: 34.9671,
+      timestamp: DateTime.now(),
+      accuracy: 5.0,
+      altitude: 0.0,
+      altitudeAccuracy: 0.0,
+      heading: 0.0,
+      headingAccuracy: 0.0,
+      speed: 0.0,
+      speedAccuracy: 0.0,
+    );
+  }
+}
+
 void main() {
   late AppDatabase db;
+  late FakeGeolocatorPlatform fakeGeolocator;
 
   setUpAll(() {
     drift.driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   });
 
   setUp(() {
+    fakeGeolocator = FakeGeolocatorPlatform();
+    GeolocatorPlatform.instance = fakeGeolocator;
     db = AppDatabase.forTesting(NativeDatabase.memory());
     AppDatabase.setTestInstance(db);
   });
@@ -100,8 +140,8 @@ void main() {
     expect(find.text('Sightseeing'), findsOneWidget);
     expect(find.text('Dining'), findsOneWidget);
 
-    // Verify Visited Time & Live Weather
-    expect(find.text('Visited Time'), findsOneWidget);
+    // Verify Date Visited & Live Weather
+    expect(find.text('Date Visited'), findsOneWidget);
     expect(find.text('Live Weather'), findsOneWidget);
 
     // Verify Visual Relics & Photos section
@@ -334,4 +374,49 @@ void main() {
     expect(updatedMedia.length, 1);
     expect(updatedMedia.first.localFilePath, 'assets/images/place_three.jpeg');
   });
+
+  testWidgets(
+    'PlaceLoggerScreen shows shimmer on map and search field while initially loading default place and prevents editing',
+    (WidgetTester tester) async {
+      fakeGeolocator.delay = const Duration(milliseconds: 300);
+
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.0;
+
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+      });
+
+      await tester.pumpWidget(
+        createSubject(
+          albumId: 'test-shimmer-album',
+          albumTitle: 'Shimmer Expedition',
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap button to open sheet
+      await tester.tap(find.text('Open Story Sheet'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(find.byType(PlaceLoggerScreen), findsOneWidget);
+      // Verify shimmer effect on both map and search field while initially loading
+      expect(find.byKey(const Key('place_logger_search_shimmer')), findsOneWidget);
+      expect(find.byKey(const Key('place_logger_map_shimmer')), findsOneWidget);
+      expect(find.byType(WaymarkShimmer), findsWidgets);
+
+      // Verify search TextField cannot be edited while initially loading
+      expect(find.byKey(const Key('place_logger_search_field')), findsNothing);
+
+      // Advance clock for initial location resolution to complete
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // After settling, shimmers are removed and interactive TextField is available for editing
+      expect(find.byKey(const Key('place_logger_search_shimmer')), findsNothing);
+      expect(find.byKey(const Key('place_logger_map_shimmer')), findsNothing);
+      expect(find.byKey(const Key('place_logger_search_field')), findsOneWidget);
+    },
+  );
 }

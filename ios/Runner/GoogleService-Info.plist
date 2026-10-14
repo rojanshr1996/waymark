@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.waymark.app</string>
+	<string>com.wanderline.app</string>
 	<key>PROJECT_ID</key>
 	<string>waymark-264f6</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:470529540260:ios:b4d6bb7fe30e121ea36631</string>
+	<string>1:470529540260:ios:6d01fccc3a0038e7a36631</string>
 </dict>
 </plist>

@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.waymark.app"
+    namespace = "com.wanderline.app"
     compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
@@ -17,7 +17,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.waymark.app"
+        applicationId = "com.wanderline.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

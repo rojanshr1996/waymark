@@ -769,7 +769,7 @@ class PostcardCanvasWidget extends StatelessWidget {
         ),
         SizedBox(height: isSquare ? 0.5 : 1.0),
         Text(
-          '${album.title} • Live Memoir Preview',
+          album.title,
           style: GoogleFonts.inter(
             fontSize: albumSize,
             fontWeight: FontWeight.w600,

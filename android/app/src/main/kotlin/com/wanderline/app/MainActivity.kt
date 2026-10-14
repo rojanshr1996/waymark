@@ -1,4 +1,4 @@
-package com.waymark.app
+package com.wanderline.app
 
 import io.flutter.embedding.android.FlutterActivity
 

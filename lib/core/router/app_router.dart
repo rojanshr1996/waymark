@@ -3,6 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:waymark/core/database/app_database.dart';
 import 'package:waymark/core/presentation/screens/waymark_navigation_shell.dart';
 import 'package:waymark/core/router/route_names.dart';
+import 'package:waymark/core/services/remote_config_models.dart';
+import 'package:waymark/core/services/remote_config_service.dart';
+import 'package:waymark/features/app_maintenance/presentation/screens/app_maintenance_screen.dart';
+import 'package:waymark/features/app_update/presentation/screens/app_update_screen.dart';
 import 'package:waymark/features/journeys/presentation/screens/all_active_expeditions_screen.dart';
 import 'package:waymark/features/journeys/presentation/screens/journey_album_detail_screen.dart';
 import 'package:waymark/features/onboarding/presentation/screens/onboarding_screen.dart';
@@ -20,11 +24,34 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: AppRoutes.splash,
+    refreshListenable: RemoteConfigService.instance.gateNotifier,
     debugLogDiagnostics: false,
     redirect: (context, state) async {
-      final isSplash = state.matchedLocation == AppRoutes.splash;
-      final isOnboarding = state.matchedLocation == AppRoutes.onboarding;
-      if (isSplash || isOnboarding) return null;
+      final matched = state.matchedLocation;
+      final isSplash = matched == AppRoutes.splash;
+      final isMaintenance = matched == AppRoutes.maintenance;
+      final isUpdate = matched == AppRoutes.appUpdate;
+
+      final gate = RemoteConfigService.instance.currentGate;
+
+      // Allow splash to run its initial 5-second cinematic entrance & bootstrap
+      if (isSplash) return null;
+
+      // 1. Check Maintenance Gate
+      if (gate.status == AppGateStatus.maintenance) {
+        return isMaintenance ? null : AppRoutes.maintenance;
+      }
+      if (isMaintenance && gate.status != AppGateStatus.maintenance) {
+        return AppRoutes.splash;
+      }
+
+      // 2. Check Force Update Gate
+      if (gate.status == AppGateStatus.forceUpdate) {
+        return isUpdate ? null : AppRoutes.appUpdate;
+      }
+
+      final isOnboarding = matched == AppRoutes.onboarding;
+      if (isOnboarding || isUpdate) return null;
 
       final profile = await AppDatabase.instance.userProfileDao.getProfile();
       if (profile == null) {
@@ -40,7 +67,24 @@ class AppRouter {
         builder: (context, state) => const SplashScreen(),
       ),
 
-      // 2. Onboarding Screen
+      // 2. App Maintenance Screen (Remote Config Controlled)
+      GoRoute(
+        path: AppRoutes.maintenance,
+        name: AppRoutes.maintenanceName,
+        builder: (context, state) => const AppMaintenanceScreen(),
+      ),
+
+      // 3. App Update Screen (Force & Recommended Update)
+      GoRoute(
+        path: AppRoutes.appUpdate,
+        name: AppRoutes.appUpdateName,
+        builder: (context, state) {
+          final eval = state.extra as AppGateEvaluation?;
+          return AppUpdateScreen(initialEvaluation: eval);
+        },
+      ),
+
+      // 4. Onboarding Screen
       GoRoute(
         path: AppRoutes.onboarding,
         name: AppRoutes.onboardingName,

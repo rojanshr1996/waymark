@@ -7,6 +7,82 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:470529540260:android:73e7fd33d22443cda36631",
+        "android_client_info": {
+          "package_name": "com.wanderline.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCgBTAQXlgN5w_uBQPRBGiQFdN6jDgTqk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470529540260:android:be58829b15e51078a36631",
+        "android_client_info": {
+          "package_name": "com.wanderline.app.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCgBTAQXlgN5w_uBQPRBGiQFdN6jDgTqk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470529540260:android:112e9c5a10a8e9c8a36631",
+        "android_client_info": {
+          "package_name": "com.wanderline.app.qa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCgBTAQXlgN5w_uBQPRBGiQFdN6jDgTqk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470529540260:android:83f945796073253ca36631",
+        "android_client_info": {
+          "package_name": "com.wanderline.app.uat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCgBTAQXlgN5w_uBQPRBGiQFdN6jDgTqk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:470529540260:android:074e35e788337102a36631",
         "android_client_info": {
           "package_name": "com.waymark.app"

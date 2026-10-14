@@ -977,17 +977,17 @@
   "@filterFavorites": {
     "description": "Filter tab favorites"
   },
-  "journeysExportFieldJournalTitle": "Export Field Journal",
+  "journeysExportFieldJournalTitle": "Expedition Field Journal Dossier",
   "@journeysExportFieldJournalTitle": {
     "description": "Title in export field journal banner"
   },
-  "journeysExportFieldJournalDesc": "Generate an archival PDF dossier of your journeys with high-res photos and route logs.",
+  "journeysExportFieldJournalDesc": "Export a full plain-text log of all your journeys, coordinates, weather, and field notes for sharing or offline archive.",
   "@journeysExportFieldJournalDesc": {
     "description": "Description in export field journal banner"
   },
-  "journeysBtnPreview": "Preview",
+  "journeysBtnPreview": "View Dossier",
   "@journeysBtnPreview": {
-    "description": "Button to preview journal in export banner"
+    "description": "Button to view journal in export banner"
   },
   "journeysActiveExpedition": "Active Expedition",
   "@journeysActiveExpedition": {
@@ -1271,7 +1271,7 @@
       }
     }
   },
-  "journeysExportFieldJournalPreparing": "Field Journal PDF compiler is preparing your printable layout...",
+  "journeysExportFieldJournalPreparing": "Preparing your expedition field journal dossier...",
   "@journeysExportFieldJournalPreparing": {
     "description": "Snackbar text when preparing field journal export"
   },

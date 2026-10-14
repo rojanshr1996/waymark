@@ -9,6 +9,8 @@ import 'package:waymark/core/database/app_database.dart';
 import 'package:waymark/core/gen/assets.gen.dart';
 import 'package:waymark/core/l10n/l10n_extension.dart';
 import 'package:waymark/core/router/route_names.dart';
+import 'package:waymark/core/services/remote_config_models.dart';
+import 'package:waymark/core/services/remote_config_service.dart';
 import 'package:waymark/core/theme/waymark_colors.dart';
 import 'package:waymark/core/theme/waymark_typography.dart';
 
@@ -146,8 +148,30 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _bootstrap() async {
+    // 1. Initiate Remote Config fetch and gate evaluation concurrently with splash display
+    final remoteConfigFuture = RemoteConfigService.instance
+        .fetchAndActivate()
+        .then((_) => RemoteConfigService.instance.evaluateGate())
+        .catchError((_) => RemoteConfigService.instance.evaluateGate());
+
     // Splash screen lasts 5 seconds before routing
     await Future.delayed(const Duration(milliseconds: 5000));
+
+    final gate = await remoteConfigFuture;
+    if (!mounted) return;
+
+    // 2. Priority Gate Check: Maintenance Mode
+    if (gate.status == AppGateStatus.maintenance) {
+      context.go(AppRoutes.maintenance);
+      return;
+    }
+
+    // 3. Priority Gate Check: Force Update or Recommended Update
+    if (gate.status == AppGateStatus.forceUpdate ||
+        gate.status == AppGateStatus.recommendedUpdate) {
+      context.go(AppRoutes.appUpdate, extra: gate);
+      return;
+    }
 
     final prefs = await SharedPreferences.getInstance();
     // One-time complete purge of legacy static/seeded database content

@@ -16,7 +16,7 @@ platform :ios do
   desc "Build and distribute Dev flavor to Firebase App Distribution"
   lane :distribute_dev do |options|
     notes = options[:notes] || "Dev build"
-    # match(type: "adhoc", app_identifier: "com.waymark.app.dev")  # Uncomment after match setup
+    # match(type: "adhoc", app_identifier: "com.wanderline.app.dev")  # Uncomment after match setup
     build_ios_app(
       scheme: "dev",
       configuration: "Release",
@@ -35,7 +35,7 @@ platform :ios do
   desc "Build and distribute QA flavor to Firebase App Distribution"
   lane :distribute_qa do |options|
     notes = options[:notes] || "QA build"
-    # match(type: "adhoc", app_identifier: "com.waymark.app.qa")
+    # match(type: "adhoc", app_identifier: "com.wanderline.app.qa")
     build_ios_app(
       scheme: "qa",
       configuration: "Release",
@@ -54,7 +54,7 @@ platform :ios do
   desc "Build and distribute UAT flavor to Firebase App Distribution"
   lane :distribute_uat do |options|
     notes = options[:notes] || "UAT build"
-    # match(type: "adhoc", app_identifier: "com.waymark.app.uat")
+    # match(type: "adhoc", app_identifier: "com.wanderline.app.uat")
     build_ios_app(
       scheme: "uat",
       configuration: "Release",
@@ -73,7 +73,7 @@ platform :ios do
   desc "Build and distribute Production flavor to Firebase App Distribution"
   lane :distribute_prod do |options|
     notes = options[:notes] || "Production build"
-    # match(type: "adhoc", app_identifier: "com.waymark.app")
+    # match(type: "adhoc", app_identifier: "com.wanderline.app")
     build_ios_app(
       scheme: "production",
       configuration: "Release",

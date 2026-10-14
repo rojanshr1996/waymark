@@ -10,10 +10,10 @@ WayMark supports four distinct environments/flavors across both platforms:
 
 | Environment | iOS Scheme | iOS Bundle ID | Android Flavor | Android Package Name | Tester Group | Target Audience |
 |---|---|---|---|---|---|---|
-| **Dev** | `dev` | `com.waymark.app.dev` | `dev` | `com.waymark.app.dev` | `dev-testers` | Active developers & internal testers |
-| **QA** | `qa` | `com.waymark.app.qa` | `qa` | `com.waymark.app.qa` | `qa-testers` | QA team, regression & feature testing |
-| **UAT** | `uat` | `com.waymark.app.uat` | `uat` | `com.waymark.app.uat` | `uat-testers` | Stakeholders & beta user acceptance |
-| **Production** | `production` | `com.waymark.app` | `production` | `com.waymark.app` | `prod-testers` | Final release candidates & staging |
+| **Dev** | `dev` | `com.wanderline.app.dev` | `dev` | `com.wanderline.app.dev` | `dev-testers` | Active developers & internal testers |
+| **QA** | `qa` | `com.wanderline.app.qa` | `qa` | `com.wanderline.app.qa` | `qa-testers` | QA team, regression & feature testing |
+| **UAT** | `uat` | `com.wanderline.app.uat` | `uat` | `com.wanderline.app.uat` | `uat-testers` | Stakeholders & beta user acceptance |
+| **Production** | `production` | `com.wanderline.app` | `production` | `com.wanderline.app` | `prod-testers` | Final release candidates & staging |
 
 ---
 
@@ -53,24 +53,34 @@ Before running the distribution scripts or Fastlane lanes, ensure your local or 
 
 Fastlane requires credentials and Firebase App IDs passed via environment variables. Configure these in your CI secrets, shell profile (`~/.zshrc`), or export them before running lanes:
 
-| Variable Name | Description | Required | Example |
-|---|---|---|---|
-| `FIREBASE_TOKEN` | Firebase CLI CI authentication token | Yes | `1//04xxx...` |
-| `FIREBASE_APP_ID_IOS_DEV` | Firebase App ID for iOS Dev | If distributing iOS Dev | `1:123456789:ios:abcdef1` |
-| `FIREBASE_APP_ID_IOS_QA` | Firebase App ID for iOS QA | If distributing iOS QA | `1:123456789:ios:abcdef2` |
-| `FIREBASE_APP_ID_IOS_UAT` | Firebase App ID for iOS UAT | If distributing iOS UAT | `1:123456789:ios:abcdef3` |
-| `FIREBASE_APP_ID_IOS_PROD` | Firebase App ID for iOS Production | If distributing iOS Prod | `1:123456789:ios:abcdef4` |
-| `FIREBASE_APP_ID_ANDROID_DEV` | Firebase App ID for Android Dev | If distributing Android Dev | `1:123456789:android:abcdef1` |
-| `FIREBASE_APP_ID_ANDROID_QA` | Firebase App ID for Android QA | If distributing Android QA | `1:123456789:android:abcdef2` |
-| `FIREBASE_APP_ID_ANDROID_UAT` | Firebase App ID for Android UAT | If distributing Android UAT | `1:123456789:android:abcdef3` |
-| `FIREBASE_APP_ID_ANDROID_PROD` | Firebase App ID for Android Production | If distributing Android Prod | `1:123456789:android:abcdef4` |
-| `SET_BUILD_NUMBER` | Set to `true` to auto-increment iOS build number | Optional | `true` |
+| Variable Name | Description | Registered App ID |
+|---|---|---|
+| `FIREBASE_TOKEN` | Firebase CLI CI authentication token | `firebase login:ci` token |
+| `FIREBASE_APP_ID_IOS_DEV` | Firebase App ID for iOS Dev (`com.wanderline.app.dev`) | `1:470529540260:ios:6e5ad672147d7f20a36631` |
+| `FIREBASE_APP_ID_IOS_QA` | Firebase App ID for iOS QA (`com.wanderline.app.qa`) | `1:470529540260:ios:734f2e9d7f2a84bca36631` |
+| `FIREBASE_APP_ID_IOS_UAT` | Firebase App ID for iOS UAT (`com.wanderline.app.uat`) | `1:470529540260:ios:8a87a192d61ecddca36631` |
+| `FIREBASE_APP_ID_IOS_PROD` | Firebase App ID for iOS Production (`com.wanderline.app`) | `1:470529540260:ios:6d01fccc3a0038e7a36631` |
+| `FIREBASE_APP_ID_ANDROID_DEV` | Firebase App ID for Android Dev (`com.wanderline.app.dev`) | `1:470529540260:android:be58829b15e51078a36631` |
+| `FIREBASE_APP_ID_ANDROID_QA` | Firebase App ID for Android QA (`com.wanderline.app.qa`) | `1:470529540260:android:112e9c5a10a8e9c8a36631` |
+| `FIREBASE_APP_ID_ANDROID_UAT` | Firebase App ID for Android UAT (`com.wanderline.app.uat`) | `1:470529540260:android:83f945796073253ca36631` |
+| `FIREBASE_APP_ID_ANDROID_PROD` | Firebase App ID for Android Production (`com.wanderline.app`) | `1:470529540260:android:73e7fd33d22443cda36631` |
+| `SET_BUILD_NUMBER` | Set to `true` to auto-increment iOS build number | Optional (`true`) |
 
 ### Export Example
 ```bash
 export FIREBASE_TOKEN="your_firebase_ci_token"
-export FIREBASE_APP_ID_IOS_DEV="1:XXXXXXXX:ios:YYYYYYYY"
-export FIREBASE_APP_ID_ANDROID_DEV="1:XXXXXXXX:android:ZZZZZZZZ"
+
+# Android App IDs
+export FIREBASE_APP_ID_ANDROID_PROD="1:470529540260:android:73e7fd33d22443cda36631"
+export FIREBASE_APP_ID_ANDROID_DEV="1:470529540260:android:be58829b15e51078a36631"
+export FIREBASE_APP_ID_ANDROID_QA="1:470529540260:android:112e9c5a10a8e9c8a36631"
+export FIREBASE_APP_ID_ANDROID_UAT="1:470529540260:android:83f945796073253ca36631"
+
+# iOS App IDs
+export FIREBASE_APP_ID_IOS_PROD="1:470529540260:ios:6d01fccc3a0038e7a36631"
+export FIREBASE_APP_ID_IOS_DEV="1:470529540260:ios:6e5ad672147d7f20a36631"
+export FIREBASE_APP_ID_IOS_QA="1:470529540260:ios:734f2e9d7f2a84bca36631"
+export FIREBASE_APP_ID_IOS_UAT="1:470529540260:ios:8a87a192d61ecddca36631"
 ```
 
 ---
@@ -152,16 +162,16 @@ For seamless, reproducible code signing across developer machines and CI environ
 
 2. **Generate Ad-Hoc Profiles for All Flavors**
    ```bash
-   bundle exec fastlane match adhoc -a com.waymark.app.dev
-   bundle exec fastlane match adhoc -a com.waymark.app.qa
-   bundle exec fastlane match adhoc -a com.waymark.app.uat
-   bundle exec fastlane match adhoc -a com.waymark.app
+   bundle exec fastlane match adhoc -a com.wanderline.app.dev
+   bundle exec fastlane match adhoc -a com.wanderline.app.qa
+   bundle exec fastlane match adhoc -a com.wanderline.app.uat
+   bundle exec fastlane match adhoc -a com.wanderline.app
    ```
 
 3. **Configure `ios/fastlane/Appfile`**
    Fill in your Apple Developer Team ID and App Store Connect credentials:
    ```ruby
-   app_identifier("com.waymark.app")
+   app_identifier("com.wanderline.app")
    apple_id("developer@example.com")
    itc_team_id("123456789")
    team_id("XXXXXXXXXX")
@@ -170,7 +180,7 @@ For seamless, reproducible code signing across developer machines and CI environ
 4. **Enable Match in `ios/fastlane/Fastfile`**
    Uncomment the `match` call in each lane inside `ios/fastlane/Fastfile`:
    ```ruby
-   match(type: "adhoc", app_identifier: "com.waymark.app.dev")
+   match(type: "adhoc", app_identifier: "com.wanderline.app.dev")
    ```
 
 ---

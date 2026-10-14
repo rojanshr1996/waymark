@@ -4,6 +4,12 @@ class AppRoutes {
   static const String splash = '/';
   static const String splashName = 'splash';
 
+  static const String appUpdate = '/app-update';
+  static const String appUpdateName = 'appUpdate';
+
+  static const String maintenance = '/maintenance';
+  static const String maintenanceName = 'maintenance';
+
   static const String onboarding = '/onboarding';
   static const String onboardingName = 'onboarding';
 

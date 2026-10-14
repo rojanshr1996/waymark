@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:waymark/core/constants/waymark_spacing.dart';
 import 'package:waymark/core/database/app_database.dart';
 import 'package:waymark/core/l10n/l10n_extension.dart';
@@ -729,145 +730,373 @@ class _AllJourneysDashboardScreenState
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
       builder: (modalContext) {
-        return Container(
-          padding: EdgeInsets.only(
-            left: 20.w,
-            right: 20.w,
-            top: 20.h,
-            bottom: MediaQuery.paddingOf(modalContext).bottom + 20.h,
+        return _FieldJournalExportModalContent(
+          albums: albums,
+          places: places,
+          totalKm: totalKm,
+          journalContent: journalContent,
+        );
+      },
+    );
+  }
+}
+
+class _FieldJournalExportModalContent extends StatefulWidget {
+  final List<TripAlbum> albums;
+  final List<TripPlace> places;
+  final double totalKm;
+  final String journalContent;
+
+  const _FieldJournalExportModalContent({
+    required this.albums,
+    required this.places,
+    required this.totalKm,
+    required this.journalContent,
+  });
+
+  @override
+  State<_FieldJournalExportModalContent> createState() =>
+      _FieldJournalExportModalContentState();
+}
+
+class _FieldJournalExportModalContentState
+    extends State<_FieldJournalExportModalContent> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleShare() async {
+    try {
+      await Share.share(
+        widget.journalContent,
+        subject: 'Wanderline Expedition Field Journal Dossier',
+      );
+    } catch (_) {
+      if (mounted) {
+        WaymarkSnackbar.showError(context, 'Unable to open share sheet.');
+      }
+    }
+  }
+
+  Future<void> _handleCopy() async {
+    await Clipboard.setData(ClipboardData(text: widget.journalContent));
+    if (mounted) {
+      WaymarkSnackbar.showSuccess(
+        context,
+        'Field Journal Dossier copied to clipboard!',
+      );
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
+  void _scrollToTop() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colorScheme;
+    final modalHeight = MediaQuery.sizeOf(context).height * 0.88;
+
+    return Container(
+      height: modalHeight,
+      padding: EdgeInsets.only(
+        left: 20.w,
+        right: 20.w,
+        top: 14.h,
+        bottom: MediaQuery.paddingOf(context).bottom + 16.h,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Drag handle
+          Center(
+            child: Container(
+              width: 44.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: colors.borderDivider,
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
           ),
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.sizeOf(modalContext).height * 0.85,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+          SizedBox(height: 14.h),
+
+          // Header Row
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Handle bar
-              Center(
-                child: Container(
-                  width: 40.w,
-                  height: 4.h,
-                  decoration: BoxDecoration(
-                    color: colors.borderDivider,
-                    borderRadius: BorderRadius.circular(2.r),
-                  ),
+              Container(
+                width: 40.w,
+                height: 40.w,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFDEA9),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 8.r,
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.auto_stories_rounded,
+                  size: 22.sp,
+                  color: const Color(0xFF5E4100),
                 ),
               ),
-              SizedBox(height: 16.h),
-
-              // Title and icon
-              Row(
-                children: [
-                  Container(
-                    width: 36.w,
-                    height: 36.w,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFFDEA9),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.auto_stories_rounded,
-                      size: 20.sp,
-                      color: const Color(0xFF5E4100),
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        Text(
-                          'Field Journal Export Preview',
-                          style: modalContext.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: colors.textPrimary,
+                        Flexible(
+                          child: Text(
+                            'Expedition Field Journal',
+                            style: context.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16.sp,
+                              color: colors.textPrimary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        SizedBox(height: 2.h),
-                        Text(
-                          '${albums.length} journeys • ${places.length} places recorded',
-                          style: modalContext.textTheme.caption.copyWith(
-                            color: colors.textSecondary,
+                        SizedBox(width: 6.w),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6.w,
+                            vertical: 2.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                          child: Text(
+                            'TEXT DOSSIER',
+                            style: context.textTheme.caption.copyWith(
+                              fontSize: 9.sp,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.6,
+                              color: colors.primary,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.h),
-
-              // Preview Box
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(14.w),
-                  decoration: BoxDecoration(
-                    color: colors.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(
-                      WaymarkSpacing.radiusMd,
-                    ),
-                    border: Border.all(color: colors.borderDivider),
-                  ),
-                  child: ScrollConfiguration(
-                    behavior: const WaymarkNoOverscrollScrollBehavior(),
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: SelectableText(
-                        journalContent,
-                        style: modalContext.textTheme.bodySmall?.copyWith(
-                          fontFamily: 'monospace',
-                          height: 1.5,
-                          fontSize: 12.sp,
-                          color: colors.textPrimary,
-                        ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      '${widget.albums.length} journeys • ${widget.places.length} places recorded • ${widget.totalKm.toStringAsFixed(1)} km',
+                      style: context.textTheme.caption.copyWith(
+                        color: colors.textSecondary,
+                        fontSize: 11.5.sp,
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-              SizedBox(height: 16.h),
-
-              // Action Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      icon: Icon(Icons.copy_rounded, size: 18.sp),
-                      label: const Text('Copy Text'),
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                        side: BorderSide(color: colors.borderDivider),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            WaymarkSpacing.radiusSm,
-                          ),
-                        ),
-                      ),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: journalContent));
-                        Navigator.pop(modalContext);
-                        WaymarkSnackbar.showSuccess(
-                          context,
-                          'Field Journal copied to clipboard!',
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: WaymarkPrimaryButton(
-                      label: 'Done',
-                      onPressed: () => Navigator.pop(modalContext),
-                    ),
-                  ),
-                ],
+              IconButton(
+                icon: const Icon(Icons.close_rounded),
+                color: colors.textSecondary,
+                tooltip: 'Close',
+                onPressed: () => Navigator.pop(context),
               ),
             ],
           ),
-        );
-      },
+          SizedBox(height: 10.h),
+
+          // Explanatory Info Card: "What is this feature?"
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              color: colors.primary.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(WaymarkSpacing.radiusSm),
+              border: Border.all(
+                color: colors.primary.withValues(alpha: 0.16),
+                width: 0.8,
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  size: 16.sp,
+                  color: colors.primary,
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    'A complete, plain-text ledger of your expedition history with GPS coordinates, timestamps, and notes. Copy or share directly to notes apps (Obsidian, Apple Notes), emails, or keep as an offline archive.',
+                    style: context.textTheme.caption.copyWith(
+                      color: colors.textPrimary.withValues(alpha: 0.85),
+                      fontSize: 11.sp,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10.h),
+
+          // Preview Box with smooth scrolling, selection & interactive scrollbar
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: colors.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(WaymarkSpacing.radiusMd),
+                border: Border.all(color: colors.borderDivider),
+              ),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(
+                      WaymarkSpacing.radiusMd - 1,
+                    ),
+                    child: SelectionArea(
+                      child: Scrollbar(
+                        controller: _scrollController,
+                        thumbVisibility: true,
+                        interactive: true,
+                        radius: const Radius.circular(4),
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          physics: const ClampingScrollPhysics(),
+                          padding: EdgeInsets.only(
+                            left: 14.w,
+                            right: 20.w,
+                            top: 14.h,
+                            bottom: 50.h,
+                          ),
+                          child: Text(
+                            widget.journalContent,
+                            style: context.textTheme.bodySmall?.copyWith(
+                              fontFamily: 'monospace',
+                              height: 1.55,
+                              fontSize: 11.5.sp,
+                              color: colors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Floating quick-scroll jump buttons (Top / Bottom)
+                  Positioned(
+                    right: 8.w,
+                    bottom: 8.h,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: colors.surfaceCard.withValues(alpha: 0.92),
+                        borderRadius: BorderRadius.circular(
+                          WaymarkSpacing.radiusFull,
+                        ),
+                        border: Border.all(
+                          color: colors.borderDivider,
+                          width: 0.8,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            iconSize: 18.sp,
+                            padding: EdgeInsets.all(6.w),
+                            constraints: const BoxConstraints(),
+                            icon: const Icon(Icons.arrow_upward_rounded),
+                            tooltip: 'Scroll to top',
+                            onPressed: _scrollToTop,
+                          ),
+                          Container(
+                            height: 14.h,
+                            width: 1,
+                            color: colors.borderDivider,
+                          ),
+                          IconButton(
+                            iconSize: 18.sp,
+                            padding: EdgeInsets.all(6.w),
+                            constraints: const BoxConstraints(),
+                            icon: const Icon(Icons.arrow_downward_rounded),
+                            tooltip: 'Scroll to bottom',
+                            onPressed: _scrollToBottom,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 14.h),
+
+          // Action Buttons: Copy Text & Share Dossier
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: Icon(Icons.copy_rounded, size: 18.sp),
+                  label: const Text('Copy Text'),
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 12.h),
+                    side: BorderSide(color: colors.borderDivider),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        WaymarkSpacing.radiusSm,
+                      ),
+                    ),
+                  ),
+                  onPressed: _handleCopy,
+                ),
+              ),
+              SizedBox(width: 10.w),
+              Expanded(
+                child: WaymarkPrimaryButton(
+                  label: 'Share Dossier',
+                  icon: Icons.share_rounded,
+                  onPressed: _handleShare,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

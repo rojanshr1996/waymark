@@ -195,6 +195,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
   final ValueNotifier<_SearchState> _searchStateNotifier =
       ValueNotifier<_SearchState>(const _SearchState());
   final ValueNotifier<bool> _isSavingNotifier = ValueNotifier<bool>(false);
+  late final ValueNotifier<bool> _isInitialLocationLoadingNotifier;
 
   int _existingVisitOrder = 0;
 
@@ -246,6 +247,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
 
     int initialRecommendationScale = 8;
     if (_isEditing) {
+      _isInitialLocationLoadingNotifier = ValueNotifier<bool>(false);
       final p = widget.placeToEdit!;
       _nameController.text = p.name;
       final address = p.locationAddress ?? p.name;
@@ -283,6 +285,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
       _loadExistingMedia(p.id);
       _fetchLiveWeather(p.latitude, p.longitude);
     } else {
+      _isInitialLocationLoadingNotifier = ValueNotifier<bool>(true);
       _nameController.text = '';
       _searchController.text = '';
       _locationStateNotifier = ValueNotifier<_LocationState>(
@@ -327,20 +330,40 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
 
   Future<void> _initUserLocation() async {
     try {
-      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return;
-
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) return;
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled()
+          .timeout(const Duration(seconds: 2));
+      if (!serviceEnabled) {
+        if (mounted) {
+          await _reverseGeocode(_locationStateNotifier.value.coordinates);
+        }
+        return;
       }
-      if (permission == LocationPermission.deniedForever) return;
+
+      var permission = await Geolocator.checkPermission().timeout(
+        const Duration(seconds: 2),
+      );
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission().timeout(
+          const Duration(seconds: 2),
+        );
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            await _reverseGeocode(_locationStateNotifier.value.coordinates);
+          }
+          return;
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          await _reverseGeocode(_locationStateNotifier.value.coordinates);
+        }
+        return;
+      }
 
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 5),
+          timeLimit: Duration(seconds: 3),
         ),
       );
 
@@ -355,6 +378,13 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
       }
     } catch (_) {
       // Retain fallback coordinates cleanly
+      if (mounted && _searchController.text.trim().isEmpty) {
+        await _reverseGeocode(_locationStateNotifier.value.coordinates);
+      }
+    } finally {
+      if (mounted) {
+        _isInitialLocationLoadingNotifier.value = false;
+      }
     }
   }
 
@@ -407,6 +437,7 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
     _photosNotifier.dispose();
     _searchStateNotifier.dispose();
     _isSavingNotifier.dispose();
+    _isInitialLocationLoadingNotifier.dispose();
     super.dispose();
   }
 
@@ -1544,67 +1575,120 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: colors.surfaceCard,
-                          borderRadius: BorderRadius.circular(12.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                      ValueListenableBuilder<bool>(
+                        valueListenable: _isInitialLocationLoadingNotifier,
+                        builder: (context, isInitialLoading, _) {
+                          if (isInitialLoading) {
+                            return Container(
+                              key: const Key('place_logger_search_shimmer'),
+                              height: 52.h,
+                              decoration: BoxDecoration(
+                                color: colors.surfaceCard,
+                                borderRadius: BorderRadius.circular(12.r),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.04),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 16.w),
+                              child: WaymarkShimmer(
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.search_rounded,
+                                      color: colors.textSecondary.withValues(
+                                        alpha: 0.45,
+                                      ),
+                                      size: 20.sp,
+                                    ),
+                                    SizedBox(width: 12.w),
+                                    Expanded(
+                                      child: Container(
+                                        height: 14.h,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFEBE7DF),
+                                          borderRadius: BorderRadius.circular(
+                                            4.r,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 28.w),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: colors.surfaceCard,
+                              borderRadius: BorderRadius.circular(12.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.04),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: _onSearchChanged,
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: colors.textPrimary,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: context.l10n.placeLoggerSearchPlaceholder,
-                            hintStyle: TextStyle(
-                              color: colors.textSecondary.withValues(
-                                alpha: 0.7,
+                            child: TextField(
+                              key: const Key('place_logger_search_field'),
+                              controller: _searchController,
+                              onChanged: _onSearchChanged,
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: colors.textPrimary,
+                              ),
+                              decoration: InputDecoration(
+                                hintText:
+                                    context.l10n.placeLoggerSearchPlaceholder,
+                                hintStyle: TextStyle(
+                                  color: colors.textSecondary.withValues(
+                                    alpha: 0.7,
+                                  ),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.search_rounded,
+                                  color: colors.textSecondary,
+                                ),
+                                suffixIcon: _searchController.text.isNotEmpty
+                                    ? IconButton(
+                                        icon: Icon(
+                                          Icons.cancel_rounded,
+                                          color: colors.textSecondary,
+                                          size: 18.sp,
+                                        ),
+                                        onPressed: () {
+                                          _searchController.clear();
+                                          _onSearchChanged('');
+                                        },
+                                      )
+                                    : (isSearching
+                                          ? Padding(
+                                              padding: EdgeInsets.all(12.w),
+                                              child: SizedBox(
+                                                width: 16.w,
+                                                height: 16.w,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: colors.primary,
+                                                    ),
+                                              ),
+                                            )
+                                          : null),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.w,
+                                  vertical: 14.h,
+                                ),
                               ),
                             ),
-                            prefixIcon: Icon(
-                              Icons.search_rounded,
-                              color: colors.textSecondary,
-                            ),
-                            suffixIcon: _searchController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: Icon(
-                                      Icons.cancel_rounded,
-                                      color: colors.textSecondary,
-                                      size: 18.sp,
-                                    ),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      _onSearchChanged('');
-                                    },
-                                  )
-                                : (isSearching
-                                      ? Padding(
-                                          padding: EdgeInsets.all(12.w),
-                                          child: SizedBox(
-                                            width: 16.w,
-                                            height: 16.w,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: colors.primary,
-                                            ),
-                                          ),
-                                        )
-                                      : null),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16.w,
-                              vertical: 14.h,
-                            ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
 
                       // Search Suggestions Dropdown or Shimmer Loading Skeleton
@@ -2124,6 +2208,76 @@ class _PlaceLoggerScreenState extends State<PlaceLoggerScreen>
                                     size: 18.sp,
                                   ),
                                 ),
+                              ),
+
+                              // Initial Default Place Loading Map Shimmer Overlay
+                              ValueListenableBuilder<bool>(
+                                valueListenable:
+                                    _isInitialLocationLoadingNotifier,
+                                builder: (context, isInitialLoading, _) {
+                                  if (!isInitialLoading) {
+                                    return const SizedBox.shrink();
+                                  }
+
+                                  return Positioned.fill(
+                                    key: const Key('place_logger_map_shimmer'),
+                                    child: WaymarkShimmer(
+                                      child: Container(
+                                        color: const Color(0xFFEBE7DF),
+                                        child: Center(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                width: 52.w,
+                                                height: 52.w,
+                                                decoration: const BoxDecoration(
+                                                  color: Color(0xFFFBF9F5),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  Icons.map_rounded,
+                                                  size: 26.sp,
+                                                  color: const Color(
+                                                    0xFFDDC0BB,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 12.h),
+                                              Container(
+                                                width: 140.w,
+                                                height: 14.h,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(
+                                                    0xFFFBF9F5,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        4.r,
+                                                      ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 6.h),
+                                              Container(
+                                                width: 90.w,
+                                                height: 10.h,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(
+                                                    0xFFFBF9F5,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        3.r,
+                                                      ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),

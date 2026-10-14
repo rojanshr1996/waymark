@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCCgBTAQXlgN5w_uBQPRBGiQFdN6jDgTqk',
-    appId: '1:470529540260:android:074e35e788337102a36631',
+    appId: '1:470529540260:android:73e7fd33d22443cda36631',
     messagingSenderId: '470529540260',
     projectId: 'waymark-264f6',
     storageBucket: 'waymark-264f6.firebasestorage.app',
@@ -59,10 +59,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBlmg6f9u2FMMQ4kIWSUQHJrN_775CqPUc',
-    appId: '1:470529540260:ios:b4d6bb7fe30e121ea36631',
+    appId: '1:470529540260:ios:6d01fccc3a0038e7a36631',
     messagingSenderId: '470529540260',
     projectId: 'waymark-264f6',
     storageBucket: 'waymark-264f6.firebasestorage.app',
-    iosBundleId: 'com.waymark.app',
+    iosBundleId: 'com.wanderline.app',
   );
 }

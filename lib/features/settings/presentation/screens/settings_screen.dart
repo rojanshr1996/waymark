@@ -12,6 +12,7 @@ import 'package:waymark/core/presentation/widgets/waymark_liquid_glass_app_bar.d
 import 'package:waymark/core/presentation/widgets/waymark_snackbar.dart';
 import 'package:waymark/core/router/route_names.dart';
 import 'package:waymark/core/services/backup_service.dart';
+import 'package:waymark/core/services/remote_config_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:waymark/core/theme/waymark_colors.dart';
 import 'package:waymark/core/theme/waymark_typography.dart';
@@ -187,6 +188,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           _buildMenuTile(
             context,
+            Icons.system_update_rounded,
+            'Check for Updates',
+            'Verify current version against Firebase Remote Config',
+            onTap: () => _handleCheckForUpdates(context),
+          ),
+          _buildDivider(context),
+          _buildMenuTile(
+            context,
             Icons.support_agent_rounded,
             'Help & Support',
             'Contact support and get troubleshooting guidance',
@@ -320,6 +329,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleCheckForUpdates(BuildContext context) async {
+    _isProcessingNotifier.value = true;
+    try {
+      await RemoteConfigService.instance.clearSkippedRecommendedVersion();
+      await RemoteConfigService.instance.fetchAndActivate();
+      final result = await RemoteConfigService.instance.evaluateGate();
+      if (!context.mounted) return;
+
+      if (result.isForceUpdate || result.isRecommendedUpdate) {
+        context.push(AppRoutes.appUpdate, extra: result);
+      } else if (result.isMaintenance) {
+        context.push(AppRoutes.maintenance);
+      } else {
+        WaymarkSnackbar.showSuccess(
+          context,
+          'You are running the latest version of Waymark (v${result.currentVersion}).',
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        WaymarkSnackbar.showError(
+          context,
+          'Unable to check for updates. Please verify your network connection.',
+        );
+      }
+    } finally {
+      if (mounted) {
+        _isProcessingNotifier.value = false;
+      }
+    }
   }
 
   Future<void> _handleManualBackup() async {
